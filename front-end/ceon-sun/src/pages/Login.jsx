@@ -46,7 +46,7 @@ function Login() {
             // 로그인 성공시 페이지 이동
             // 추가 정보 입력X -> 추가 정보 입력 페이지
             // 추가 정보 입력O -> 메인페이지지
-            navigate("/SignUp");
+            navigate("/signup");
           }
         })
         .catch((err) => {
