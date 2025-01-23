@@ -1,0 +1,19 @@
+# 초기 버전
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: chunsun-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_USER: chunsun
+      MYSQL_PASSWORD: chunsun
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./init-db:/docker-entrypoint-initdb.d
+      - mysql_data:/var/lib/mysql
+    command:
+      --skip-character-set-client-handshake
+volumes:
+  mysql_data:
