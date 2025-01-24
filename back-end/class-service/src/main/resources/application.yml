@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: class-service
+
+server:
+  port: 8086
+
+
