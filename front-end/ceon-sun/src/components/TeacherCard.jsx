@@ -4,7 +4,7 @@ function TeacherCard({
   // 항상 표시될 정보
   nickname,
   subjects = [],
-  profileImageUrl = "",
+  profileImage = "",
 
   // 선택적으로 표시할 정보들
   showDetail = false, // "자세히 보기" 텍스트 표시 여부
@@ -12,16 +12,16 @@ function TeacherCard({
   age = null,
   showGender = false,
   gender = "",
-  showRemainingLessons = false,
-  remainingLessonsCount = 0,
-  showEnterClassroomButton = false,
-  enterClassroomButtonOnTop = false, // true면 상단, false면 하단
+  showRemainLessons = false,
+  remainLessonsCnt = 0,
+  showClassroomButton = false,
+  classroomButtonOnTop = false, // true면 상단, false면 하단
   showPaymentButton = false,
 }) {
   // 하단 영역(구분선 아래)을 표시해야 하는지 여부
-  const isBottomAreaVisible =
-    showRemainingLessons ||
-    (showEnterClassroomButton && !enterClassroomButtonOnTop) ||
+  const bottomVisible =
+    showRemainLessons ||
+    (showClassroomButton && !classroomButtonOnTop) ||
     showPaymentButton;
 
   // 나이+성별이 둘 다 공개된 경우 => w-16 h-16, 그렇지 않으면 기본 w-20 h-20
@@ -53,9 +53,9 @@ function TeacherCard({
             overflow-hidden
           `}
         >
-          {profileImageUrl && (
+          {profileImage && (
             <img
-              src={profileImageUrl}
+              src={profileImage}
               alt="profile"
               className="w-full h-full object-cover"
             />
@@ -116,7 +116,7 @@ function TeacherCard({
               </span>
             </div>
             {/* 상단 수업방 버튼 (옵션) */}
-            {enterClassroomButtonOnTop && showEnterClassroomButton && (
+            {classroomButtonOnTop && showClassroomButton && (
               <button
                 className="
                   whitespace-nowrap
@@ -137,22 +137,22 @@ function TeacherCard({
       </div>
 
       {/* 구분선 + 하단 영역 (필요 시) */}
-      {isBottomAreaVisible && (
+      {bottomVisible && (
         <>
           <div className="mt-4 mx-1 border-t border-gray-300" />
           <div className="mt-3 flex justify-between items-center">
             {/* 잔여 수업 횟수 (0이어도 표시) */}
-            {showRemainingLessons && (
+            {showRemainLessons && (
               <span className="text-sm text-gray-500 whitespace-nowrap">
                 잔여 수업 횟수 :{" "}
                 <span className="text-gray-600 font-bold">
-                  {remainingLessonsCount}
+                  {remainLessonsCnt}
                 </span>
               </span>
             )}
             <div className="flex space-x-2">
               {/* 하단 수업방 접속 버튼 */}
-              {!enterClassroomButtonOnTop && showEnterClassroomButton && (
+              {!classroomButtonOnTop && showClassroomButton && (
                 <button
                   className="
                     whitespace-nowrap
