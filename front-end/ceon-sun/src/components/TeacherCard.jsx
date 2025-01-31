@@ -37,7 +37,6 @@ function TeacherCard({
         rounded-md
         p-4
         shadow-[0_2px_8px_rgba(0,0,0,0.1)]
-        w-[450px]
       "
     >
       {/* 상단 영역 */}

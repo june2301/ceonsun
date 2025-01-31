@@ -4,8 +4,8 @@ import logo from "../assets/img/logo.png";
 
 const Header = () => {
   return (
-    <div className="fixed top-0 w-full bg-gray-100 shadow-md z-50">
-      <div className="max-w-[60%] mx-auto flex items-center justify-between h-24 px-4">
+    <div className="w-full bg-gray-100 shadow-md">
+      <div className="max-w-[940px] mx-auto flex items-center justify-between h-24 px-4">
         {/* 로고 */}
         <div className="flex items-center">
           <Link to="/mainpage" className="flex items-center">
