@@ -2,7 +2,7 @@ import React from "react";
 
 const PromotionLink = () => {
   return (
-    <div className="bg-blue-100 w-full py-4">
+    <div className="bg-blue-100 w-full py-4 mb-6">
       <div className="max-w-screen-xl mx-auto px-4">
         {/* 콘텐츠를 60% 영역으로 제한 */}
         <div className="max-w-[60%] mx-auto text-center">
