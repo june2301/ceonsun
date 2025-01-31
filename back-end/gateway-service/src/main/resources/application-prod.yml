@@ -1,0 +1,57 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: gateway-service
+  cloud:
+    gateway:
+      routes:
+        - id: auth-service
+          uri: http://auth-service:8081
+          predicates:
+            - Path=/auth-service/**
+          filters:
+            - RewritePath=/auth-service/(?<segment>.*), /$\{segment}
+
+        - id: member-service
+          uri: http://member-service:8082
+          predicates:
+            - Path=/member-service/**
+          filters:
+            - RewritePath=/member-service/(?<segment>.*), /$\{segment}
+
+        - id: coupon-service
+          uri: http://coupon-service:8083
+          predicates:
+            - Path=/coupon-service/**
+          filters:
+            - RewritePath=/coupon-service/(?<segment>.*), /$\{segment}
+
+        - id: rank-service
+          uri: http://rank-service:8084
+          predicates:
+            - Path=/rank-service/**
+          filters:
+            - RewritePath=/rank-service/(?<segment>.*), /$\{segment}
+
+        - id: payment-service
+          uri: http://payment-service:8085
+          predicates:
+            - Path=/payment-service/**
+          filters:
+            - RewritePath=/payment-service/(?<segment>.*), /$\{segment}
+
+        - id: class-service
+          uri: http://class-service:8086
+          predicates:
+            - Path=/class-service/**
+          filters:
+            - RewritePath=/class-service/(?<segment>.*), /$\{segment}
+
+        - id: chat-service
+          uri: http://chat-service:8087
+          predicates:
+            - Path=/chat-service/**
+          filters:
+            - RewritePath=/chat-service/(?<segment>.*), /$\{segment}

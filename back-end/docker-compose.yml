@@ -1,5 +1,64 @@
 # 초기 버전
 services:
+  gateway-service:
+    build:
+      context: ./gateway-service
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    networks:
+      - msa-network
+
+  auth-service:
+    build:
+      context: ./auth-service
+      dockerfile: Dockerfile
+    networks:
+      - msa-network
+
+  member-service:
+    build:
+      context: ./member-service
+      dockerfile: Dockerfile
+    networks:
+      - msa-network
+
+  coupon-service:
+    build:
+      context: ./coupon-service
+      dockerfile: Dockerfile
+    networks:
+      - msa-network
+
+  rank-service:
+    build:
+      context: ./rank-service
+      dockerfile: Dockerfile
+    networks:
+      - msa-network
+
+  payment-service:
+    build:
+      context: ./payment-service
+      dockerfile: Dockerfile
+    networks:
+      - msa-network
+
+  class-service:
+    build:
+      context: ./class-service
+      dockerfile: Dockerfile
+    networks:
+      - msa-network
+
+  chat-service:
+    build:
+      context: ./chat-service
+      dockerfile: Dockerfile
+    networks:
+      - msa-network
+
+
   mysql:
     image: mysql:8.0
     container_name: chunsun-db
@@ -17,3 +76,7 @@ services:
       --skip-character-set-client-handshake
 volumes:
   mysql_data:
+
+networks:
+  msa-network:
+    driver: bridge
