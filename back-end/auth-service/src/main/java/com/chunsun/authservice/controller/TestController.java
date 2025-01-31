@@ -1,4 +1,4 @@
-package com.chunsun.rankservice.controller;
+package com.chunsun.authservice.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -7,6 +7,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class TestController {
 	@GetMapping
 	public String test() {
-		return "rank-service";
+		return "auth-service";
 	}
 }
