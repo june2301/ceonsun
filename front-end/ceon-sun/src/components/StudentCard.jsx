@@ -11,8 +11,6 @@ function StudentCard({
 
   // "자세히 보기" 표시 여부
   showDetail = false,
-
-  // 하단 영역 표시 여부들
   showRemainLessons = false,
   remainLessonsCnt = 0,
   showClassroomButton = false, // "수업방 접속"
@@ -74,12 +72,10 @@ function StudentCard({
         <div className="flex flex-col w-full">
           {/* 1) [닉네임 : xxx] + [상태] 같은 줄 */}
           <div className="mt-1 flex items-center justify-between">
-            {/* 닉네임 영역 */}
             <div>
               <span className="text-gray-600">닉네임 : </span>
               <span className="font-bold text-gray-600">{nickname}</span>
             </div>
-            {/* 우측 상태 표시 */}
             {studentStatus && (
               <span className="text-sm font-semibold" style={statusStyle}>
                 {studentStatus}
@@ -89,7 +85,14 @@ function StudentCard({
 
           {/* 2) [희망 과목 : xxx] + [자세히 보기] 같은 줄 */}
           <div className="mt-2.5 flex items-center justify-between text-sm text-gray-500">
-            <div className="flex items-center flex-1 overflow-hidden whitespace-nowrap">
+            <div
+              className="
+                flex items-center
+                flex-1
+                overflow-hidden
+                whitespace-nowrap
+              "
+            >
               <span className="text-gray-600">희망 과목 : </span>
               <span
                 className="
@@ -99,6 +102,7 @@ function StudentCard({
                   text-ellipsis
                   whitespace-nowrap
                   ml-1
++                 max-w-[180px] 
                 "
               >
                 {subjects.join(", ")}
