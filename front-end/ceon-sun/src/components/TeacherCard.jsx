@@ -96,14 +96,14 @@ function TeacherCard({
           )}
 
           {/* 3) 수업 과목 & 상단 "수업방 접속" (옵션) 같은 라인 */}
-          <div className="mt-0.3 flex items-center justify-between text-sm text-gray-500">
+          <div className="mt-0.5 flex items-center justify-between text-sm text-gray-500">
             {/* 과목 영역 */}
             <div className="overflow-hidden whitespace-nowrap text-ellipsis flex-1 mr-2">
               <span className="text-gray-600 align-middle">수업 과목 : </span>
               <span
                 className="
                   inline-block
-                  max-w-[130px]
+                  max-w-[180px]
                   align-middle
                   overflow-hidden
                   whitespace-nowrap

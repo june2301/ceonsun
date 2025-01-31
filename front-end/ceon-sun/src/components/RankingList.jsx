@@ -9,7 +9,7 @@ function RankingList({ rankingData = [] }) {
   const rightList = rankingData.slice(3, 6);
 
   return (
-    <section className="mb-8 max-w-[920px] mx-auto px-2">
+    <section className="mb-8 max-w-[920px] mx-auto px-2 pb-12">
       {/* 제목 + 랭킹 설명 */}
       <div className="flex items-center mb-3">
         <h2 className="text-lg font-semibold mr-2">선생님 랭킹</h2>
