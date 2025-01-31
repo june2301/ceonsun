@@ -4,7 +4,7 @@ function StudentCard({
   // 항상 표시될 정보
   nickname,
   subjects = [],
-  profileImageUrl = "",
+  profileImage = "",
 
   // 상태: "신청중", "과외중", "과외 종료"
   studentStatus = "",
@@ -13,16 +13,16 @@ function StudentCard({
   showDetail = false,
 
   // 하단 영역 표시 여부들
-  showRemainingLessons = false,
-  remainingLessonsCount = 0,
-  showEnterClassroomButton = false, // "수업방 접속"
+  showRemainLessons = false,
+  remainLessonsCnt = 0,
+  showClassroomButton = false, // "수업방 접속"
   showAcceptButton = false, // "수락하기"
   showRejectButton = false, // "거절하기"
 }) {
   // 하단 영역(구분선 아래)을 표시해야 하는지 여부
-  const isBottomAreaVisible =
-    showRemainingLessons ||
-    showEnterClassroomButton ||
+  const bottomVisible =
+    showRemainLessons ||
+    showClassroomButton ||
     showAcceptButton ||
     showRejectButton;
 
@@ -63,9 +63,9 @@ function StudentCard({
             overflow-hidden
           "
         >
-          {profileImageUrl && (
+          {profileImage && (
             <img
-              src={profileImageUrl}
+              src={profileImage}
               alt="profile"
               className="w-full h-full object-cover"
             />
@@ -116,16 +116,16 @@ function StudentCard({
       </div>
 
       {/* 구분선 + 하단 영역 (필요 시) */}
-      {isBottomAreaVisible && (
+      {bottomVisible && (
         <>
           <div className="mt-4 mx-1 border-t border-gray-300" />
           <div className="mt-3 flex justify-between items-center">
             {/* 잔여 수업 횟수 (0이어도 표시) */}
-            {showRemainingLessons && (
+            {showRemainLessons && (
               <span className="text-sm text-gray-500 whitespace-nowrap">
                 잔여 수업 횟수 :{" "}
                 <span className="text-gray-600 font-bold">
-                  {remainingLessonsCount}
+                  {remainLessonsCnt}
                 </span>
               </span>
             )}
@@ -133,7 +133,7 @@ function StudentCard({
             {/* 버튼들 (오른쪽 정렬) */}
             <div className="flex space-x-2">
               {/* 수업방 접속 */}
-              {showEnterClassroomButton && (
+              {showClassroomButton && (
                 <button
                   className="
                     whitespace-nowrap
