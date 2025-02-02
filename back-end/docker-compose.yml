@@ -67,11 +67,13 @@ services:
       MYSQL_ROOT_PASSWORD: 1234
       MYSQL_USER: chunsun
       MYSQL_PASSWORD: chunsun
+      MYSQL_DATABASE : mydatabase # 임시 추가
     ports:
       - "3306:3306"
     volumes:
       - ./db/init-mysql:/docker-entrypoint-initdb.d
       - mysql_data:/var/lib/mysql
+      - ./db/my.cnf:/etc/mysql/conf.d/my.cnf  # 임시추가
     command:
       --skip-character-set-client-handshake
 volumes:
