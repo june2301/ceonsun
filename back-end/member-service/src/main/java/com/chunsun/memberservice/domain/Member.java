@@ -80,6 +80,7 @@ public class Member {
 	public void updateInfo(String nickname, String profileImage) {
 		this.nickname = nickname;
 		this.profileImage = profileImage;
+		updatedAt = LocalDateTime.now();
 	}
 
 	public void delete() {
