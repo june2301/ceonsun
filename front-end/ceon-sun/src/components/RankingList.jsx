@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import DefaultProfile from "@/assets/img/default-profile.png";
 
 function RankingList({ rankingData = [] }) {
   // 랭킹 설명 팝업 표시 여부
@@ -115,26 +116,17 @@ function RankingList({ rankingData = [] }) {
 // 각 항목(프로필 + 닉네임 + 랭킹 수치)
 function RankingItem({ rankNumber, profileImage, nickname, rankScore }) {
   return (
-    <div
-      className="
-        w-[420px]
-        flex items-center
-        p-2
-        bg-white
-      "
-    >
+    <div className="w-[420px] flex items-center p-2 bg-white">
       {/* 랭킹 번호 */}
       <span className="text-sm text-gray-600 ml-4 mr-2">{rankNumber}.</span>
 
       {/* 프로필 */}
-      <div className="w-10 h-10 bg-gray-100 rounded-md overflow-hidden mr-2 flex-shrink-0">
-        {profileImage && (
-          <img
-            src={profileImage}
-            alt="profile"
-            className="object-cover w-full h-full"
-          />
-        )}
+      <div className="w-10 h-10 bg-white border border-gray-300 rounded-md overflow-hidden mr-2 flex-shrink-0">
+        <img
+          src={profileImage || DefaultProfile}
+          alt="profile"
+          className="object-cover w-full h-full"
+        />
       </div>
 
       {/* 닉네임 (가운데 정렬) */}

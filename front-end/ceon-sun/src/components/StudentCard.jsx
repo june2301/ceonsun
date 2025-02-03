@@ -1,4 +1,6 @@
 import React from "react";
+import { ArrowDownIcon } from "@heroicons/react/24/solid";
+import DefaultProfile from "@/assets/img/default-profile.png";
 
 function StudentCard({
   // 항상 표시될 정보
@@ -16,6 +18,7 @@ function StudentCard({
   showClassroomButton = false, // "수업방 접속"
   showAcceptButton = false, // "수락하기"
   showRejectButton = false, // "거절하기"
+  onDetailClick, // "자세히 보기" 버튼 클릭 시 호출할 함수
 }) {
   // 하단 영역(구분선 아래)을 표시해야 하는지 여부
   const bottomVisible =
@@ -39,34 +42,27 @@ function StudentCard({
   })();
 
   return (
-    <div
-      className="
-        bg-white
-        rounded-md
-        p-4
-        shadow-[0_2px_8px_rgba(0,0,0,0.1)]
-      "
-    >
+    <div className="bg-white rounded-md p-4 shadow-[0_2px_8px_rgba(0,0,0,0.1)]">
       {/* 상단 영역 */}
       <div className="flex items-start">
         {/* 프로필 이미지 */}
         <div
           className="
             w-16 h-16
-            bg-gray-100
+            bg-white
             rounded-md
             mr-4
             flex-shrink-0
             overflow-hidden
+            border
+            border-gray-300
           "
         >
-          {profileImage && (
-            <img
-              src={profileImage}
-              alt="profile"
-              className="w-full h-full object-cover"
-            />
-          )}
+          <img
+            src={profileImage || DefaultProfile}
+            alt="profile"
+            className="w-full h-full object-cover"
+          />
         </div>
 
         <div className="flex flex-col w-full">
@@ -96,13 +92,14 @@ function StudentCard({
               <span className="text-gray-600">희망 과목 : </span>
               <span
                 className="
-                  font-bold
-                  text-gray-600
-                  overflow-hidden
-                  text-ellipsis
-                  whitespace-nowrap
+                  inline-block
+                  max-w-[180px]
                   ml-1
-+                 max-w-[180px] 
+                  align-middle
+                  overflow-hidden
+                  whitespace-nowrap
+                  text-ellipsis
+                  font-bold text-gray-600
                 "
               >
                 {subjects.join(", ")}
@@ -110,8 +107,12 @@ function StudentCard({
             </div>
             {/* 자세히 보기 버튼 */}
             {showDetail && (
-              <span className="font-semibold text-sm text-gray-600 cursor-pointer">
+              <span
+                className="flex items-center font-semibold text-sm text-gray-600 cursor-pointer"
+                onClick={() => onDetailClick && onDetailClick()}
+              >
                 자세히 보기
+                <ArrowDownIcon className="w-4 h-4 ml-1" />
               </span>
             )}
           </div>

@@ -1,4 +1,6 @@
 import React from "react";
+import { ArrowRightIcon } from "@heroicons/react/24/solid";
+import DefaultProfile from "@/assets/img/default-profile.png";
 
 function TeacherCard({
   // 항상 표시될 정보
@@ -17,6 +19,7 @@ function TeacherCard({
   showClassroomButton = false,
   classroomButtonOnTop = false, // true면 상단, false면 하단
   showPaymentButton = false,
+  onDetailClick, // "자세히 보기" 버튼 클릭 시 호출할 함수
 }) {
   // 하단 영역(구분선 아래)을 표시해야 하는지 여부
   const bottomVisible =
@@ -24,78 +27,73 @@ function TeacherCard({
     (showClassroomButton && !classroomButtonOnTop) ||
     showPaymentButton;
 
-  // 나이+성별이 둘 다 공개된 경우 => w-16 h-16, 그렇지 않으면 기본 w-20 h-20
+  // 나이+성별이 둘 다 공개된 경우 => w-20 h-20, 그렇지 않으면 기본 w-16 h-16
   const profileSizeClass =
     showAge && age !== null && showGender && gender !== ""
       ? "w-20 h-20"
       : "w-16 h-16";
 
   return (
-    <div
-      className="
-        bg-white
-        rounded-md
-        p-4
-        shadow-[0_2px_8px_rgba(0,0,0,0.1)]
-      "
-    >
+    <div className="bg-white rounded-md p-4 shadow-[0_2px_8px_rgba(0,0,0,0.1)]">
       {/* 상단 영역 */}
       <div className="flex items-start">
         {/* 프로필 이미지 */}
         <div
           className={`
             ${profileSizeClass}
-            bg-gray-100
+            bg-white
             rounded-md
             mr-4
             flex-shrink-0
             overflow-hidden
+            border
+            border-gray-300
           `}
         >
-          {profileImage && (
-            <img
-              src={profileImage}
-              alt="profile"
-              className="w-full h-full object-cover"
-            />
-          )}
+          <img
+            src={profileImage || DefaultProfile}
+            alt="profile"
+            className="w-full h-full object-cover"
+          />
         </div>
 
         <div className="flex flex-col w-full">
-          {/* 1) 닉네임 & 자세히 보기 */}
+          {/* 닉네임 & 자세히 보기 */}
           <div className="mt-0.5 mb-1 flex items-center justify-between">
             <div>
               <span className="text-gray-600">닉네임 : </span>
               <span className="font-bold text-gray-600">{nickname}</span>
             </div>
             {showDetail && (
-              <span className="font-semibold text-sm text-gray-600 cursor-pointer">
+              <span
+                className="flex items-center font-semibold text-sm text-gray-600 cursor-pointer"
+                onClick={() => onDetailClick && onDetailClick()}
+              >
                 자세히 보기
+                <ArrowRightIcon className="w-4 h-4 ml-1" />
               </span>
             )}
           </div>
 
-          {/* 2) 나이 / 성별 (옵션) */}
+          {/* 나이 / 성별 (옵션) */}
           {(showAge || showGender) && (
             <div className="mt-0.5 text-sm text-gray-500 mb-1">
               {showAge && age !== null && (
                 <span className="mr-4">
                   <span className="text-gray-600">나이 : </span>
-                  {/* 실제 나이만 진한 글씨 */}
                   <span className="text-gray-600 font-bold">{age}</span>
                 </span>
               )}
               {showGender && gender && (
                 <span>
                   <span className="text-gray-600">성별 : </span>
-                  {/* 실제 성별만 진한 글씨 */}
                   <span className="text-gray-600 font-bold">{gender}</span>
                 </span>
               )}
             </div>
           )}
 
-          {/* 3) 수업 과목 & 상단 "수업방 접속" (옵션) 같은 라인 */}
+          {/* 수업 과목 & 상단 "수업방 접속" (옵션) 같은 라인 */}
           <div className="mt-0.5 flex items-center justify-between text-sm text-gray-500">
             {/* 과목 영역 */}
             <div className="overflow-hidden whitespace-nowrap text-ellipsis flex-1 mr-2">

@@ -1,11 +1,13 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import Filter from "../components/Filter";
 import TopBar from "../components/TopBar";
 import CardList from "../components/CardList";
 
 function CardListPage() {
-  const userRole = "student"; // "student" 또는 "teacher"
+  const navigate = useNavigate();
+  const userRole = "teacher"; // "student" 또는 "teacher"
 
   // TopBar 메뉴 항목 (학생이 "선생님 리스트" 볼 때만 사용)
   const topBarItems = ["선생님 목록", "찜한 선생님", "선생님 랭킹"];
@@ -14,18 +16,21 @@ function CardListPage() {
   // 1) 선생님 카드 리스트를 보여줄 때 쓸 예시 데이터들
   const allTeachers = [
     {
+      profileImage: "",
       nickname: "선선선",
       age: 29,
       gender: "남자",
       subjects: ["Python", "Java", "JavaScript"],
     },
     {
+      profileImage: "",
       nickname: "선생님B",
       age: 35,
       gender: "여자",
       subjects: ["C++", "JavaScript"],
     },
     {
+      profileImage: "",
       nickname: "선생님C",
       age: 35,
       gender: "여자",
@@ -34,6 +39,7 @@ function CardListPage() {
   ];
   const favoriteTeachers = [
     {
+      profileImage: "",
       nickname: "선생님Z",
       age: 33,
       gender: "여자",
@@ -42,12 +48,14 @@ function CardListPage() {
   ];
   const rankingTeachers = [
     {
+      profileImage: "",
       nickname: "선생님Rank1",
       age: 38,
       gender: "여자",
       subjects: ["Python", "Flask", "Django"],
     },
     {
+      profileImage: "",
       nickname: "선생님Rank2",
       age: 50,
       gender: "남자",
@@ -94,6 +102,18 @@ function CardListPage() {
     currentList = studentList;
   }
 
+  // 선생카드에서 "자세히 보기" 클릭 시 TeacherDetail 페이지로 이동하는 함수
+  const handleListDetail = (cardData) => {
+    navigate("/teacherdetail", { state: { teacher: cardData } });
+  };
+
+  // 학생카드에서 "자세히 보기" 클릭 시 해당 카드가 확장되도록 처리하는 함수
+  const [expandedStudentIndex, setExpandedStudentIndex] = useState(null);
+  const handleStudentDetail = (cardData, index) => {
+    setExpandedStudentIndex((prevIndex) =>
+      prevIndex === index ? null : index,
+    );
+  };
   return (
     <div className="h-screen w-full flex flex-col overflow-hidden">
       <Header />
@@ -120,8 +140,22 @@ function CardListPage() {
 
           {/* CardList (세로 스크롤) */}
           <div className="flex-1 overflow-y-auto pt-2 pb-6 px-2 list-scrollbar">
-            {/* type="teacher" 또는 "student"로 카드 종류를 구분 */}
-            <CardList type={cardType} cards={currentList} />
+            {cardType === "teacher" ? (
+              <CardList
+                type={cardType}
+                cards={currentList}
+                onDetailClick={(cardData) => handleListDetail(cardData)}
+              />
+            ) : (
+              <CardList
+                type={cardType}
+                cards={currentList}
+                onDetailClick={(cardData, idx) =>
+                  handleStudentDetail(cardData, idx)
+                }
+                expandedStudentIndex={expandedStudentIndex}
+              />
+            )}
           </div>
         </div>
       </div>
