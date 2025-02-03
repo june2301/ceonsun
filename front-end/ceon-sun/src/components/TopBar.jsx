@@ -11,7 +11,10 @@ function TopBar({
         // 현재 인덱스와 selectedIndex 비교
         const isSelected = idx === selectedIndex;
         return (
-          <div key={idx} className="flex-1 flex items-center justify-center">
+          <div
+            key={idx}
+            className="flex-1 flex items-center justify-center pb-2"
+          >
             <button
               onClick={() => onSelectItem(idx)}
               className={`
@@ -25,7 +28,7 @@ function TopBar({
             </button>
             {/* 세로 구분선 (마지막 버튼 제외) */}
             {idx < menuItems.length - 1 && (
-              <div className="w-[2px] h-5 bg-gray-300" />
+              <div className="w-[2px] h-8 bg-gray-300" />
             )}
           </div>
         );

@@ -15,10 +15,16 @@ const Header = () => {
 
         {/* 메뉴 */}
         <div className="flex gap-6">
-          <Link to="#" className="text-lg text-gray-700 hover:text-blue-500">
+          <Link
+            to="/cardlistpage"
+            className="text-lg text-gray-700 hover:text-blue-500"
+          >
             선생님 목록
           </Link>
-          <Link to="#" className="text-lg text-gray-700 hover:text-blue-500">
+          <Link
+            to="/cardlistpage"
+            className="text-lg text-gray-700 hover:text-blue-500"
+          >
             학생 목록
           </Link>
           <Link to="#" className="text-lg text-gray-700 hover:text-blue-500">
