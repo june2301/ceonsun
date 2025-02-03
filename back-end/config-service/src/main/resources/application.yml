@@ -23,7 +23,7 @@ spring:
           uri: https://lab.ssafy.com/s12-webmobile1-sub1/S12P11A505.git
           username: '{cipher}9c3816d963a7730199ec2d6ed6207b3b81a45388a722bc519af31ec988788121'
           password: '{cipher}4ca78ec85be15b78a7c42538bc122c285f4d7d1be85fb84c2c82ccb1c5146dc5a83b0a6ddb92e1fa2cb97316de96db1c'
-          default-label: feature/62
+          default-label: BE-master
           searchPaths: back-end/yml-directory
 
 encrypt:
