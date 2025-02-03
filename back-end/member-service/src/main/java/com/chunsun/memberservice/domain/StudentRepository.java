@@ -1,4 +1,7 @@
 package com.chunsun.memberservice.domain;
 
-public interface StudentRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface StudentRepository extends JpaRepository<Student, Long> {
+
 }
