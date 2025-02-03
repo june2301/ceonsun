@@ -11,41 +11,33 @@ spring:
           uri: http://localhost:8081
           predicates:
             - Path=/auth-service/**
-          filters:
-            - RewritePath=/auth-service/(?<segment>.*), /$\{segment}
+
         - id: member-service
           uri: http://localhost:8082
           predicates:
             - Path=/member-service/**
-          filters:
-            - RewritePath=/member-service/(?<segment>.*), /$\{segment}
+
         - id: coupon-service
           uri: http://localhost:8083
           predicates:
             - Path=/coupon-service/**
-          filters:
-            - RewritePath=/coupon-service/(?<segment>.*), /$\{segment}
+
         - id: rank-service
           uri: http://localhost:8084
           predicates:
             - Path=/rank-service/**
-          filters:
-            - RewritePath=/rank-service/(?<segment>.*), /$\{segment}
+
         - id: payment-service
           uri: http://localhost:8085
           predicates:
             - Path=/payment-service/**
-          filters:
-            - RewritePath=/payment-service/(?<segment>.*), /$\{segment}
+
         - id: class-service
           uri: http://localhost:8086
           predicates:
             - Path=/class-service/**
-          filters:
-            - RewritePath=/class-service/(?<segment>.*), /$\{segment}
+
         - id: chat-service
           uri: http://localhost:8087
           predicates:
             - Path=/chat-service/**
-          filters:
-            - RewritePath=/chat-service/(?<segment>.*), /$\{segment}

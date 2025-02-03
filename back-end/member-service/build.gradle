@@ -27,6 +27,3 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
 }
-bootJar {
-    archiveFileName = 'member-service.jar'
-}
