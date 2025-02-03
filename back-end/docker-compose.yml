@@ -1,88 +1,10 @@
 services:
-  gateway-service:
-    build:
-      context: ./gateway-service
-      dockerfile: Dockerfile
-    ports:
-      - "8080:8080"
-    networks:
-      - chunsun-network
-
-  auth-service:
-    build:
-      context: ./auth-service
-      dockerfile: Dockerfile
-    networks:
-      - chunsun-network
-    depends_on:
-      chunsun-db:
-        condition: service_healthy
-
-  member-service:
-    build:
-      context: ./member-service
-      dockerfile: Dockerfile
-    networks:
-      - chunsun-network
-    depends_on:
-      chunsun-db:
-        condition: service_healthy
-
-  coupon-service:
-    build:
-      context: ./coupon-service
-      dockerfile: Dockerfile
-    networks:
-      - chunsun-network
-    depends_on:
-      chunsun-db:
-        condition: service_healthy
-
-  rank-service:
-    build:
-      context: ./rank-service
-      dockerfile: Dockerfile
-    networks:
-      - chunsun-network
-    depends_on:
-      chunsun-db:
-        condition: service_healthy
-
-  payment-service:
-    build:
-      context: ./payment-service
-      dockerfile: Dockerfile
-    networks:
-      - chunsun-network
-    depends_on:
-      chunsun-db:
-        condition: service_healthy
-
-  class-service:
-    build:
-      context: ./class-service
-      dockerfile: Dockerfile
-    networks:
-      - chunsun-network
-    depends_on:
-      chunsun-db:
-        condition: service_healthy
-
-  chat-service:
-    build:
-      context: ./chat-service
-      dockerfile: Dockerfile
-    networks:
-      - chunsun-network
-    depends_on:
-      chunsun-db:
-        condition: service_healthy
-
-  chunsun-db:
+  mysql:
     image: mysql:8.0
+    container_name: chunsun-db
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_ROOT_PASSWORD: "1234"
       MYSQL_USER: chunsun
       MYSQL_PASSWORD: chunsun
     ports:
@@ -90,16 +12,202 @@ services:
     volumes:
       - ./db/init-mysql:/docker-entrypoint-initdb.d
       - mysql_data:/var/lib/mysql
-    command:
-      --skip-character-set-client-handshake
+    command: --skip-character-set-client-handshake
     networks:
       - chunsun-network
     healthcheck:
-      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
       timeout: 5s
       retries: 5
 
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    restart: always
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - chunsun-network
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  config-service:
+    container_name: config-service
+    build:
+      context: ./config-service
+      dockerfile: Dockerfile
+    ports:
+      - "8888:8888"
+    environment:
+      spring.rabbitmq.host: rabbitmq
+    networks:
+      - chunsun-network
+    depends_on:
+      - rabbitmq
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8888/actuator/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  discovery-service:
+    container_name: discovery-service
+    build:
+      context: ./discovery-service
+      dockerfile: Dockerfile
+    ports:
+      - "8761:8761"
+    networks:
+      - chunsun-network
+    depends_on:
+      - config-service
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8761/actuator/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  gateway-service:
+    container_name: gateway-service
+    build:
+      context: ./gateway-service
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      spring.rabbitmq.host: rabbitmq
+      spring.cloud.config.uri: http://config-service:8888
+      eureka.client.serviceUrl.defaultZone: http://discovery-service:8761/eureka/
+    networks:
+      - chunsun-network
+    depends_on:
+      - config-service
+      - discovery-service
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/actuator/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  auth-service:
+    container_name: auth-service
+    build:
+      context: ./auth-service
+      dockerfile: Dockerfile
+    environment:
+      spring.rabbitmq.host: rabbitmq
+      spring.cloud.config.uri: http://config-service:8888
+      eureka.client.serviceUrl.defaultZone: http://discovery-service:8761/eureka/
+    networks:
+      - chunsun-network
+    depends_on:
+      - config-service
+      - discovery-service
+      - gateway-service
+
+  member-service:
+    container_name: member-service
+    build:
+      context: ./member-service
+      dockerfile: Dockerfile
+    environment:
+      spring.rabbitmq.host: rabbitmq
+      spring.cloud.config.uri: http://config-service:8888
+      eureka.client.serviceUrl.defaultZone: http://discovery-service:8761/eureka/
+    networks:
+      - chunsun-network
+    depends_on:
+      - config-service
+      - discovery-service
+      - gateway-service
+
+  coupon-service:
+    container_name: coupon-service
+    build:
+      context: ./coupon-service
+      dockerfile: Dockerfile
+    environment:
+      spring.rabbitmq.host: rabbitmq
+      spring.cloud.config.uri: http://config-service:8888
+      eureka.client.serviceUrl.defaultZone: http://discovery-service:8761/eureka/
+    networks:
+      - chunsun-network
+    depends_on:
+      - config-service
+      - discovery-service
+      - gateway-service
+
+  rank-service:
+    container_name: rank-service
+    build:
+      context: ./rank-service
+      dockerfile: Dockerfile
+    environment:
+      spring.rabbitmq.host: rabbitmq
+      spring.cloud.config.uri: http://config-service:8888
+      eureka.client.serviceUrl.defaultZone: http://discovery-service:8761/eureka/
+    networks:
+      - chunsun-network
+    depends_on:
+      - config-service
+      - discovery-service
+      - gateway-service
+
+  payment-service:
+    container_name: payment-service
+    build:
+      context: ./payment-service
+      dockerfile: Dockerfile
+    environment:
+      spring.rabbitmq.host: rabbitmq
+      spring.cloud.config.uri: http://config-service:8888
+      eureka.client.serviceUrl.defaultZone: http://discovery-service:8761/eureka/
+    networks:
+      - chunsun-network
+    depends_on:
+      - config-service
+      - discovery-service
+      - gateway-service
+
+  class-service:
+    container_name: class-service
+    build:
+      context: ./class-service
+      dockerfile: Dockerfile
+    environment:
+      spring.rabbitmq.host: rabbitmq
+      spring.cloud.config.uri: http://config-service:8888
+      eureka.client.serviceUrl.defaultZone: http://discovery-service:8761/eureka/
+    networks:
+      - chunsun-network
+    depends_on:
+      - config-service
+      - discovery-service
+      - gateway-service
+
+  chat-service:
+    container_name: chat-service
+    build:
+      context: ./chat-service
+      dockerfile: Dockerfile
+    environment:
+      spring.rabbitmq.host: rabbitmq
+      spring.cloud.config.uri: http://config-service:8888
+      eureka.client.serviceUrl.defaultZone: http://discovery-service:8761/eureka/
+    networks:
+      - chunsun-network
+    depends_on:
+      - config-service
+      - discovery-service
+      - gateway-service
 
 volumes:
   mysql_data:

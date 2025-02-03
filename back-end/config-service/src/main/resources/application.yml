@@ -1,0 +1,36 @@
+server:
+  port: 8888
+
+spring:
+  application:
+    name: config-service
+
+  rabbitmq:
+    host: 127.0.0.1
+    port: 5672
+    username: guest
+    password: guest
+  #    username: '{cipher}ac0d4fda7d75b7332ec46bdbc84c93ce47980011cf86d88e7e160b61b6a5d1c0'
+  #    password: '{cipher}ac0d4fda7d75b7332ec46bdbc84c93ce47980011cf86d88e7e160b61b6a5d1c0'
+  #    username: '{cipher}d79ddeb52eabe7f2a656753d8e65089861e6f273afb8aa2577aa08082cc0a118'
+  #    password: '{cipher}51552a12ded68918d03a41fecbf3afeeb213926916dc77125b08378a21a66d8e4ba5c9bf2d84603a7e08cc8f2061e91e'
+
+  cloud:
+    config:
+      uri: http://127.0.0.1:8888
+      server:
+        git:
+          uri: https://lab.ssafy.com/s12-webmobile1-sub1/S12P11A505.git
+          username: '{cipher}9c3816d963a7730199ec2d6ed6207b3b81a45388a722bc519af31ec988788121'
+          password: '{cipher}4ca78ec85be15b78a7c42538bc122c285f4d7d1be85fb84c2c82ccb1c5146dc5a83b0a6ddb92e1fa2cb97316de96db1c'
+          default-label: feature/62
+          searchPaths: back-end/yml-directory
+
+encrypt:
+  key: ${ENCRYPT_KEY:my-secret-key-chunsun-moon-kim-um-yu-yun-hwang}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: refresh, health, beans, busrefresh
