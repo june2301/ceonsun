@@ -49,7 +49,7 @@ public class Member {
 
 	private String profileImage;
 
-	private LocalDate birthday;
+	private LocalDate birthdate;
 
 	@Enumerated(EnumType.STRING)
 	private Role role;
@@ -71,6 +71,19 @@ public class Member {
 		this.email = email;
 		this.createdAt = LocalDateTime.now();
 	}
+
+	public void insertInfo(String name, String nickname, LocalDate birthdate, Gender gender) {
+		this.name = name;
+		this.nickname = nickname;
+		this.birthdate = birthdate;
+		this.gender = gender;
+	}
+
+	public void updateInfo(String nickname, String profileImage) {
+		this.nickname = nickname;
+		this.profileImage = profileImage;
+	}
+
 
 	public void delete() {
 		this.deletedAt = LocalDateTime.now();
