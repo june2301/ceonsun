@@ -2,6 +2,8 @@ package com.chunsun.memberservice.domain;
 
 import java.time.LocalDateTime;
 
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import jakarta.persistence.Entity;
@@ -43,7 +45,12 @@ public class Teacher extends Member{
 
 	private int price;
 
-	// createdAt 과 updatedAt은 부모로 부터 상속 받기 때문에 필요 없음.
+	@CreatedDate
+	private LocalDateTime createdAt;
+
+	@LastModifiedDate
+	private LocalDateTime updatedAt;
+
 	private LocalDateTime deletedAt;
 
 }
