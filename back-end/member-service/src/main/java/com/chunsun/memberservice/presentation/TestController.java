@@ -10,8 +10,4 @@ public class TestController {
             return "member-service";
         }
 
-        @GetMapping("members")
-        public String test2() {
-            return "members";
-        }
 }
