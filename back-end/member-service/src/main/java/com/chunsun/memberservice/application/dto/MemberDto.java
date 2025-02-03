@@ -3,27 +3,29 @@ package com.chunsun.memberservice.application.dto;
 import java.time.LocalDate;
 
 import com.chunsun.memberservice.domain.Gender;
+import com.chunsun.memberservice.domain.Role;
 
 public record MemberDto() {
 
-	public record SignUpRequest(
+	public record KaKaoRequest(
 		String kakaoId,
 		String email) {
 	}
 
-	public record SignUpResponse(
-		String message,
-		String token) {
+	public record KaKaoResponse(){
+
 	}
 
-	public record InsertInfoRequest(
+	public record SignUpRequest(
 		String name,
 		String nickname,
 		LocalDate birthdate,
 		Gender gender) {
 	}
 
-	public record InsertInfoResponse() {
+	public record SignUpResponse(
+		String message,
+		String token) {
 	}
 
 	public record UpdateInfoRequest(

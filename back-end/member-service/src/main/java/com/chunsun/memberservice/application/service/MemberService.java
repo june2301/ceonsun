@@ -4,19 +4,20 @@ import com.chunsun.memberservice.application.dto.MemberDto;
 
 public interface MemberService {
 
-	MemberDto.SignUpResponse signUp(MemberDto.SignUpRequest request);
+	MemberDto.SignUpResponse signUp(String kakaoId, String email, MemberDto.SignUpRequest request);
 
 	boolean existsByKakaoId(String kakaoId);
 
 	boolean existsByEmail(String email);
 
-	void deleteMember(int id);
+	void deleteMember(Long id);
 
 	boolean existsByNickname(String nickname);
 
-	MemberDto.InsertInfoResponse insertMemberInfo(int id, MemberDto.InsertInfoRequest request);
+	MemberDto.UpdateInfoResponse updateMemberInfo(Long id, MemberDto.UpdateInfoRequest request);
 
-	MemberDto.UpdateInfoResponse updateMemberInfo(int id, MemberDto.UpdateInfoRequest request);
+	MemberDto.GetInfoResponse getMemberInfo(Long id);
 
-	MemberDto.GetInfoResponse getMemberInfo(int id);
+	boolean isDeleted(String kakaoId);
+
 }

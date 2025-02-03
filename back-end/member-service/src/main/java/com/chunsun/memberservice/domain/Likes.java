@@ -21,7 +21,7 @@ import lombok.NoArgsConstructor;
 public class Likes {
 
 	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int id;
+	private Long id;
 
 	@ManyToOne
 	@JoinColumn(name = "liker_id")

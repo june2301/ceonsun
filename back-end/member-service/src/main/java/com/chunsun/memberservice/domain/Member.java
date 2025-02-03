@@ -34,7 +34,7 @@ import lombok.NoArgsConstructor;
 public class Member {
 
 	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int id;
+	private Long id;
 
 	private String kakaoId;
 
@@ -66,24 +66,21 @@ public class Member {
 	private LocalDateTime deletedAt;
 
 	@Builder
-	public Member(String kakaoId, String email) {
+	public Member(String kakaoId, String email, String name, String nickname, LocalDate birthdate, Role role,Gender gender) {
 		this.kakaoId = kakaoId;
 		this.email = email;
-		this.createdAt = LocalDateTime.now();
-	}
-
-	public void insertInfo(String name, String nickname, LocalDate birthdate, Gender gender) {
 		this.name = name;
 		this.nickname = nickname;
 		this.birthdate = birthdate;
+		this.role = role;
 		this.gender = gender;
+		this.createdAt = LocalDateTime.now();
 	}
 
 	public void updateInfo(String nickname, String profileImage) {
 		this.nickname = nickname;
 		this.profileImage = profileImage;
 	}
-
 
 	public void delete() {
 		this.deletedAt = LocalDateTime.now();

@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import com.chunsun.memberservice.application.dto.MemberDto;
 import com.chunsun.memberservice.domain.Member;
 import com.chunsun.memberservice.domain.MemberRepository;
+import com.chunsun.memberservice.domain.Role;
 
 @Service
 public class MemberServiceImpl implements MemberService {
@@ -17,10 +18,15 @@ public class MemberServiceImpl implements MemberService {
 
 	// 회원 가입
 	@Override
-	public MemberDto.SignUpResponse signUp(MemberDto.SignUpRequest request) {
+	public MemberDto.SignUpResponse signUp(String kakaoId, String email, MemberDto.SignUpRequest request) {
 		Member member = Member.builder()
-			.kakaoId(request.kakaoId())
-			.email(request.email())
+			.kakaoId(kakaoId)
+			.email(email)
+			.name(request.name())
+			.nickname(request.nickname())
+			.birthdate(request.birthdate())
+			.role(Role.NONE)
+			.gender(request.gender())
 			.build();
 		memberRepository.save(member);
 
@@ -43,7 +49,7 @@ public class MemberServiceImpl implements MemberService {
 
 	// 회원 탈퇴
 	@Override
-	public void deleteMember(int id) {
+	public void deleteMember(Long id) {
 		Member member = memberRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."));
 
 		member.delete();
@@ -56,20 +62,9 @@ public class MemberServiceImpl implements MemberService {
 		return memberRepository.existsByNickname(nickname);
 	}
 
-	// 개인정보 입력
-	@Override
-	public MemberDto.InsertInfoResponse insertMemberInfo(int id, MemberDto.InsertInfoRequest request) {
-		Member member = memberRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."));
-
-		member.insertInfo(request.name(), request.nickname(), request.birthdate(), request.gender());
-		memberRepository.save(member);
-
-		return new MemberDto.InsertInfoResponse();
-	}
-
 	// 개인정보 수정
 	@Override
-	public MemberDto.UpdateInfoResponse updateMemberInfo(int id, MemberDto.UpdateInfoRequest request) {
+	public MemberDto.UpdateInfoResponse updateMemberInfo(Long id, MemberDto.UpdateInfoRequest request) {
 		Member member = memberRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."));
 
 		member.updateInfo(request.nickname(), request.profileImage());
@@ -80,7 +75,7 @@ public class MemberServiceImpl implements MemberService {
 
 	// 개인정보 조회
 	@Override
-	public MemberDto.GetInfoResponse getMemberInfo(int id) {
+	public MemberDto.GetInfoResponse getMemberInfo(Long id) {
 		Member member = memberRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."));
 
 		return new MemberDto.GetInfoResponse(
@@ -91,6 +86,14 @@ public class MemberServiceImpl implements MemberService {
 			member.getGender(),
 			member.getProfileImage()
 		);
+	}
+
+	// 탈퇴한 회원인지 확인
+	@Override
+	public boolean isDeleted(String kakaoId) {
+		Member member = memberRepository.findByKakaoId(kakaoId);
+
+		return member.getDeletedAt() == null;
 	}
 
 }
