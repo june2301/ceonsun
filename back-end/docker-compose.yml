@@ -1,4 +1,3 @@
-# 초기 버전
 services:
   gateway-service:
     build:
@@ -7,61 +6,80 @@ services:
     ports:
       - "8080:8080"
     networks:
-      - msa-network
+      - chunsun-network
 
   auth-service:
     build:
       context: ./auth-service
       dockerfile: Dockerfile
     networks:
-      - msa-network
+      - chunsun-network
+    depends_on:
+      chunsun-db:
+        condition: service_healthy
 
   member-service:
     build:
       context: ./member-service
       dockerfile: Dockerfile
     networks:
-      - msa-network
+      - chunsun-network
+    depends_on:
+      chunsun-db:
+        condition: service_healthy
 
   coupon-service:
     build:
       context: ./coupon-service
       dockerfile: Dockerfile
     networks:
-      - msa-network
+      - chunsun-network
+    depends_on:
+      chunsun-db:
+        condition: service_healthy
 
   rank-service:
     build:
       context: ./rank-service
       dockerfile: Dockerfile
     networks:
-      - msa-network
+      - chunsun-network
+    depends_on:
+      chunsun-db:
+        condition: service_healthy
 
   payment-service:
     build:
       context: ./payment-service
       dockerfile: Dockerfile
     networks:
-      - msa-network
+      - chunsun-network
+    depends_on:
+      chunsun-db:
+        condition: service_healthy
 
   class-service:
     build:
       context: ./class-service
       dockerfile: Dockerfile
     networks:
-      - msa-network
+      - chunsun-network
+    depends_on:
+      chunsun-db:
+        condition: service_healthy
 
   chat-service:
     build:
       context: ./chat-service
       dockerfile: Dockerfile
     networks:
-      - msa-network
+      - chunsun-network
+    depends_on:
+      chunsun-db:
+        condition: service_healthy
 
-
-  mysql:
+  chunsun-db:
     image: mysql:8.0
-    container_name: chunsun-db
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: 1234
@@ -76,9 +94,18 @@ services:
       - ./db/my.cnf:/etc/mysql/conf.d/my.cnf  # 임시추가
     command:
       --skip-character-set-client-handshake
+    networks:
+      - chunsun-network
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+
 volumes:
   mysql_data:
 
 networks:
-  msa-network:
+  chunsun-network:
     driver: bridge
