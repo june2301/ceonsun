@@ -3,10 +3,10 @@ spring:
     name: member-service
 
   datasource:
-    url: jdbc:mysql://chunsun-db:3306/mydatabase
+    url: jdbc:mysql://chunsun-db:3306/member
     username: chunsun
     password: chunsun
-    driver-class-name: com.mysql.cj.jdbc.Driver  # MySQL 드라이버 추가
+    driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
     database: mysql

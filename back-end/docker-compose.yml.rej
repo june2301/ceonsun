@@ -1,0 +1,93 @@
+diff a/back-end/docker-compose.yml b/back-end/docker-compose.yml	(rejected hunks)
+@@ -6,61 +6,80 @@
+     ports:
+       - "8080:8080"
+     networks:
+-      - msa-network
++      - chunsun-network
+ 
+   auth-service:
+     build:
+       context: ./auth-service
+       dockerfile: Dockerfile
+     networks:
+-      - msa-network
++      - chunsun-network
++    depends_on:
++      chunsun-db:
++        condition: service_healthy
+ 
+   member-service:
+     build:
+       context: ./member-service
+       dockerfile: Dockerfile
+     networks:
+-      - msa-network
++      - chunsun-network
++    depends_on:
++      chunsun-db:
++        condition: service_healthy
+ 
+   coupon-service:
+     build:
+       context: ./coupon-service
+       dockerfile: Dockerfile
+     networks:
+-      - msa-network
++      - chunsun-network
++    depends_on:
++      chunsun-db:
++        condition: service_healthy
+ 
+   rank-service:
+     build:
+       context: ./rank-service
+       dockerfile: Dockerfile
+     networks:
+-      - msa-network
++      - chunsun-network
++    depends_on:
++      chunsun-db:
++        condition: service_healthy
+ 
+   payment-service:
+     build:
+       context: ./payment-service
+       dockerfile: Dockerfile
+     networks:
+-      - msa-network
++      - chunsun-network
++    depends_on:
++      chunsun-db:
++        condition: service_healthy
+ 
+   class-service:
+     build:
+       context: ./class-service
+       dockerfile: Dockerfile
+     networks:
+-      - msa-network
++      - chunsun-network
++    depends_on:
++      chunsun-db:
++        condition: service_healthy
+ 
+   chat-service:
+     build:
+       context: ./chat-service
+       dockerfile: Dockerfile
+     networks:
+-      - msa-network
++      - chunsun-network
++    depends_on:
++      chunsun-db:
++        condition: service_healthy
+ 
+-
+-  mysql:
++  chunsun-db:
+     image: mysql:8.0
+-    container_name: chunsun-db
+     restart: always
+     environment:
+       MYSQL_ROOT_PASSWORD: 1234
