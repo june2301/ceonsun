@@ -4,7 +4,7 @@ import logo from "../assets/img/logo.png";
 
 const Header = () => {
   return (
-    <div className="w-full bg-gray-100 shadow-md">
+    <div className="w-full bg-gray-100">
       <div className="max-w-[940px] mx-auto flex items-center justify-between h-24 px-4">
         {/* 로고 */}
         <div className="flex items-center">
