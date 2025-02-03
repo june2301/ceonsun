@@ -9,5 +9,3 @@ out/
 
 ### VS Code ###
 .vscode/
-discovery-service
-config-service

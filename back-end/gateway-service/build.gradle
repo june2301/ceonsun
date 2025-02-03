@@ -26,8 +26,6 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'io.projectreactor:reactor-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-    // 임시용
-    implementation 'org.springframework.boot:spring-boot-starter-webflux'
 }
 
 dependencyManagement {
@@ -38,7 +36,4 @@ dependencyManagement {
 
 tasks.named('test') {
     useJUnitPlatform()
-}
-bootJar {
-    archiveFileName = 'gateway-service.jar' // 실행 가능한 JAR 파일 이름 설정
 }
