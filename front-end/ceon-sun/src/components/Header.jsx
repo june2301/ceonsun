@@ -27,7 +27,10 @@ const Header = () => {
           >
             학생 목록
           </Link>
-          <Link to="#" className="text-lg text-gray-700 hover:text-blue-500">
+          <Link
+            to="/mypage"
+            className="text-lg text-gray-700 hover:text-blue-500"
+          >
             내 수업
           </Link>
         </div>
