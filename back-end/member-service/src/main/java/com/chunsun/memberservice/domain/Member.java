@@ -17,16 +17,14 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Inheritance;
-import jakarta.persistence.InheritanceType;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "members")
 @Getter
 @NoArgsConstructor
@@ -35,6 +33,12 @@ public class Member {
 
 	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+
+	@OneToOne(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Student student;
+
+	@OneToOne(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Teacher teacher;
 
 	private String kakaoId;
 
@@ -85,6 +89,10 @@ public class Member {
 
 	public void delete() {
 		this.deletedAt = LocalDateTime.now();
+	}
+
+	public void updateRole(Role role) {
+		this.role = role;
 	}
 
 }
