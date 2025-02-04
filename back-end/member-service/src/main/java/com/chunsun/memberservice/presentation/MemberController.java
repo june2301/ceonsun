@@ -107,7 +107,7 @@ public class MemberController {
 
 		if (kakaoId == null || email == null) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-				.body(new MemberDto.SignUpResponse("쿠키 정보가 없습니다.", null));
+				.body(new MemberDto.SignUpResponse("쿠키 정보가 없습니다."));
 		}
 
 		// 회원 정보 생성
