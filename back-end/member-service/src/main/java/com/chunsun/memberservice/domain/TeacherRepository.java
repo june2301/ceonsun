@@ -1,4 +1,6 @@
 package com.chunsun.memberservice.domain;
 
-public interface TeacherRepository {
+import org.springframework.data.repository.CrudRepository;
+
+public interface TeacherRepository extends CrudRepository<Teacher, Long> {
 }
