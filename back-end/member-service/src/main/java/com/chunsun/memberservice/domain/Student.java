@@ -1,18 +1,18 @@
 package com.chunsun.memberservice.domain;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
-import jakarta.persistence.PrimaryKeyJoinColumn;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.MapsId;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import lombok.Builder;
+import jakarta.persistence.Version;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -20,9 +20,16 @@ import lombok.NoArgsConstructor;
 @Table(name = "students")
 @Getter
 @NoArgsConstructor
-@EntityListeners(AuditingEntityListener.class)
-@PrimaryKeyJoinColumn(name = "id")
-public class Student extends Member {
+public class Student {
+
+	@Id
+	private Long id;
+
+	@MapsId
+	@OneToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "id")
+	private Member member;
+
 
 	private boolean isExposed;
 
@@ -36,7 +43,12 @@ public class Student extends Member {
 
 	private LocalDateTime deletedAt;
 
-	public Student(Long id, boolean isExposed, String description) {
+	@Version
+	private Long Version;
+
+	public Student(Member member, boolean isExposed, String description) {
+		this.member = member;
+		this.id = member.getId();
 		this.isExposed = isExposed;
 		this.description = description;
 		createdAt = LocalDateTime.now();

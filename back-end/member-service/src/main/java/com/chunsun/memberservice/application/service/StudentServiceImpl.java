@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.chunsun.memberservice.application.dto.StudentDto;
 import com.chunsun.memberservice.domain.Member;
 import com.chunsun.memberservice.domain.MemberRepository;
+import com.chunsun.memberservice.domain.Role;
 import com.chunsun.memberservice.domain.Student;
 import com.chunsun.memberservice.domain.StudentRepository;
 
@@ -24,20 +25,34 @@ public class StudentServiceImpl implements StudentService {
 
 	@Override
 	public StudentDto.CreateCardResponse createCard(Long id, StudentDto.CreateCardRequest request) {
-		Student student = new Student(id, request.isExposed(), request.description());
+
+		Member member = memberRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."));
+
+		member.updateRole(Role.STUDENT);
+
+		Student student = new Student(
+			member,
+			request.isExposed(),
+			request.description()
+		);
+
 		studentRepository.save(student);
 
-		return new StudentDto.CreateCardResponse("학생 카드 생성 완료" + id);
+		return new StudentDto.CreateCardResponse("학생 카드 생성 완료 : " + id);
 	}
 
 	@Override
 	public StudentDto.UpdateCardResponse updateCard(Long id, StudentDto.UpdateCardRequest request) {
 		Student student = studentRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."));
 
-		student.updateCard(request.isExposed(), request.description());
+		student.updateCard(
+			request.isExposed(),
+			request.description()
+		);
+
 		studentRepository.save(student);
 
-		return new StudentDto.UpdateCardResponse();
+		return new StudentDto.UpdateCardResponse("학생 카드 업데이트 완료 : " + id);
 	}
 
 	@Override

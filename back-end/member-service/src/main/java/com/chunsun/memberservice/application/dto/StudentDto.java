@@ -18,7 +18,7 @@ public record StudentDto() {
 	}
 
 	public record UpdateCardResponse(
-	) {
+		String message) {
 	}
 
 	public record GetCardResponse(
