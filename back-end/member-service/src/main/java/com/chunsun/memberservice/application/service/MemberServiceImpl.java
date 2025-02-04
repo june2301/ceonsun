@@ -25,14 +25,12 @@ public class MemberServiceImpl implements MemberService {
 			.name(request.name())
 			.nickname(request.nickname())
 			.birthdate(request.birthdate())
-			.role(Role.NONE)
+			.role(Role.GUEST)
 			.gender(request.gender())
 			.build();
 		memberRepository.save(member);
 
-		// 토큰 값 추후 입력
-		String token = "jwtToken";
-		return new MemberDto.SignUpResponse("가입 완료",token);
+		return new MemberDto.SignUpResponse("가입 완료");
 	}
 
 	// 카카오 아이디 중복 가입 체크

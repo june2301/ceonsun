@@ -24,8 +24,7 @@ public record MemberDto() {
 	}
 
 	public record SignUpResponse(
-		String message,
-		String token) {
+		String message) {
 	}
 
 	public record UpdateInfoRequest(
