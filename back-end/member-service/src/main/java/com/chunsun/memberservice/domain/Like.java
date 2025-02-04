@@ -10,7 +10,11 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.MapsId;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -18,19 +22,29 @@ import lombok.NoArgsConstructor;
 @Table(name = "likes")
 @Getter
 @NoArgsConstructor
-public class Likes {
+public class Like {
 
 	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@ManyToOne
 	@JoinColumn(name = "liker_id")
-	private Member liker;
+	private Long likerId;
 
-	@ManyToOne
 	@JoinColumn(name = "likee_id")
-	private Member likee;
+	private Long likeeId;
 
 	@CreatedDate
 	private LocalDateTime createdAt;
+
+	@Version
+	private Long version;
+
+	@Builder
+	public Like(Long likerId, Long likeeId) {
+		this.likerId = likerId;
+		this.likeeId = likeeId;
+		createdAt = LocalDateTime.now();
+	}
+
+
 }
