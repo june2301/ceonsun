@@ -9,7 +9,7 @@ public record LikeDto() {
 	}
 
 	public record GetLikeResponse(
-		boolean isLike,
+		Boolean isLike,
 		String message
 	){
 	}

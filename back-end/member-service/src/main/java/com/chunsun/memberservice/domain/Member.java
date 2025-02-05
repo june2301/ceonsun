@@ -81,9 +81,13 @@ public class Member {
 		this.createdAt = LocalDateTime.now();
 	}
 
+	public Member(Long memberId) {
+		this.id = memberId;
+	}
+
 	public void updateInfo(String nickname, String profileImage) {
-		this.nickname = nickname;
-		this.profileImage = profileImage;
+		if(nickname != null) this.nickname = nickname;
+		if(profileImage != null) this.profileImage = profileImage;
 		updatedAt = LocalDateTime.now();
 	}
 
@@ -94,5 +98,4 @@ public class Member {
 	public void updateRole(Role role) {
 		this.role = role;
 	}
-
 }

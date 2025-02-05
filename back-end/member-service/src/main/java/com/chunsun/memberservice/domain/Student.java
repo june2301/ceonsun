@@ -30,8 +30,7 @@ public class Student {
 	@JoinColumn(name = "id")
 	private Member member;
 
-
-	private boolean isExposed;
+	private Boolean isExposed;
 
 	private String description;
 
@@ -46,7 +45,7 @@ public class Student {
 	@Version
 	private Long Version;
 
-	public Student(Member member, boolean isExposed, String description) {
+	public Student(Member member, Boolean isExposed, String description) {
 		this.member = member;
 		this.id = member.getId();
 		this.isExposed = isExposed;
@@ -54,11 +53,13 @@ public class Student {
 		createdAt = LocalDateTime.now();
 	}
 
-	public void updateCard(boolean isExposed, String description) {
-		this.isExposed = isExposed;
-		this.description = description;
+	public void updateCard(Boolean isExposed, String description) {
+		if(isExposed != null) this.isExposed = isExposed;
+		if(description != null) this.description = description;
 		updatedAt = LocalDateTime.now();
 	}
 
-
+	public void delete() {
+		this.deletedAt = LocalDateTime.now();
+	}
 }

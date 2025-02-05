@@ -3,6 +3,7 @@ package com.chunsun.memberservice.presentation;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,6 +22,13 @@ public class StudentController {
 	public StudentController(StudentService studentService) {
 		this.studentService = studentService;
 	}
+
+	/*
+	* 학생 카드 생성
+	* 학생 카드 수정
+	* 학생 카드 조회(본인 카드)
+	* 학생 카드 조회(남 카드)
+	* */
 
 	@PostMapping
 	public ResponseEntity<StudentDto.CreateCardResponse> addCard(@CookieValue(name = "userId", required = false) String userId, @RequestBody StudentDto.CreateCardRequest request) {
@@ -47,13 +55,9 @@ public class StudentController {
 	}
 
 	@GetMapping("/{studentId}")
-	public ResponseEntity<StudentDto.GetDetailResponse> getDetail(@CookieValue(name = "userId", required = false) String userId) {
-		Long id = Long.parseLong(userId);
+	public ResponseEntity<StudentDto.GetDetailResponse> getDetail(@PathVariable Long studentId) {
 
-		StudentDto.GetDetailResponse response = studentService.getDetail(id);
+		StudentDto.GetDetailResponse response = studentService.getDetail(studentId);
 		return ResponseEntity.ok(response);
 	}
-
-
-
 }

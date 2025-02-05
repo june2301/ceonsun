@@ -1,8 +1,6 @@
 package com.chunsun.memberservice.presentation;
 
-import java.time.LocalDateTime;
-import java.util.Map;
-
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
@@ -17,12 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.chunsun.memberservice.application.dto.MemberDto;
 import com.chunsun.memberservice.application.service.MemberService;
-import com.chunsun.memberservice.common.error.GlobalErrorCodes;
-import com.chunsun.memberservice.common.exception.BadRequestException;
-import com.chunsun.memberservice.common.exception.ForbiddenException;
-import com.chunsun.memberservice.common.exception.UnauthorizedException;
 
-import feign.Response;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -36,67 +29,48 @@ public class MemberController {
 		this.memberService = memberService;
 	}
 
+	/*
+	* 회원 중복 체크 & 쿠키에 카카오 아이디
+	* 회원 탈퇴(소프트 딜리트) => 멤버 & (학생 또는 선생) 빼고 나머지는 하드 딜리팅
+	* 닉네임 중복 체크
+	* 상세정보 생성
+	* 상세정보 수정
+	* 상세정보 조회(본인 상세정보)
+	* */
+
 	@PostMapping
 	public ResponseEntity<Void> signUp(HttpServletResponse response, @RequestBody MemberDto.KaKaoRequest request) {
-		try {
-			// 중복 체크
-			boolean existsKaKaoId = memberService.existsByKakaoId(request.kakaoId());
-			boolean existsEmail = memberService.existsByEmail(request.email());
 
-			if (existsKaKaoId || existsEmail) {
-				return ResponseEntity.status(HttpStatus.CONFLICT).build();
-			}
-			// 쿠키에 카카오 아이디, 이메일 저장
-			Cookie kakaoIdCookie = new Cookie("kakaoId", request.kakaoId());
-			kakaoIdCookie.setPath("/");
-			kakaoIdCookie.setMaxAge(60 * 10);
+		// 쿠키에 카카오 아이디, 이메일 저장
+		Cookie kakaoIdCookie = new Cookie("kakaoId", request.kakaoId());
+		kakaoIdCookie.setPath("/");
+		kakaoIdCookie.setMaxAge(60 * 10);
 
-			Cookie emailCookie = new Cookie("email", request.email());
-			emailCookie.setPath("/");
-			emailCookie.setMaxAge(60 * 10);
+		Cookie emailCookie = new Cookie("email", request.email());
+		emailCookie.setPath("/");
+		emailCookie.setMaxAge(60 * 10);
 
-			response.addCookie(kakaoIdCookie);
-			response.addCookie(emailCookie);
+		response.addCookie(kakaoIdCookie);
+		response.addCookie(emailCookie);
 
-			// 회원가입 후 리다이렉팅
-			return ResponseEntity.ok().build();
-		} catch (Exception e) {
-			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-		}
+		return ResponseEntity.ok().build();
 	}
 
 	@DeleteMapping
 	public ResponseEntity<Void> withdraw(@CookieValue(value = "userId", required = false) String userId) {
 
-		extractUserId(userId);
+		Long id = Long.parseLong(userId);
+		memberService.deleteMember(id);
 
-		try {
-			Long id = Long.parseLong(userId);
-			memberService.deleteMember(id);
-			return ResponseEntity.ok().build();
-		} catch (NumberFormatException e) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build(); // userId가 숫자가 아닐 경우 400 에러
-		} catch (Exception e) {
-			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-		}
+		return ResponseEntity.ok().build();
 	}
 
 	@GetMapping
 	public ResponseEntity<Void> nicknameCheck(@RequestParam String nickname) {
-		try {
-			boolean existsNickname = memberService.existsByNickname(nickname);
-			System.out.println(nickname);
 
-			if (existsNickname) { // 중복 되면 409
-				return ResponseEntity.status(HttpStatus.CONFLICT).build();
-			}
-			return ResponseEntity.ok().build();
-		} catch (Exception e) {
-			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-		}
+		memberService.checkNicknameAvailability(nickname);
+
+		return ResponseEntity.ok().build();
 	}
 
 	@PostMapping("/info")
@@ -105,12 +79,6 @@ public class MemberController {
 		@CookieValue(value = "email", required = false) String email,
 		@RequestBody MemberDto.SignUpRequest request) {
 
-		if (kakaoId == null || email == null) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-				.body(new MemberDto.SignUpResponse("쿠키 정보가 없습니다."));
-		}
-
-		// 회원 정보 생성
 		MemberDto.SignUpResponse response = memberService.signUp(kakaoId, email, request);
 
 		return ResponseEntity.ok(response);
@@ -121,59 +89,34 @@ public class MemberController {
 		@CookieValue(value = "userId", required = false) String userId,
 		@RequestBody MemberDto.UpdateInfoRequest request) {
 
-		extractUserId(userId);
+		Long id = Long.parseLong(userId);
+		MemberDto.UpdateInfoResponse updateInfo = memberService.updateMemberInfo(id, request);
 
-		try {
-			Long id = Long.parseLong(userId);
-			MemberDto.UpdateInfoResponse updateInfo = memberService.updateMemberInfo(id, request);
-			return ResponseEntity.ok(updateInfo);
-		} catch (NumberFormatException e) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-		}
+		return ResponseEntity.ok(updateInfo);
 	}
 
 	@GetMapping("/info")
 	public ResponseEntity<MemberDto.GetInfoResponse> getInfo(
 		@CookieValue(value = "userId", required = false) String userId) {
 
-		extractUserId(userId);
+		Long id = Long.parseLong(userId);
+		MemberDto.GetInfoResponse getInfo = memberService.getMemberInfo(id);
 
-		try {
-			Long id = Long.parseLong(userId);
-			MemberDto.GetInfoResponse getInfo = memberService.getMemberInfo(id);
-			return ResponseEntity.ok(getInfo);
-		} catch (NumberFormatException e) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-		}
+		return ResponseEntity.ok(getInfo);
 	}
 
-	////////////////////////////////////////////////////////////
+	@GetMapping("/search")
+	public ResponseEntity<Page<MemberDto.MemberListItem>> searchMembers(
+		@CookieValue(name = "userId", required = false) String userId,
+		@RequestParam(required = false) String category,
+		@RequestParam(required = false) String gender,
+		@RequestParam(required = false) String age,
+		@RequestParam(defaultValue = "0") int page,
+		@RequestParam(defaultValue = "10") int size) {
 
-	private Integer extractUserId(String userId) {
-		// 쿠키에 userId가 null 일 때
-		if (userId == null) {
-			throw new UnauthorizedException(GlobalErrorCodes.UNAUTHORIZED);
-		}
-		try {
-			return Integer.parseInt(userId);
-		}
-		// userId에 숫자가 아닌 값이 들어왔을 때
-		catch (NumberFormatException e) {
-			throw new BadRequestException(GlobalErrorCodes.INVALID_USER_ID);
-		}
+		Long id = Long.parseLong(userId);
+		Page<MemberDto.MemberListItem> result = memberService.getFilterMembers(category, gender, age, page, size, id);
+
+		return ResponseEntity.ok(result);
 	}
-
-	// 탈퇴한 회원인지 확인
-	private boolean checkDeltedMember(String kakaoId) {
-		// deletedAt이 null인지 체크
-		return memberService.isDeleted(kakaoId);
-	}
-
-
 }

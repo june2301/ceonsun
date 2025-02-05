@@ -12,4 +12,8 @@ public interface TeacherService {
 	TeacherDto.GetCardResponse getCard(Long id);
 
 	TeacherDto.GetDetailResponse getDetail(Long id);
+
+	TeacherDto.ClassFinishResponse updateClass(Long id, TeacherDto.ClassFinishRequest request);
+
+	TeacherDto.ClassFinishResponse getClass(Long id);
 }

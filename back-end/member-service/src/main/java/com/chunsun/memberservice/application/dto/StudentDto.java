@@ -1,10 +1,13 @@
 package com.chunsun.memberservice.application.dto;
 
+import java.util.List;
+
+import com.chunsun.memberservice.domain.Category;
 import com.chunsun.memberservice.domain.Gender;
 
 public record StudentDto() {
 	public record CreateCardRequest(
-		boolean isExposed,
+		Boolean isExposed,
 		String description) {
 	}
 
@@ -13,7 +16,7 @@ public record StudentDto() {
 	}
 
 	public record UpdateCardRequest(
-		boolean isExposed,
+		Boolean isExposed,
 		String description) {
 	}
 
@@ -22,7 +25,7 @@ public record StudentDto() {
 	}
 
 	public record GetCardResponse(
-		boolean isExposed,
+		Boolean isExposed,
 		String description) {
 	}
 
@@ -30,7 +33,7 @@ public record StudentDto() {
 		String name,
 		String nickname,
 		Gender gender,
-		int age,
+		Integer age,
 		String description) {
 	}
 
