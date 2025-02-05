@@ -1,7 +1,9 @@
 package com.chunsun.memberservice.application.dto;
 
 import java.time.LocalDate;
+import java.util.List;
 
+import com.chunsun.memberservice.domain.Category;
 import com.chunsun.memberservice.domain.Gender;
 import com.chunsun.memberservice.domain.Role;
 
@@ -48,4 +50,13 @@ public record MemberDto() {
 		String profileImage
 	) {
 	}
+
+	public record MemberListItem(
+		Long id,
+		String nickname,
+		Integer age,
+		Gender gender,
+		List<Category> categories){
+	}
+
 }

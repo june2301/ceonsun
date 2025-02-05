@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 public class MemberCategory {
 
 	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int id;
+	private Long id;
 
 	@ManyToOne
 	@JoinColumn(name = "member_id")
@@ -27,4 +27,8 @@ public class MemberCategory {
 	@JoinColumn(name = "category_id")
 	private Category category;
 
+	public MemberCategory(Member member, Category category) {
+		this.member = member;
+		this.category = category;
+	}
 }
