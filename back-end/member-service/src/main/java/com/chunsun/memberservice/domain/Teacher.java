@@ -40,11 +40,11 @@ public class Teacher {
 
 	private String classProgress;
 
-	private int totalClassCount;
+	private Integer totalClassCount;
 
-	private int totalClassHours;
+	private Integer totalClassHours;
 
-	private boolean isWanted;
+	private Boolean isWanted;
 
 	// 은행 추가 필요
 	@Enumerated(EnumType.STRING)
@@ -52,7 +52,7 @@ public class Teacher {
 
 	private String account;
 
-	private int price;
+	private Integer price;
 
 	@Version
 	private Long Version;
@@ -65,7 +65,7 @@ public class Teacher {
 
 	private LocalDateTime deletedAt;
 
-	public Teacher(Member member, String description, String careerDescription, String classContents, String classProgress, boolean isWanted, Bank bank, String account, int price) {
+	public Teacher(Member member, String description, String careerDescription, String classContents, String classProgress, Boolean isWanted, Bank bank, String account, Integer price) {
 		this.member = member;
 		this.id = member.getId();
 		this.description = description;
@@ -79,16 +79,24 @@ public class Teacher {
 		createdAt = LocalDateTime.now();
 	}
 
-	public void updateCard(String description, String classContents, String careerDescription, String classProgress, boolean isWanted, Bank bank, String account, int price) {
-		this.description = description;
-		this.classContents = classContents;
-		this.careerDescription = careerDescription;
-		this.classProgress = classProgress;
-		this.isWanted = isWanted;
-		this.bank = bank;
-		this.account = account;
-		this.price = price;
+	public void updateCard(String description, String classContents, String careerDescription, String classProgress, Boolean isWanted, Bank bank, String account, Integer price) {
+		if (description != null) this.description = description;
+		if (classContents != null) this.classContents = classContents;
+		if (careerDescription != null) this.careerDescription = careerDescription;
+		if (classProgress != null) this.classProgress = classProgress;
+		if (isWanted != null) this.isWanted = isWanted;
+		if (bank != null) this.bank = bank;
+		if (account != null) this.account = account;
+		if (price != null) this.price = price;
 		updatedAt = LocalDateTime.now();
 	}
 
+	public void updateClass(Integer totalClassCount, Integer totalClassHours) {
+		this.totalClassCount = totalClassCount;
+		this.totalClassHours = totalClassHours;
+	}
+
+	public void delete() {
+		this.deletedAt = LocalDateTime.now();
+	}
 }

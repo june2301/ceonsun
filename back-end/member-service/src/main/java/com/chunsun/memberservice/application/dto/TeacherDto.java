@@ -1,5 +1,7 @@
 package com.chunsun.memberservice.application.dto;
 
+import java.time.LocalDateTime;
+
 import com.chunsun.memberservice.domain.Bank;
 import com.chunsun.memberservice.domain.Gender;
 
@@ -9,10 +11,10 @@ public record TeacherDto() {
 		String classContents,
 		String careerDescription,
 		String careerProgress,
-		boolean isWanted,
+		Boolean isWanted,
 		Bank bank,
 		String account,
-		int price) {
+		Integer price) {
 	}
 
 	public record CreateCardResponse(
@@ -24,10 +26,10 @@ public record TeacherDto() {
 		String classContents,
 		String careerDescription,
 		String careerProgress,
-		boolean isWanted,
+		Boolean isWanted,
 		Bank bank,
 		String account,
-		int price) {
+		Integer price) {
 	}
 
 	public record UpdateCardResponse(
@@ -39,25 +41,36 @@ public record TeacherDto() {
 		String careerDescription,
 		String careerProgress,
 		String classContents,
-		boolean isWanted,
+		Boolean isWanted,
 		Bank bank,
 		String account,
-		int price,
-		int totalClassCount,
-		int totalClassHours) {
+		Integer price,
+		Integer totalClassCount,
+		Integer totalClassHours) {
 	}
 
 	public record GetDetailResponse(
 		String name,
 		String nickname,
 		Gender gender,
-		int age,
+		Integer age,
 		String description,
 		String careerDescription,
 		String careerProgress,
 		String classContents,
-		int price,
-		int totalClassCount,
-		int totalClassHours) {
+		Integer price,
+		Integer totalClassCount,
+		Integer totalClassHours) {
+	}
+
+	public record ClassFinishRequest(
+		Integer time
+	) {
+	}
+
+	public record ClassFinishResponse(
+		Integer totalClassCount,
+		Integer totalClassHours
+	){
 	}
 }
