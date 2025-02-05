@@ -17,10 +17,11 @@ public class LikeServiceImpl implements LikeService {
 	}
 
 	@Override
-	public boolean getLike(Long liker, LikeDto.GetLikeRequest request) {
+	public Boolean getLike(Long liker, LikeDto.GetLikeRequest request) {
+
 		Long likee = request.likeeId();
 
-		boolean isLike = likeRepository.existsByLikerIdAndLikeeId(liker,likee);
+		Boolean isLike = likeRepository.existsByLikerIdAndLikeeId(liker,likee);
 
 		if(isLike) {
 			likeRepository.deleteByLikerIdAndLikeeId(liker, likee);

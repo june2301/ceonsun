@@ -6,6 +6,8 @@ import java.time.Period;
 import org.springframework.stereotype.Service;
 
 import com.chunsun.memberservice.application.dto.StudentDto;
+import com.chunsun.memberservice.common.error.GlobalErrorCodes;
+import com.chunsun.memberservice.common.exception.BusinessException;
 import com.chunsun.memberservice.domain.Member;
 import com.chunsun.memberservice.domain.MemberRepository;
 import com.chunsun.memberservice.domain.Role;
@@ -23,10 +25,16 @@ public class StudentServiceImpl implements StudentService {
 		this.memberRepository = memberRepository;
 	}
 
+	// 카드 생성
 	@Override
 	public StudentDto.CreateCardResponse createCard(Long id, StudentDto.CreateCardRequest request) {
 
-		Member member = memberRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."));
+		Member member = memberRepository.findById(id).orElseThrow(()
+			-> new BusinessException(GlobalErrorCodes.USER_NOT_FOUND));
+
+		if(member.getRole() == Role.STUDENT) {
+			throw new BusinessException(GlobalErrorCodes.ALREADY_STUDENT);
+		}
 
 		member.updateRole(Role.STUDENT);
 
@@ -41,9 +49,16 @@ public class StudentServiceImpl implements StudentService {
 		return new StudentDto.CreateCardResponse("학생 카드 생성 완료 : " + id);
 	}
 
+	// 카드 업데이트
 	@Override
 	public StudentDto.UpdateCardResponse updateCard(Long id, StudentDto.UpdateCardRequest request) {
-		Student student = studentRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."));
+
+		Student student = studentRepository.findById(id).orElseThrow(()
+			-> new BusinessException(GlobalErrorCodes.STUDENT_NOT_FOUND));
+
+		if(student.getMember().getRole() != Role.STUDENT) {
+			throw new BusinessException(GlobalErrorCodes.NOT_STUDENT);
+		}
 
 		student.updateCard(
 			request.isExposed(),
@@ -55,20 +70,28 @@ public class StudentServiceImpl implements StudentService {
 		return new StudentDto.UpdateCardResponse("학생 카드 업데이트 완료 : " + id);
 	}
 
+	// 카드 조회
 	@Override
 	public StudentDto.GetCardResponse getCard(Long id) {
-		Student student = studentRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."));
+
+		Student student = studentRepository.findById(id).orElseThrow(()
+			-> new BusinessException(GlobalErrorCodes.STUDENT_NOT_FOUND));
 
 		return new StudentDto.GetCardResponse(
-			student.isExposed(),
+			student.getIsExposed(),
 			student.getDescription()
 		);
 	}
 
+	// 카드 상세조회
 	@Override
 	public StudentDto.GetDetailResponse getDetail(Long id) {
-		Member memberInfo = memberRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."));
-		Student studentInfo = studentRepository.findById(id).orElseThrow();
+
+		Member memberInfo = memberRepository.findById(id).orElseThrow(()
+			-> new BusinessException(GlobalErrorCodes.USER_NOT_FOUND));
+
+		Student studentInfo = studentRepository.findById(id).orElseThrow(()
+			-> new BusinessException(GlobalErrorCodes.STUDENT_NOT_FOUND));
 
 		return new StudentDto.GetDetailResponse(
 			memberInfo.getName(),

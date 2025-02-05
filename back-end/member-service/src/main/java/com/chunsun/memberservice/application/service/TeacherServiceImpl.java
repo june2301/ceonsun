@@ -6,6 +6,8 @@ import java.time.Period;
 import org.springframework.stereotype.Service;
 
 import com.chunsun.memberservice.application.dto.TeacherDto;
+import com.chunsun.memberservice.common.error.GlobalErrorCodes;
+import com.chunsun.memberservice.common.exception.BusinessException;
 import com.chunsun.memberservice.domain.Member;
 import com.chunsun.memberservice.domain.MemberRepository;
 import com.chunsun.memberservice.domain.Role;
@@ -26,7 +28,12 @@ public class TeacherServiceImpl implements TeacherService {
 	@Override
 	public TeacherDto.CreateCardResponse createCard(Long id, TeacherDto.CreateCardRequest request) {
 
-		Member member = memberRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."));
+		Member member = memberRepository.findById(id).orElseThrow(()
+			-> new BusinessException(GlobalErrorCodes.USER_NOT_FOUND));
+
+		if(member.getRole() == Role.TEACHER) {
+			throw new BusinessException(GlobalErrorCodes.ALREADY_TEACHER);
+		}
 
 		member.updateRole(Role.TEACHER);
 
@@ -41,7 +48,6 @@ public class TeacherServiceImpl implements TeacherService {
 			request.account(),
 			request.price()
 		);
-
 		teacherRepository.save(teacher);
 
 		return new TeacherDto.CreateCardResponse("선생 카드 생성 완료 : " + id);
@@ -50,7 +56,12 @@ public class TeacherServiceImpl implements TeacherService {
 	@Override
 	public TeacherDto.UpdateCardResponse updateCard(Long id, TeacherDto.UpdateCardRequest request) {
 
-		Teacher teacher = teacherRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."));
+		Teacher teacher = teacherRepository.findById(id).orElseThrow(()
+			-> new BusinessException(GlobalErrorCodes.TEACHER_NOT_FOUND));
+
+		if (teacher.getMember().getRole() != Role.TEACHER) {
+			throw new BusinessException(GlobalErrorCodes.NOT_TEACHER);
+		}
 
 		teacher.updateCard(
 			request.description(),
@@ -62,7 +73,6 @@ public class TeacherServiceImpl implements TeacherService {
 			request.account(),
 			request.price()
 		);
-
 		teacherRepository.save(teacher);
 
 		return new TeacherDto.UpdateCardResponse("선생 카드 업데이트 완료 : " + id);
@@ -71,14 +81,15 @@ public class TeacherServiceImpl implements TeacherService {
 	@Override
 	public TeacherDto.GetCardResponse getCard(Long id) {
 
-		Teacher teacher = teacherRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."));
+		Teacher teacher = teacherRepository.findById(id).orElseThrow(()
+			-> new BusinessException(GlobalErrorCodes.TEACHER_NOT_FOUND));
 
 		return new TeacherDto.GetCardResponse(
 			teacher.getDescription(),
 			teacher.getCareerDescription(),
 			teacher.getClassProgress(),
 			teacher.getClassContents(),
-			teacher.isWanted(),
+			teacher.getIsWanted(),
 			teacher.getBank(),
 			teacher.getAccount(),
 			teacher.getPrice(),
@@ -90,8 +101,11 @@ public class TeacherServiceImpl implements TeacherService {
 	@Override
 	public TeacherDto.GetDetailResponse getDetail(Long id) {
 
-		Member memberInfo = memberRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."));
-		Teacher teacherInfo = teacherRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."));
+		Member memberInfo = memberRepository.findById(id).orElseThrow(()
+			-> new BusinessException(GlobalErrorCodes.USER_NOT_FOUND));
+
+		Teacher teacherInfo = teacherRepository.findById(id).orElseThrow(()
+			-> new BusinessException(GlobalErrorCodes.TEACHER_NOT_FOUND));
 
 		return new TeacherDto.GetDetailResponse(
 			memberInfo.getName(),
@@ -106,5 +120,33 @@ public class TeacherServiceImpl implements TeacherService {
 			teacherInfo.getTotalClassCount(),
 			teacherInfo.getTotalClassHours()
 		);
+	}
+
+	@Override
+	public TeacherDto.ClassFinishResponse updateClass(Long id, TeacherDto.ClassFinishRequest request) {
+
+		Teacher teacher = teacherRepository.findById(id).orElseThrow(()
+			-> new BusinessException(GlobalErrorCodes.TEACHER_NOT_FOUND));
+
+		if (request.time() <= 0) {
+			throw new BusinessException(GlobalErrorCodes.INVALID_CLASS_TIME);
+		}
+
+		Integer count = teacher.getTotalClassCount() + 1;
+		Integer hours = teacher.getTotalClassHours() + request.time();
+
+		teacher.updateClass(count, hours);
+		teacherRepository.save(teacher);
+
+		return new TeacherDto.ClassFinishResponse(count, hours);
+	}
+
+	@Override
+	public TeacherDto.ClassFinishResponse getClass(Long id) {
+
+		Teacher teacher = teacherRepository.findById(id).orElseThrow(()
+			-> new BusinessException(GlobalErrorCodes.TEACHER_NOT_FOUND));
+
+		return new TeacherDto.ClassFinishResponse(teacher.getTotalClassCount(), teacher.getTotalClassHours());
 	}
 }
