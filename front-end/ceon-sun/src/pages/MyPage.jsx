@@ -7,7 +7,7 @@ import MyLecture from "../components/MyLecture"; // MyLecture 컴포넌트를 �
 
 function MyPage() {
   // "student", "teacher", "none" 중 하나 (예제에서는 "none"으로 설정)
-  const [userRole, setUserRole] = useState("none");
+  const [userRole, setUserRole] = useState("student");
   // 좌측 메뉴 선택 상태 (초기값은 "내 정보")
   const [selectedMenu, setSelectedMenu] = useState("내 정보");
 
@@ -50,7 +50,7 @@ function MyPage() {
             {selectedMenu === "수강 정보" && (
               // 상대 위치 컨테이너를 만들고, 그 안에 절대 위치로 스크롤 영역을 구성합니다.
               <div className="relative h-full">
-                <div className="absolute inset-0 overflow-y-auto custom-scrollbar pl-6 pr-4 py-6">
+                <div className="absolute inset-0 overflow-y-auto custom-scrollbar">
                   <MyLecture />
                 </div>
               </div>
