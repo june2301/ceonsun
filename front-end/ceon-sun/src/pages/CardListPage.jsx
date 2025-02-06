@@ -13,7 +13,7 @@ function CardListPage() {
   const topBarItems = ["선생님 목록", "찜한 선생님", "선생님 랭킹"];
   const [selectedMenu, setSelectedMenu] = useState(0);
 
-  // 1) 선생님 카드 리스트를 보여줄 때 쓸 예시 데이터들
+  // 1) 선생님 카드 리스트 예시 데이터
   const allTeachers = [
     {
       profileImage: "",
@@ -21,20 +21,15 @@ function CardListPage() {
       age: 29,
       gender: "남자",
       subjects: ["Python", "Java", "JavaScript"],
-    },
-    {
-      profileImage: "",
-      nickname: "선생님B",
-      age: 35,
-      gender: "여자",
-      subjects: ["C++", "JavaScript"],
-    },
-    {
-      profileImage: "",
-      nickname: "선생님C",
-      age: 35,
-      gender: "여자",
-      subjects: ["C++", "JavaScript"],
+      // 선생 카드에서 표시할 추가 props
+      showDetail: true,
+      showAge: true,
+      showGender: true,
+      showRemainLessons: false,
+      remainLessonsCnt: 0,
+      showClassroomButton: false,
+      classroomButtonOnTop: false,
+      showPaymentButton: false,
     },
   ];
   const favoriteTeachers = [
@@ -44,6 +39,14 @@ function CardListPage() {
       age: 33,
       gender: "여자",
       subjects: ["Go", "Rust"],
+      showDetail: true,
+      showAge: true,
+      showGender: true,
+      showRemainLessons: false,
+      remainLessonsCnt: 0,
+      showClassroomButton: false,
+      classroomButtonOnTop: false,
+      showPaymentButton: false,
     },
   ];
   const rankingTeachers = [
@@ -53,81 +56,106 @@ function CardListPage() {
       age: 38,
       gender: "여자",
       subjects: ["Python", "Flask", "Django"],
-    },
-    {
-      profileImage: "",
-      nickname: "선생님Rank2",
-      age: 50,
-      gender: "남자",
-      subjects: ["Java", "Spring Boot"],
+      showDetail: true,
+      showAge: true,
+      showGender: true,
+      showRemainLessons: false,
+      remainLessonsCnt: 0,
+      showClassroomButton: false,
+      classroomButtonOnTop: false,
+      showPaymentButton: false,
     },
   ];
 
-  // 2) 학생 카드 리스트를 보여줄 때 쓸 예시 데이터들
+  // 2) 학생 카드 리스트 예시 데이터
   const studentList = [
     {
       nickname: "학생A",
+      name: "학생A 이름",
+      age: 20,
+      gender: "여자",
       profileImage: "",
       subjects: ["Python", "Java"],
+      introduction: "학생A 소개글 내용",
+      // 추가 props (전체 목록 조회 시 사용)
+      isOwner: false,
+      cardPublic: true,
+      isListDetail: true,
     },
     {
-      nickname: "학생B",
+      nickname: "학생A",
+      name: "학생A 이름",
+      age: 20,
+      gender: "여자",
       profileImage: "",
-      subjects: ["C++", "JavaScript"],
+      subjects: ["Python", "Java"],
+      introduction: "학생A 소개글 내용",
+      // 추가 props (전체 목록 조회 시 사용)
+      isOwner: false,
+      cardPublic: true,
+      isListDetail: true,
     },
     {
-      nickname: "학생C",
+      nickname: "학생A",
+      name: "학생A 이름",
+      age: 20,
+      gender: "여자",
       profileImage: "",
-      subjects: ["Python", "Rust"],
+      subjects: ["Python", "Java"],
+      introduction: "학생A 소개글 내용",
+      // 추가 props (전체 목록 조회 시 사용)
+      isOwner: false,
+      cardPublic: true,
+      isListDetail: true,
     },
   ];
 
-  // 실제로 렌더링할 카드 목록과 카드 종류("teacher" vs "student")
+  // 실제 렌더링할 카드 목록과 카드 타입 결정
   let currentList = [];
-  let cardType = "teacher";
+  let cardType = "";
   let showTopBar = false;
 
   if (userRole === "student") {
     // 학생 → 선생님 카드 리스트 보여주기
-    showTopBar = true; // TopBar 보이기
+    showTopBar = true;
     cardType = "teacher";
-    // TopBar의 메뉴 선택값에 따라 선생님 목록 분기
     if (selectedMenu === 0) currentList = allTeachers;
     else if (selectedMenu === 1) currentList = favoriteTeachers;
     else currentList = rankingTeachers;
   } else {
     // 선생 → 학생 카드 리스트 보여주기
-    showTopBar = false; // TopBar 숨기기
+    showTopBar = false;
     cardType = "student";
     currentList = studentList;
   }
 
-  // 선생카드에서 "자세히 보기" 클릭 시 TeacherDetail 페이지로 이동하는 함수
-  const handleListDetail = (cardData) => {
+  // 선생 카드에서 "자세히 보기" 클릭 시 TeacherDetail 페이지로 이동하는 함수
+  const handleTeacherDetail = (cardData) => {
     navigate("/teacherdetail", { state: { teacher: cardData } });
   };
 
-  // 학생카드에서 "자세히 보기" 클릭 시 해당 카드가 확장되도록 처리하는 함수
+  // 학생 카드에서 "자세히 보기" 클릭 시 해당 카드가 확장되도록 처리하는 함수
   const [expandedStudentIndex, setExpandedStudentIndex] = useState(null);
-  const handleStudentDetail = (cardData, index) => {
+  const handleStudentListDetail = (cardData, index) => {
     setExpandedStudentIndex((prevIndex) =>
       prevIndex === index ? null : index,
     );
   };
+
   return (
     <div className="h-screen w-full flex flex-col overflow-hidden">
       <Header />
 
-      {/* 메인 영역: 중앙 정렬 + 세로/가로 분할 */}
+      {/* 메인 영역: 중앙 정렬 + 좌측 필터, 우측 카드 리스트 */}
       <div className="flex-1 flex justify-center overflow-hidden pt-5">
-        {/* 왼쪽: 필터 (280px 고정) */}
+        {/* 왼쪽: 필터 */}
         <div className="flex-none w-[280px] h-full overflow-auto mr-2 pb-4 list-scrollbar">
           <Filter />
         </div>
 
-        {/* 오른쪽: (선생님 / 학생) 카드 리스트 영역 */}
+        {/* 오른쪽: 카드 리스트 영역 */}
         <div className="flex-none w-[620px] flex flex-col overflow-hidden">
-          {/* TopBar (학생시점일 때만) */}
+          {/* TopBar (학생 시점일 때만) */}
           {showTopBar && (
             <div className="flex-none px-2">
               <TopBar
@@ -138,21 +166,19 @@ function CardListPage() {
             </div>
           )}
 
-          {/* CardList (세로 스크롤) */}
+          {/* CardList */}
           <div className="flex-1 overflow-y-auto pt-2 pb-6 px-2 list-scrollbar">
             {cardType === "teacher" ? (
               <CardList
                 type={cardType}
                 cards={currentList}
-                onDetailClick={(cardData) => handleListDetail(cardData)}
+                onDetailClick={handleTeacherDetail}
               />
             ) : (
               <CardList
                 type={cardType}
                 cards={currentList}
-                onDetailClick={(cardData, idx) =>
-                  handleStudentDetail(cardData, idx)
-                }
+                onDetailClick={handleStudentListDetail}
                 expandedStudentIndex={expandedStudentIndex}
               />
             )}
