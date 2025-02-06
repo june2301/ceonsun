@@ -55,15 +55,15 @@ function TeacherAction({ teacher, onBack }) {
       {/* 문의, 찜하기, 과외신청 버튼 */}
       <div className="flex flex-col space-y-2">
         <div className="flex items-center space-x-2">
-          <button className="w-[100px] h-[40px] border-2 border-gray-300 rounded py-1 px-3 text-sm hover:bg-gray-100">
+          <button className="w-[100px] h-[40px] font-semibold border-2 border-green-300 rounded py-1 px-3 text-sm bg-green-200 hover:bg-green-300">
             문의하기
           </button>
-          <button className="w-[100px] h-[40px] border-2 border-gray-300 rounded py-1 px-3 text-sm hover:bg-gray-100 flex items-center justify-center">
-            <StarIcon className="w-5 h-5 mr-1 text-gray-200" />
+          <button className="w-[100px] h-[40px] font-semibold border-2 border-gray-300 rounded py-1 px-3 text-sm bg-gray-100 hover:bg-gray-100 flex items-center justify-center">
+            <StarIcon className="w-5 h-5 mr-1 text-gray-400" />
             찜하기
           </button>
         </div>
-        <button className="bg-yellow-400 hover:bg-yellow-300 text-white rounded py-2 font-semibold">
+        <button className="bg-amber-200 hover:bg-amber-300 text-black rounded py-2 font-bold">
           과외 신청하기
         </button>
       </div>

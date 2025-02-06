@@ -32,7 +32,7 @@ function DefaultProfile({
       {/* 프로필 정보 */}
       <div
         className={`text-gray-800 ${
-          isLarge ? "space-y-2" : "grid grid-cols-2 gap-x-10 gap-y-2"
+          isLarge ? "space-y-2" : "grid grid-cols-2 gap-x-20 gap-y-2"
         }`}
       >
         <div>

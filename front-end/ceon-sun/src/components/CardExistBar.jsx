@@ -6,7 +6,7 @@ function CardExistBar({ userRole }) {
 
   return (
     <div className="w-full py-5 bg-white flex justify-center border-b-2 border-gray-300">
-      <div className="flex space-x-28">
+      <div className="flex space-x-40">
         <button className="text-black-500 font-bold">학생 카드 작성하기</button>
         <button className="text-black-500 font-bold">
           선생 & 수업 등록하기
