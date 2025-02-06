@@ -6,27 +6,25 @@ import com.chunsun.memberservice.domain.Category;
 import com.chunsun.memberservice.domain.Gender;
 
 public record StudentDto() {
-	public record CreateCardRequest(
+	public record CardRequest(
+		Long id,
 		Boolean isExposed,
 		String description) {
 	}
 
-	public record CreateCardResponse(
+	public record CardResponse(
 		String message) {
 	}
 
-	public record UpdateCardRequest(
-		Boolean isExposed,
-		String description) {
-	}
-
-	public record UpdateCardResponse(
-		String message) {
+	public record GetCardRequest(
+		Long id
+	) {
 	}
 
 	public record GetCardResponse(
 		Boolean isExposed,
-		String description) {
+		String description,
+		List<Category> categories) {
 	}
 
 	public record GetDetailResponse(
@@ -34,7 +32,8 @@ public record StudentDto() {
 		String nickname,
 		Gender gender,
 		Integer age,
-		String description) {
+		String description,
+		List<Category> categories) {
 	}
 
 }

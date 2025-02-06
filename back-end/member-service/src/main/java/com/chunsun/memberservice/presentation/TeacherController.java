@@ -33,50 +33,51 @@ public class TeacherController {
 	* */
 
 	@PostMapping
-	public ResponseEntity<TeacherDto.CreateCardResponse> addCard(@CookieValue(name = "userId", required = false) String userId, @RequestBody TeacherDto.CreateCardRequest request) {
-		Long id = Long.parseLong(userId);
+	public ResponseEntity<TeacherDto.CreateCardResponse> addCard(
+		@RequestBody TeacherDto.CreateCardRequest request) {
 
-		TeacherDto.CreateCardResponse response = teacherService.createCard(id, request);
+		TeacherDto.CreateCardResponse response = teacherService.createCard(request);
 		return ResponseEntity.ok(response);
 	}
 
 	@PutMapping
-	public ResponseEntity<TeacherDto.UpdateCardResponse> updateCard(@CookieValue(name = "userId", required = false) String userId, @RequestBody TeacherDto.UpdateCardRequest request) {
-		Long id = Long.parseLong(userId);
+	public ResponseEntity<TeacherDto.UpdateCardResponse> updateCard(
+		@RequestBody TeacherDto.UpdateCardRequest request) {
 
-		TeacherDto.UpdateCardResponse response = teacherService.updateCard(id, request);
+		TeacherDto.UpdateCardResponse response = teacherService.updateCard(request);
 		return ResponseEntity.ok(response);
 	}
 
 	@GetMapping
-	public ResponseEntity<TeacherDto.GetCardResponse> getCard(@CookieValue(name = "userId", required = false) String userId) {
-		Long id = Long.parseLong(userId);
+	public ResponseEntity<TeacherDto.GetCardResponse> getCard(
+		@RequestBody TeacherDto.GetCardRequest request) {
 
-		TeacherDto.GetCardResponse response = teacherService.getCard(id);
+		TeacherDto.GetCardResponse response = teacherService.getCard(request.id());
 		return ResponseEntity.ok(response);
 	}
 
 	@GetMapping("/{teacherId}")
-	public ResponseEntity<TeacherDto.GetDetailResponse> getDetail(@PathVariable Long teacherId) {
+	public ResponseEntity<TeacherDto.GetDetailResponse> getDetail(
+		@PathVariable Long teacherId) {
 
 		TeacherDto.GetDetailResponse response = teacherService.getDetail(teacherId);
 		return ResponseEntity.ok(response);
 	}
 
 	@PutMapping("/class")
-	public ResponseEntity<TeacherDto.ClassFinishResponse> classCountUpdate(@CookieValue(name = "userId", required = false) String userId, @RequestBody TeacherDto.ClassFinishRequest request){
-		Long id = Long.parseLong(userId);
+	public ResponseEntity<TeacherDto.ClassFinishResponse> classCountUpdate(
+		@RequestBody TeacherDto.ClassFinishRequest request){
 
-		TeacherDto.ClassFinishResponse response = teacherService.updateClass(id, request);
+		TeacherDto.ClassFinishResponse response = teacherService.updateClass(request);
 
 		return ResponseEntity.ok(response);
 	}
 
 	@GetMapping("/class")
-	public ResponseEntity<TeacherDto.ClassFinishResponse> getClassCount(@CookieValue(name = "userId", required = false) String userId) {
-		Long id = Long.parseLong(userId);
+	public ResponseEntity<TeacherDto.ClassFinishResponse> getClassCount(
+		@RequestBody TeacherDto.GetClassRequest request) {
 
-		TeacherDto.ClassFinishResponse response = teacherService.getClass(id);
+		TeacherDto.ClassFinishResponse response = teacherService.getClass(request.id());
 
 		return ResponseEntity.ok(response);
 	}

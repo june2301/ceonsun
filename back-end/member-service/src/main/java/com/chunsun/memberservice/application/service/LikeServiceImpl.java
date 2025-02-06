@@ -7,6 +7,8 @@ import com.chunsun.memberservice.application.dto.LikeDto;
 import com.chunsun.memberservice.domain.Like;
 import com.chunsun.memberservice.domain.LikeRepository;
 
+import jakarta.transaction.Transactional;
+
 @Service
 public class LikeServiceImpl implements LikeService {
 
@@ -17,8 +19,10 @@ public class LikeServiceImpl implements LikeService {
 	}
 
 	@Override
-	public Boolean getLike(Long liker, LikeDto.GetLikeRequest request) {
+	@Transactional
+	public Boolean getLike(LikeDto.GetLikeRequest request) {
 
+		Long liker = request.likerId();
 		Long likee = request.likeeId();
 
 		Boolean isLike = likeRepository.existsByLikerIdAndLikeeId(liker,likee);

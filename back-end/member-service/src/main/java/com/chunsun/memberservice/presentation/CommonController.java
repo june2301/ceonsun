@@ -31,37 +31,36 @@ public class CommonController {
 	* 회원 카테고리 수정
 	* 회원 카테고리 조회
 	* 카테고리 목록조회
-	* //////////////
 	* 찜하기
 	* */
 
 	@PostMapping("/category")
-	public ResponseEntity<CategoryDto.CategoryResponse> createCategory(@CookieValue(name = "userId", required = false) String userId, @RequestBody CategoryDto.CategoryRequest request) {
+	public ResponseEntity<CategoryDto.CategoryResponse> createCategory(
+		@RequestBody CategoryDto.CategoryRequest request) {
 
-		Long id = Long.parseLong(userId);
-		categoryService.createCategory(id, request);
+
+		categoryService.createCategory(request);
 
 		return ResponseEntity.ok().body(new CategoryDto.CategoryResponse("카테고리 입력/업데이트 완료", request.categoryIds()));
 	}
 
 	@PutMapping("/category")
-	public ResponseEntity<CategoryDto.CategoryResponse> updateCategory(@CookieValue(name = "userId", required = false) String userId, @RequestBody CategoryDto.CategoryRequest request) {
+	public ResponseEntity<CategoryDto.CategoryResponse> updateCategory(
+		@RequestBody CategoryDto.CategoryRequest request) {
 
-		Long id = Long.parseLong(userId);
 		// 기존 카테고리 정보 삭제
-		categoryService.deleteCategory(id);
+		categoryService.deleteCategory(request.id());
 
-		createCategory(userId, request);
+		createCategory(request);
 
 		return ResponseEntity.ok().body(new CategoryDto.CategoryResponse("카테고리 업데이트 완료", request.categoryIds()));
 	}
 
 	@GetMapping("/category")
-	public List<Category> getUserCategories(@CookieValue(name = "userId", required = false) String userId) {
+	public List<Category> getUserCategories(
+		@RequestBody CategoryDto.GetCategoryRequest request) {
 
-		Long id = Long.parseLong(userId);
-
-		return categoryService.getUserCategories(id);
+		return categoryService.getUserCategories(request.id());
 	}
 
 	@GetMapping("/categories")
@@ -70,15 +69,14 @@ public class CommonController {
 		return categoryService.getList();
 	}
 
-	 ///////////찜기능///////////
-
 	@PostMapping("/like")
-	public ResponseEntity<LikeDto.GetLikeResponse> like(@CookieValue(name = "userId", required = false) String userId, @RequestBody LikeDto.GetLikeRequest request) {
+	public ResponseEntity<LikeDto.GetLikeResponse> like(
+		@RequestBody LikeDto.GetLikeRequest request) {
 
-		Long liker = Long.parseLong(userId);
 		// 이미 찜했다면 삭제, 안했다면 찜
-		Boolean isLike = likeService.getLike(liker, request);
-		String message = isLike? (liker + "가 찜했습니다.") : (liker + "가 찜을 해제했습니다.");
+		Boolean isLike = likeService.getLike(request);
+
+		String message = isLike? (request.likerId() + "가 찜했습니다.") : (request.likerId() + "가 찜을 해제했습니다.");
 
 		return ResponseEntity.ok(new LikeDto.GetLikeResponse(isLike, message));
 	}

@@ -6,15 +6,15 @@ import com.chunsun.memberservice.application.dto.MemberDto;
 
 public interface MemberService {
 
-	MemberDto.SignUpResponse signUp(String kakaoId, String email, MemberDto.SignUpRequest request);
+	MemberDto.SignUpResponse signUp(MemberDto.SignUpRequest request);
+
+	MemberDto.UpdateInfoResponse updateMemberInfo(MemberDto.UpdateInfoRequest request);
+
+	MemberDto.GetInfoResponse getMemberInfo(Long id);
 
 	void deleteMember(Long id);
 
 	void checkNicknameAvailability(String nickname);
-
-	MemberDto.UpdateInfoResponse updateMemberInfo(Long id, MemberDto.UpdateInfoRequest request);
-
-	MemberDto.GetInfoResponse getMemberInfo(Long id);
 
 	Boolean isDeleted(Long memberId);
 

@@ -31,31 +31,32 @@ public class StudentController {
 	* */
 
 	@PostMapping
-	public ResponseEntity<StudentDto.CreateCardResponse> addCard(@CookieValue(name = "userId", required = false) String userId, @RequestBody StudentDto.CreateCardRequest request) {
-		Long id = Long.parseLong(userId);
+	public ResponseEntity<StudentDto.CardResponse> addCard(
+		@RequestBody StudentDto.CardRequest request) {
 
-		StudentDto.CreateCardResponse response = studentService.createCard(id, request);
+		StudentDto.CardResponse response = studentService.createCard(request);
 		return ResponseEntity.ok(response);
 	}
 
 	@PutMapping
-	public ResponseEntity<StudentDto.UpdateCardResponse> updateCard(@CookieValue(name = "userId", required = false) String userId, @RequestBody StudentDto.UpdateCardRequest request) {
-		Long id = Long.parseLong(userId);
+	public ResponseEntity<StudentDto.CardResponse> updateCard(
+		@RequestBody StudentDto.CardRequest request) {
 
-		StudentDto.UpdateCardResponse response = studentService.updateCard(id, request);
+		StudentDto.CardResponse response = studentService.updateCard(request);
 		return ResponseEntity.ok(response);
 	}
 
 	@GetMapping
-	public ResponseEntity<StudentDto.GetCardResponse> getCard(@CookieValue(name = "userId", required = false) String userId) {
-		Long id = Long.parseLong(userId);
+	public ResponseEntity<StudentDto.GetCardResponse> getCard(
+		@RequestBody StudentDto.GetCardRequest request) {
 
-		StudentDto.GetCardResponse response = studentService.getCard(id);
+		StudentDto.GetCardResponse response = studentService.getCard(request);
 		return ResponseEntity.ok(response);
 	}
 
 	@GetMapping("/{studentId}")
-	public ResponseEntity<StudentDto.GetDetailResponse> getDetail(@PathVariable Long studentId) {
+	public ResponseEntity<StudentDto.GetDetailResponse> getDetail(
+		@PathVariable Long studentId) {
 
 		StudentDto.GetDetailResponse response = studentService.getDetail(studentId);
 		return ResponseEntity.ok(response);

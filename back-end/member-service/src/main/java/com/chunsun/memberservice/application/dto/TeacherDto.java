@@ -1,16 +1,18 @@
 package com.chunsun.memberservice.application.dto;
 
-import java.time.LocalDateTime;
+import java.util.List;
 
 import com.chunsun.memberservice.domain.Bank;
+import com.chunsun.memberservice.domain.Category;
 import com.chunsun.memberservice.domain.Gender;
 
 public record TeacherDto() {
 	public record CreateCardRequest(
+		Long id,
 		String description,
-		String classContents,
 		String careerDescription,
 		String careerProgress,
+		String classContents,
 		Boolean isWanted,
 		Bank bank,
 		String account,
@@ -22,10 +24,11 @@ public record TeacherDto() {
 	}
 
 	public record UpdateCardRequest(
+		Long id,
 		String description,
-		String classContents,
 		String careerDescription,
 		String careerProgress,
+		String classContents,
 		Boolean isWanted,
 		Bank bank,
 		String account,
@@ -34,6 +37,11 @@ public record TeacherDto() {
 
 	public record UpdateCardResponse(
 		String message) {
+	}
+
+	public record GetCardRequest(
+		Long id
+	){
 	}
 
 	public record GetCardResponse(
@@ -46,7 +54,8 @@ public record TeacherDto() {
 		String account,
 		Integer price,
 		Integer totalClassCount,
-		Integer totalClassHours) {
+		Integer totalClassHours,
+		List<Category> categories) {
 	}
 
 	public record GetDetailResponse(
@@ -60,10 +69,12 @@ public record TeacherDto() {
 		String classContents,
 		Integer price,
 		Integer totalClassCount,
-		Integer totalClassHours) {
+		Integer totalClassHours,
+		List<Category> categories) {
 	}
 
 	public record ClassFinishRequest(
+		Long id,
 		Integer time
 	) {
 	}
@@ -73,4 +84,10 @@ public record TeacherDto() {
 		Integer totalClassHours
 	){
 	}
+
+	public record GetClassRequest(
+		Long id
+	){
+	}
+
 }

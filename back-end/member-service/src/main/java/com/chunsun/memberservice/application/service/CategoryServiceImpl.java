@@ -45,13 +45,13 @@ public class CategoryServiceImpl implements CategoryService {
 	// 카테고리 생성 및 업데이트
 	@Override
 	@Transactional
-	public void createCategory(Long memberId, CategoryDto.CategoryRequest request) {
+	public void createCategory(CategoryDto.CategoryRequest request) {
 
 		for (Long categoryId : request.categoryIds()) {
 			Category category = categoryRepository.findById(categoryId).orElseThrow(()
 				-> new BusinessException(GlobalErrorCodes.CATEGORY_NOT_FOUND));
 
-			MemberCategory memberCategory = new MemberCategory(new Member(memberId), category);
+			MemberCategory memberCategory = new MemberCategory(new Member(request.id()), category);
 			memberCategoryRepository.save(memberCategory);
 		}
 	}

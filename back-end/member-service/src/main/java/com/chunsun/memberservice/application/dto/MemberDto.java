@@ -9,16 +9,9 @@ import com.chunsun.memberservice.domain.Role;
 
 public record MemberDto() {
 
-	public record KaKaoRequest(
-		String kakaoId,
-		String email) {
-	}
-
-	public record KaKaoResponse(){
-
-	}
-
 	public record SignUpRequest(
+		String kakaoId,
+		String email,
 		String name,
 		String nickname,
 		LocalDate birthdate,
@@ -30,6 +23,7 @@ public record MemberDto() {
 	}
 
 	public record UpdateInfoRequest(
+		Long id,
 		String nickname,
 		String profileImage
 	) {
@@ -38,7 +32,9 @@ public record MemberDto() {
 	public record UpdateInfoResponse() {
 	}
 
-	public record GetInfoRequest() {
+	public record GetInfoRequest(
+		Long id
+	) {
 	}
 
 	public record GetInfoResponse(

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.chunsun.memberservice.application.dto.TeacherDto;
 import com.chunsun.memberservice.common.error.GlobalErrorCodes;
 import com.chunsun.memberservice.common.exception.BusinessException;
+import com.chunsun.memberservice.domain.CategoryRepository;
 import com.chunsun.memberservice.domain.Member;
 import com.chunsun.memberservice.domain.MemberRepository;
 import com.chunsun.memberservice.domain.Role;
@@ -19,20 +20,24 @@ public class TeacherServiceImpl implements TeacherService {
 
 	private final TeacherRepository teacherRepository;
 	private final MemberRepository memberRepository;
+	private final CategoryRepository categoryRepository;
 
-	public TeacherServiceImpl(TeacherRepository teacherRepository, MemberRepository memberRepository) {
+	public TeacherServiceImpl(TeacherRepository teacherRepository, MemberRepository memberRepository,
+		CategoryRepository categoryRepository) {
 		this.teacherRepository = teacherRepository;
 		this.memberRepository = memberRepository;
+		this.categoryRepository = categoryRepository;
 	}
 
+	// 카드 생성
 	@Override
-	public TeacherDto.CreateCardResponse createCard(Long id, TeacherDto.CreateCardRequest request) {
+	public TeacherDto.CreateCardResponse createCard(TeacherDto.CreateCardRequest request) {
 
-		Member member = memberRepository.findById(id).orElseThrow(()
+		Member member = memberRepository.findById(request.id()).orElseThrow(()
 			-> new BusinessException(GlobalErrorCodes.USER_NOT_FOUND));
 
-		if(member.getRole() == Role.TEACHER) {
-			throw new BusinessException(GlobalErrorCodes.ALREADY_TEACHER);
+		if(member.getRole() == Role.STUDENT) {
+			throw new BusinessException(GlobalErrorCodes.ALREADY_STUDENT);
 		}
 
 		member.updateRole(Role.TEACHER);
@@ -40,9 +45,9 @@ public class TeacherServiceImpl implements TeacherService {
 		Teacher teacher = new Teacher(
 			member,
 			request.description(),
-			request.classContents(),
-			request.careerDescription(),
 			request.careerProgress(),
+			request.careerDescription(),
+			request.classContents(),
 			request.isWanted(),
 			request.bank(),
 			request.account(),
@@ -50,13 +55,14 @@ public class TeacherServiceImpl implements TeacherService {
 		);
 		teacherRepository.save(teacher);
 
-		return new TeacherDto.CreateCardResponse("선생 카드 생성 완료 : " + id);
+		return new TeacherDto.CreateCardResponse("선생 카드 생성 완료 : " + request.id());
 	}
 
+	// 카드 업데이트
 	@Override
-	public TeacherDto.UpdateCardResponse updateCard(Long id, TeacherDto.UpdateCardRequest request) {
+	public TeacherDto.UpdateCardResponse updateCard(TeacherDto.UpdateCardRequest request) {
 
-		Teacher teacher = teacherRepository.findById(id).orElseThrow(()
+		Teacher teacher = teacherRepository.findById(request.id()).orElseThrow(()
 			-> new BusinessException(GlobalErrorCodes.TEACHER_NOT_FOUND));
 
 		if (teacher.getMember().getRole() != Role.TEACHER) {
@@ -65,9 +71,9 @@ public class TeacherServiceImpl implements TeacherService {
 
 		teacher.updateCard(
 			request.description(),
-			request.classContents(),
 			request.careerDescription(),
 			request.careerProgress(),
+			request.classContents(),
 			request.isWanted(),
 			request.bank(),
 			request.account(),
@@ -75,9 +81,10 @@ public class TeacherServiceImpl implements TeacherService {
 		);
 		teacherRepository.save(teacher);
 
-		return new TeacherDto.UpdateCardResponse("선생 카드 업데이트 완료 : " + id);
+		return new TeacherDto.UpdateCardResponse("선생 카드 업데이트 완료 : " + request.id());
 	}
 
+	// 카드 조회
 	@Override
 	public TeacherDto.GetCardResponse getCard(Long id) {
 
@@ -94,10 +101,12 @@ public class TeacherServiceImpl implements TeacherService {
 			teacher.getAccount(),
 			teacher.getPrice(),
 			teacher.getTotalClassCount(),
-			teacher.getTotalClassHours()
+			teacher.getTotalClassHours(),
+			categoryRepository.findCategoriesByMemberId(id)
 		);
 	}
 
+	// 카드 상세조회(남이 보는거)
 	@Override
 	public TeacherDto.GetDetailResponse getDetail(Long id) {
 
@@ -118,14 +127,16 @@ public class TeacherServiceImpl implements TeacherService {
 			teacherInfo.getClassContents(),
 			teacherInfo.getPrice(),
 			teacherInfo.getTotalClassCount(),
-			teacherInfo.getTotalClassHours()
+			teacherInfo.getTotalClassHours(),
+			categoryRepository.findCategoriesByMemberId(id)
 		);
 	}
 
+	// 누적 수업 횟수, 시간 업데이트
 	@Override
-	public TeacherDto.ClassFinishResponse updateClass(Long id, TeacherDto.ClassFinishRequest request) {
+	public TeacherDto.ClassFinishResponse updateClass(TeacherDto.ClassFinishRequest request) {
 
-		Teacher teacher = teacherRepository.findById(id).orElseThrow(()
+		Teacher teacher = teacherRepository.findById(request.id()).orElseThrow(()
 			-> new BusinessException(GlobalErrorCodes.TEACHER_NOT_FOUND));
 
 		if (request.time() <= 0) {
@@ -141,6 +152,7 @@ public class TeacherServiceImpl implements TeacherService {
 		return new TeacherDto.ClassFinishResponse(count, hours);
 	}
 
+	// 누적 수업 횟수, 시간 조회
 	@Override
 	public TeacherDto.ClassFinishResponse getClass(Long id) {
 

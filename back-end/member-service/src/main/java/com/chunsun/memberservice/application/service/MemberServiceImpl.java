@@ -48,19 +48,19 @@ public class MemberServiceImpl implements MemberService {
 
 	// 회원 가입
 	@Override
-	public MemberDto.SignUpResponse signUp(String kakaoId, String email, MemberDto.SignUpRequest request) {
+	public MemberDto.SignUpResponse signUp(MemberDto.SignUpRequest request) {
 
-		if(memberRepository.existsByKakaoId(kakaoId)) {
+		if(memberRepository.existsByKakaoId(request.kakaoId())) {
 			throw new BusinessException(GlobalErrorCodes.DUPLICATE_KAKAO_ID);
 		}
 
-		if(memberRepository.existsByEmail(email)) {
+		if(memberRepository.existsByEmail(request.email())) {
 			throw new BusinessException(GlobalErrorCodes.DUPLICATE_EMAIL);
 		}
 
 		Member member = Member.builder()
-			.kakaoId(kakaoId)
-			.email(email)
+			.kakaoId(request.kakaoId())
+			.email(request.email())
 			.name(request.name())
 			.nickname(request.nickname())
 			.birthdate(request.birthdate())
@@ -111,9 +111,9 @@ public class MemberServiceImpl implements MemberService {
 
 	// 개인정보 수정
 	@Override
-	public MemberDto.UpdateInfoResponse updateMemberInfo(Long id, MemberDto.UpdateInfoRequest request) {
+	public MemberDto.UpdateInfoResponse updateMemberInfo(MemberDto.UpdateInfoRequest request) {
 
-		Member member = memberRepository.findById(id)
+		Member member = memberRepository.findById(request.id())
 			.orElseThrow(() -> new BusinessException(GlobalErrorCodes.USER_NOT_FOUND));
 
 		member.updateInfo(request.nickname(), request.profileImage());

@@ -4,6 +4,5 @@ import com.chunsun.memberservice.application.dto.LikeDto;
 
 public interface LikeService {
 
-	Boolean getLike(Long likerId, LikeDto.GetLikeRequest request);
-
+	Boolean getLike(LikeDto.GetLikeRequest request);
 }
