@@ -33,10 +33,10 @@ function StudentCardDetail({
       )}
       {isMyDetail && (
         // Scenario 2: 좌측 상단에 왼쪽 화살표와 "수강 정보" 텍스트 전체가 버튼으로 동작
-        <div className="pb-3">
+        <div className="pb-3 text-gray-600 hover:text-gray-800">
           <button onClick={onClose} className="flex items-center space-x-1">
-            <ArrowLongLeftIcon className="w-7 h-7 text-gray-600 hover:text-gray-800" />
-            <span className="font-bold text-gray-700">수강 정보</span>
+            <ArrowLongLeftIcon className="w-7 h-7" />
+            <span className="font-bold">수강 정보</span>
           </button>
         </div>
       )}

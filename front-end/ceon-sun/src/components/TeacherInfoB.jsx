@@ -2,7 +2,7 @@ import React from "react";
 
 function TeacherInfoB({ subjects = [], lessonFee = null, lessonInfo = "" }) {
   return (
-    <div className="w-full px-4 py-2">
+    <div className="w-full px-2 py-2">
       {/* 수업 과목: 버튼처럼 보이는 작은 네모 박스로 나열 (세로줄 없음) */}
       <h2 className="text-lg font-bold mb-2">수업 과목</h2>
       <div className="flex flex-wrap gap-2 mb-6">
@@ -32,9 +32,7 @@ function TeacherInfoB({ subjects = [], lessonFee = null, lessonInfo = "" }) {
       <h2 className="text-lg font-bold mb-2">회당 수업료</h2>
       <div className="flex">
         <div className="border-l-4 border-gray-400 pl-2">
-          <p className="text-gray-800 pl-2">
-            {lessonFee ? `${lessonFee.toLocaleString()}원` : "문의해주세요"}
-          </p>
+          <p className="text-gray-800 pl-2">{lessonFee} 원</p>
         </div>
       </div>
     </div>

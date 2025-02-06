@@ -6,7 +6,7 @@ function TopBar({
   onSelectItem = () => {},
 }) {
   return (
-    <div className="w-[600px] border-b-2 border-gray-300 mb-2 flex">
+    <div className="border-b-2 border-gray-300 mb-2 flex">
       {menuItems.map((item, idx) => {
         // 현재 인덱스와 selectedIndex 비교
         const isSelected = idx === selectedIndex;

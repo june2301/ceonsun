@@ -7,7 +7,7 @@ import CardList from "../components/CardList";
 
 function CardListPage() {
   const navigate = useNavigate();
-  const userRole = "teacher"; // "student" 또는 "teacher"
+  const userRole = "student"; // "student" 또는 "teacher"
 
   // TopBar 메뉴 항목 (학생이 "선생님 리스트" 볼 때만 사용)
   const topBarItems = ["선생님 목록", "찜한 선생님", "선생님 랭킹"];
@@ -131,7 +131,7 @@ function CardListPage() {
 
   // 선생 카드에서 "자세히 보기" 클릭 시 TeacherDetail 페이지로 이동하는 함수
   const handleTeacherDetail = (cardData) => {
-    navigate("/teacherdetail", { state: { teacher: cardData } });
+    navigate("/teacherdetailpage", { state: { teacher: cardData } });
   };
 
   // 학생 카드에서 "자세히 보기" 클릭 시 해당 카드가 확장되도록 처리하는 함수
