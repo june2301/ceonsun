@@ -4,33 +4,38 @@ import java.time.LocalDate;
 import java.time.Period;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.chunsun.memberservice.application.dto.StudentDto;
 import com.chunsun.memberservice.common.error.GlobalErrorCodes;
 import com.chunsun.memberservice.common.exception.BusinessException;
-import com.chunsun.memberservice.domain.CategoryRepository;
-import com.chunsun.memberservice.domain.Member;
-import com.chunsun.memberservice.domain.MemberRepository;
-import com.chunsun.memberservice.domain.Role;
-import com.chunsun.memberservice.domain.Student;
-import com.chunsun.memberservice.domain.StudentRepository;
+import com.chunsun.memberservice.domain.Repository.CategoryRepository;
+import com.chunsun.memberservice.domain.Entity.Member;
+import com.chunsun.memberservice.domain.Repository.MemberRepository;
+import com.chunsun.memberservice.domain.Enum.Role;
+import com.chunsun.memberservice.domain.Entity.Student;
+import com.chunsun.memberservice.domain.Repository.StudentRepository;
 
 @Service
+@Transactional(readOnly = true)
 public class StudentServiceImpl implements StudentService {
 
 	private final StudentRepository studentRepository;
 	private final MemberRepository memberRepository;
 	private final CategoryRepository categoryRepository;
+	private final CategoryService categoryService;
 
 	public StudentServiceImpl(StudentRepository studentRepository, MemberRepository memberRepository,
-		CategoryRepository categoryRepository) {
+		CategoryRepository categoryRepository, CategoryService categoryService) {
 		this.studentRepository = studentRepository;
 		this.memberRepository = memberRepository;
 		this.categoryRepository = categoryRepository;
+		this.categoryService = categoryService;
 	}
 
 	// 카드 생성
 	@Override
+	@Transactional
 	public StudentDto.CardResponse createCard(StudentDto.CardRequest request) {
 
 		Member member = memberRepository.findById(request.id()).orElseThrow(()
@@ -55,6 +60,7 @@ public class StudentServiceImpl implements StudentService {
 
 	// 카드 업데이트
 	@Override
+	@Transactional
 	public StudentDto.CardResponse updateCard(StudentDto.CardRequest request) {
 
 		Student student = studentRepository.findById(request.id()).orElseThrow(()
@@ -84,7 +90,7 @@ public class StudentServiceImpl implements StudentService {
 		return new StudentDto.GetCardResponse(
 			student.getIsExposed(),
 			student.getDescription(),
-			categoryRepository.findCategoriesByMemberId(student.getId())
+			categoryService.getUserCategories(request.id())
 		);
 	}
 
@@ -104,7 +110,7 @@ public class StudentServiceImpl implements StudentService {
 			memberInfo.getGender(),
 			Period.between(memberInfo.getBirthdate(), LocalDate.now()).getYears(),
 			studentInfo.getDescription(),
-			categoryRepository.findCategoriesByMemberId(id)
+			categoryService.getUserCategories(id)
 		);
 	}
 }

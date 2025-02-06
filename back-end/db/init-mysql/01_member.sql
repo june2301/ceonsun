@@ -9,7 +9,7 @@ CREATE TABLE members (
     email         VARCHAR(100) NOT NULL UNIQUE,
     profile_image VARCHAR(255) DEFAULT NULL,
     birthdate     DATE         NOT NULL,
-    role          ENUM('GUEST', 'STUDENT', 'TEACHER', 'ADMIN') NOT NULL DEFAULT 'STUDENT',
+    role          ENUM('GUEST', 'STUDENT', 'TEACHER', 'ADMIN') NOT NULL DEFAULT 'GUEST',
     created_at    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     deleted_at    DATETIME     DEFAULT NULL
@@ -26,17 +26,13 @@ CREATE TABLE teachers (
     is_wanted            BOOLEAN NOT NULL DEFAULT TRUE,
     bank                 ENUM('KB', 'SHINHAN', 'WOORI') NOT NULL,
     account              VARCHAR(20) NOT NULL,
-    price                INT NOT NULL DEFAULT 10000,
-    PRIMARY KEY (id),
-    CONSTRAINT fk_teacher_member FOREIGN KEY (id) REFERENCES members(id)
+    price                INT NOT NULL DEFAULT 10000
 );
 
 CREATE TABLE students (
     id          BIGINT UNSIGNED NOT NULL,
     is_exposed  BOOLEAN NOT NULL DEFAULT TRUE,
-    description TEXT DEFAULT NULL,
-    PRIMARY KEY (id),
-    CONSTRAINT fk_student_member FOREIGN KEY (id) REFERENCES members(id)
+    description TEXT DEFAULT NULL
 );
 
 
@@ -48,18 +44,12 @@ CREATE TABLE category (
 CREATE TABLE member_category (
     id          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     member_id   BIGINT UNSIGNED NOT NULL,
-    category_id BIGINT UNSIGNED NOT NULL,
-    
-    CONSTRAINT fk_member_category_member FOREIGN KEY (member_id) REFERENCES members (id) ON DELETE CASCADE,
-    CONSTRAINT fk_member_category_category FOREIGN KEY (category_id) REFERENCES category (id) ON DELETE CASCADE
+    category_id BIGINT UNSIGNED NOT NULL
 );
 
 CREATE TABLE likes (
     id         BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     liker_id   BIGINT UNSIGNED NOT NULL,
     likee_id   BIGINT UNSIGNED NOT NULL,
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-    CONSTRAINT fk_likes_liker FOREIGN KEY (liker_id) REFERENCES members (id) ON DELETE CASCADE,
-    CONSTRAINT fk_likes_likee FOREIGN KEY (likee_id) REFERENCES members (id) ON DELETE CASCADE
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );

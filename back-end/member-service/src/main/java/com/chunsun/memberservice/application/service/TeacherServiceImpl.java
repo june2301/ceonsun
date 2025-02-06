@@ -4,33 +4,38 @@ import java.time.LocalDate;
 import java.time.Period;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.chunsun.memberservice.application.dto.TeacherDto;
 import com.chunsun.memberservice.common.error.GlobalErrorCodes;
 import com.chunsun.memberservice.common.exception.BusinessException;
-import com.chunsun.memberservice.domain.CategoryRepository;
-import com.chunsun.memberservice.domain.Member;
-import com.chunsun.memberservice.domain.MemberRepository;
-import com.chunsun.memberservice.domain.Role;
-import com.chunsun.memberservice.domain.Teacher;
-import com.chunsun.memberservice.domain.TeacherRepository;
+import com.chunsun.memberservice.domain.Repository.CategoryRepository;
+import com.chunsun.memberservice.domain.Entity.Member;
+import com.chunsun.memberservice.domain.Repository.MemberRepository;
+import com.chunsun.memberservice.domain.Enum.Role;
+import com.chunsun.memberservice.domain.Entity.Teacher;
+import com.chunsun.memberservice.domain.Repository.TeacherRepository;
 
 @Service
+@Transactional(readOnly = true)
 public class TeacherServiceImpl implements TeacherService {
 
 	private final TeacherRepository teacherRepository;
 	private final MemberRepository memberRepository;
 	private final CategoryRepository categoryRepository;
+	private final CategoryService categoryService;
 
 	public TeacherServiceImpl(TeacherRepository teacherRepository, MemberRepository memberRepository,
-		CategoryRepository categoryRepository) {
+		CategoryRepository categoryRepository, CategoryService categoryService) {
 		this.teacherRepository = teacherRepository;
 		this.memberRepository = memberRepository;
 		this.categoryRepository = categoryRepository;
+		this.categoryService = categoryService;
 	}
 
 	// 카드 생성
 	@Override
+	@Transactional
 	public TeacherDto.CreateCardResponse createCard(TeacherDto.CreateCardRequest request) {
 
 		Member member = memberRepository.findById(request.id()).orElseThrow(()
@@ -60,6 +65,7 @@ public class TeacherServiceImpl implements TeacherService {
 
 	// 카드 업데이트
 	@Override
+	@Transactional
 	public TeacherDto.UpdateCardResponse updateCard(TeacherDto.UpdateCardRequest request) {
 
 		Teacher teacher = teacherRepository.findById(request.id()).orElseThrow(()
@@ -102,7 +108,7 @@ public class TeacherServiceImpl implements TeacherService {
 			teacher.getPrice(),
 			teacher.getTotalClassCount(),
 			teacher.getTotalClassHours(),
-			categoryRepository.findCategoriesByMemberId(id)
+			categoryService.getUserCategories(id)
 		);
 	}
 
@@ -128,12 +134,13 @@ public class TeacherServiceImpl implements TeacherService {
 			teacherInfo.getPrice(),
 			teacherInfo.getTotalClassCount(),
 			teacherInfo.getTotalClassHours(),
-			categoryRepository.findCategoriesByMemberId(id)
+			categoryService.getUserCategories(id)
 		);
 	}
 
 	// 누적 수업 횟수, 시간 업데이트
 	@Override
+	@Transactional
 	public TeacherDto.ClassFinishResponse updateClass(TeacherDto.ClassFinishRequest request) {
 
 		Teacher teacher = teacherRepository.findById(request.id()).orElseThrow(()

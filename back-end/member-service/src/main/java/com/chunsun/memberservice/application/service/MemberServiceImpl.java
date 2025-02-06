@@ -17,37 +17,43 @@ import org.springframework.transaction.annotation.Transactional;
 import com.chunsun.memberservice.application.dto.MemberDto;
 import com.chunsun.memberservice.common.error.GlobalErrorCodes;
 import com.chunsun.memberservice.common.exception.BusinessException;
-import com.chunsun.memberservice.domain.Category;
-import com.chunsun.memberservice.domain.CategoryRepository;
-import com.chunsun.memberservice.domain.Gender;
-import com.chunsun.memberservice.domain.Member;
-import com.chunsun.memberservice.domain.MemberCategory;
-import com.chunsun.memberservice.domain.MemberRepository;
-import com.chunsun.memberservice.domain.Role;
-import com.chunsun.memberservice.domain.Student;
-import com.chunsun.memberservice.domain.StudentRepository;
+import com.chunsun.memberservice.domain.Entity.Category;
+import com.chunsun.memberservice.domain.Repository.CategoryRepository;
+import com.chunsun.memberservice.domain.Enum.Gender;
+import com.chunsun.memberservice.domain.Entity.Member;
+import com.chunsun.memberservice.domain.Entity.MemberCategory;
+import com.chunsun.memberservice.domain.Repository.MemberCategoryRepository;
+import com.chunsun.memberservice.domain.Repository.MemberRepository;
+import com.chunsun.memberservice.domain.Enum.Role;
+import com.chunsun.memberservice.domain.Entity.Student;
+import com.chunsun.memberservice.domain.Repository.StudentRepository;
 import com.chunsun.memberservice.domain.MemberSpecification;
-import com.chunsun.memberservice.domain.Teacher;
-import com.chunsun.memberservice.domain.TeacherRepository;
+import com.chunsun.memberservice.domain.Entity.Teacher;
+import com.chunsun.memberservice.domain.Repository.TeacherRepository;
 
 @Service
+@Transactional(readOnly = true)
 public class MemberServiceImpl implements MemberService {
 
 	private final MemberRepository memberRepository;
 	private final CategoryRepository categoryRepository;
 	private final StudentRepository studentRepository;
 	private final TeacherRepository teacherRepository;
+	private final MemberCategoryRepository memberCategoryRepository;
 
 	public MemberServiceImpl(MemberRepository memberRepository, CategoryRepository categoryRepository,
-		StudentRepository studentRepository, TeacherRepository teacherRepository) {
+		StudentRepository studentRepository, TeacherRepository teacherRepository,
+		MemberCategoryRepository memberCategoryRepository) {
 		this.memberRepository = memberRepository;
 		this.categoryRepository = categoryRepository;
 		this.studentRepository = studentRepository;
 		this.teacherRepository = teacherRepository;
+		this.memberCategoryRepository = memberCategoryRepository;
 	}
 
 	// 회원 가입
 	@Override
+	@Transactional
 	public MemberDto.SignUpResponse signUp(MemberDto.SignUpRequest request) {
 
 		if(memberRepository.existsByKakaoId(request.kakaoId())) {
@@ -64,8 +70,8 @@ public class MemberServiceImpl implements MemberService {
 			.name(request.name())
 			.nickname(request.nickname())
 			.birthdate(request.birthdate())
-			.role(Role.GUEST)
 			.gender(request.gender())
+			.role(Role.GUEST)
 			.build();
 		memberRepository.save(member);
 
@@ -74,6 +80,7 @@ public class MemberServiceImpl implements MemberService {
 
 	// 회원 탈퇴
 	@Override
+	@Transactional
 	public void deleteMember(Long id) {
 
 		Member member = memberRepository.findById(id)
@@ -83,8 +90,7 @@ public class MemberServiceImpl implements MemberService {
 			throw new BusinessException(GlobalErrorCodes.ALREADY_DELETED_USER);
 		}
 
-		// 1. 연관된 데이터 삭제 (카테고리 관계 삭제)
-		member.getMemberCategories().clear();
+		memberCategoryRepository.deleteByMemberId(member.getId());
 
 		if (member.getRole() == Role.STUDENT && member.getStudent() != null) {
 			Student student = studentRepository.findById(id)
@@ -101,7 +107,6 @@ public class MemberServiceImpl implements MemberService {
 
 	// 닉네임 중복 체크
 	@Override
-	@Transactional(readOnly = true)
 	public void checkNicknameAvailability(String nickname) {
 
 		if(memberRepository.existsByNickname(nickname)) {
@@ -111,6 +116,7 @@ public class MemberServiceImpl implements MemberService {
 
 	// 개인정보 수정
 	@Override
+	@Transactional
 	public MemberDto.UpdateInfoResponse updateMemberInfo(MemberDto.UpdateInfoRequest request) {
 
 		Member member = memberRepository.findById(request.id())
@@ -150,7 +156,6 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	@Override
-	@Transactional(readOnly = true)
 	public Page<MemberDto.MemberListItem> getFilterMembers(
 		String category, String gender, String age, int page, int size, Long userId) {
 
@@ -200,9 +205,6 @@ public class MemberServiceImpl implements MemberService {
 			} catch (NumberFormatException e) {
 				throw new BusinessException(GlobalErrorCodes.INVALID_AGE_FORMAT);
 			}
-
-
-
 		}
 
 		// 카테고리 필터 (예: "python,java" -> AND 조건으로 모든 카테고리를 보유한 경우)
@@ -223,7 +225,8 @@ public class MemberServiceImpl implements MemberService {
 			String nickname = member.getNickname();
 			Integer memberAge = Period.between(member.getBirthdate(), LocalDate.now()).getYears();
 			Gender memberGender = member.getGender();
-			List<Category> memberCategories = member.getMemberCategories().stream()
+
+			List<Category> memberCategories = memberCategoryRepository.findByMember(member).stream()
 				.map(MemberCategory::getCategory)
 				.collect(Collectors.toList());
 			return new MemberDto.MemberListItem(memberId, nickname, memberAge, memberGender, memberCategories);
@@ -231,5 +234,4 @@ public class MemberServiceImpl implements MemberService {
 
 		return new PageImpl<>(dtoList, pageable, resultPage.getTotalElements());
 	}
-
 }

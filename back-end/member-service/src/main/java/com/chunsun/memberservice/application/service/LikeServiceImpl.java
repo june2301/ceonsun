@@ -2,22 +2,23 @@ package com.chunsun.memberservice.application.service;
 
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.chunsun.memberservice.application.dto.LikeDto;
-import com.chunsun.memberservice.domain.Like;
-import com.chunsun.memberservice.domain.LikeRepository;
-
-import jakarta.transaction.Transactional;
+import com.chunsun.memberservice.domain.Entity.Like;
+import com.chunsun.memberservice.domain.Repository.LikeRepository;
 
 @Service
+@Transactional(readOnly = true)
 public class LikeServiceImpl implements LikeService {
 
-	private LikeRepository likeRepository;
+	private final LikeRepository likeRepository;
 
 	public LikeServiceImpl(LikeRepository likeRepository) {
 		this.likeRepository = likeRepository;
 	}
 
+	// 찜하기 요청, 취소
 	@Override
 	@Transactional
 	public Boolean getLike(LikeDto.GetLikeRequest request) {

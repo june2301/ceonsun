@@ -3,7 +3,6 @@ package com.chunsun.memberservice.presentation;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -14,7 +13,7 @@ import com.chunsun.memberservice.application.dto.CategoryDto;
 import com.chunsun.memberservice.application.dto.LikeDto;
 import com.chunsun.memberservice.application.service.CategoryService;
 import com.chunsun.memberservice.application.service.LikeService;
-import com.chunsun.memberservice.domain.Category;
+import com.chunsun.memberservice.domain.Entity.Category;
 
 @RestController
 public class CommonController {

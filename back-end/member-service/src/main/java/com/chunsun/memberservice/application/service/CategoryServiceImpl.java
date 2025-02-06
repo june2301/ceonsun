@@ -1,25 +1,28 @@
 package com.chunsun.memberservice.application.service;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.chunsun.memberservice.application.dto.CategoryDto;
 import com.chunsun.memberservice.common.error.GlobalErrorCodes;
 import com.chunsun.memberservice.common.exception.BusinessException;
-import com.chunsun.memberservice.domain.Category;
-import com.chunsun.memberservice.domain.CategoryRepository;
-import com.chunsun.memberservice.domain.Member;
-import com.chunsun.memberservice.domain.MemberCategory;
-import com.chunsun.memberservice.domain.MemberCategoryRepository;
-
-import jakarta.transaction.Transactional;
+import com.chunsun.memberservice.domain.Entity.Category;
+import com.chunsun.memberservice.domain.Repository.CategoryRepository;
+import com.chunsun.memberservice.domain.Entity.Member;
+import com.chunsun.memberservice.domain.Entity.MemberCategory;
+import com.chunsun.memberservice.domain.Repository.MemberCategoryRepository;
+import com.chunsun.memberservice.domain.Repository.MemberRepository;
 
 @Service
+@Transactional(readOnly = true)
 public class CategoryServiceImpl implements CategoryService {
 
 	private final MemberCategoryRepository memberCategoryRepository;
-	private CategoryRepository categoryRepository;
+	private final CategoryRepository categoryRepository;
 
 	public CategoryServiceImpl(CategoryRepository categoryRepository, MemberCategoryRepository memberCategoryRepository) {
 		this.categoryRepository = categoryRepository;
@@ -39,7 +42,16 @@ public class CategoryServiceImpl implements CategoryService {
 	@Override
 	public List<Category> getUserCategories(Long memberId) {
 
-		return categoryRepository.findCategoriesByMemberId(memberId);
+		List<Long> categoryIds = memberCategoryRepository.findByMemberId(memberId)
+			.stream()
+			.map(mc -> mc.getCategory().getId())
+			.collect(Collectors.toList());
+
+		if(categoryIds.isEmpty()) {
+			return Collections.emptyList();
+		}
+
+		return categoryRepository.findByIdIn(categoryIds);
 	}
 
 	// 카테고리 생성 및 업데이트

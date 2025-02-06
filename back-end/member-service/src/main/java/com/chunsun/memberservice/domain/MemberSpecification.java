@@ -8,6 +8,12 @@ import jakarta.persistence.criteria.Subquery;
 
 import org.springframework.data.jpa.domain.Specification;
 
+import com.chunsun.memberservice.domain.Entity.Category;
+import com.chunsun.memberservice.domain.Entity.Member;
+import com.chunsun.memberservice.domain.Entity.MemberCategory;
+import com.chunsun.memberservice.domain.Enum.Gender;
+import com.chunsun.memberservice.domain.Enum.Role;
+
 public class MemberSpecification {
 
 	// 학생

@@ -2,9 +2,9 @@ package com.chunsun.memberservice.application.dto;
 
 import java.util.List;
 
-import com.chunsun.memberservice.domain.Bank;
-import com.chunsun.memberservice.domain.Category;
-import com.chunsun.memberservice.domain.Gender;
+import com.chunsun.memberservice.domain.Enum.Bank;
+import com.chunsun.memberservice.domain.Entity.Category;
+import com.chunsun.memberservice.domain.Enum.Gender;
 
 public record TeacherDto() {
 	public record CreateCardRequest(
