@@ -1,4 +1,4 @@
-package com.chunsun.memberservice.domain;
+package com.chunsun.memberservice.domain.Entity;
 
 import java.time.LocalDateTime;
 
@@ -24,10 +24,8 @@ public class Like {
 	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@JoinColumn(name = "liker_id")
 	private Long likerId;
 
-	@JoinColumn(name = "likee_id")
 	private Long likeeId;
 
 	@CreatedDate

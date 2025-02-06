@@ -1,4 +1,4 @@
-package com.chunsun.memberservice.domain;
+package com.chunsun.memberservice.domain.Entity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,8 +25,4 @@ public class Category {
 	private Long id;
 
 	private String name;
-
-	@OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
-	@JsonIgnore
-	private List<MemberCategory> memberCategories = new ArrayList<>();
 }

@@ -1,14 +1,17 @@
-package com.chunsun.memberservice.domain;
+package com.chunsun.memberservice.domain.Entity;
 
 import java.time.LocalDateTime;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
+import com.chunsun.memberservice.domain.Enum.Bank;
+
+import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
+import jakarta.persistence.ForeignKey;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.MapsId;
@@ -23,14 +26,14 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class Teacher {
-
-	@MapsId
-	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "id")
-	private Member member;
-
 	@Id
+	@JoinColumn(name = "member_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
 	private Long id;
+
+	@OneToOne
+	@MapsId
+	@JoinColumn(name = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+	private Member member;
 
 	private String description;
 
@@ -98,5 +101,6 @@ public class Teacher {
 
 	public void delete() {
 		this.deletedAt = LocalDateTime.now();
+		this.member = null;
 	}
 }

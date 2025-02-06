@@ -1,4 +1,4 @@
-package com.chunsun.memberservice.domain;
+package com.chunsun.memberservice.domain.Entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -20,11 +20,11 @@ public class MemberCategory {
 	private Long id;
 
 	@ManyToOne
-	@JoinColumn(name = "member_id")
+	@JoinColumn(name = "member_id", nullable = false)
 	private Member member;
 
 	@ManyToOne
-	@JoinColumn(name = "category_id")
+	@JoinColumn(name = "category_id", nullable = false)
 	private Category category;
 
 	public MemberCategory(Member member, Category category) {
