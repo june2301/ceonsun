@@ -84,16 +84,16 @@ public class MemberController {
 		return ResponseEntity.ok().build();
 	}
 
-	@GetMapping("/search")
+	@GetMapping("/search/{id}")
 	public ResponseEntity<Page<MemberDto.MemberListItem>> searchMembers(
-		@RequestBody MemberDto.GetInfoRequest request,
+		@PathVariable Long id,
 		@RequestParam(required = false) String category,
 		@RequestParam(required = false) String gender,
 		@RequestParam(required = false) String age,
 		@RequestParam(defaultValue = "0") int page,
 		@RequestParam(defaultValue = "10") int size) {
 
-		Page<MemberDto.MemberListItem> result = memberService.getFilterMembers(category, gender, age, page, size, request.id());
+		Page<MemberDto.MemberListItem> result = memberService.getFilterMembers(category, gender, age, page, size, id);
 
 		return ResponseEntity.ok(result);
 	}
