@@ -125,10 +125,15 @@ services:
     networks:
       - chunsun-network
     depends_on:
-      - config-service
-      - discovery-service
-      - gateway-service
-      - auth-redis
+      config-service:
+        condition: service_healthy
+      discovery-service:
+        condition: service_healthy
+      gateway-service:
+        condition: service_healthy
+      auth-redis:
+        condition: service_healthy
+    restart: always
 
   member-service:
     container_name: member-service
