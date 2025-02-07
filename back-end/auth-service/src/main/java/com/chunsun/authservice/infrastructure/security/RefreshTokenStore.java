@@ -39,7 +39,6 @@ public class RefreshTokenStore {
 		} catch (JsonProcessingException e) {
 			throw new BusinessException(AuthErrorCodes.MEMBER_JSON_SERIALIZE_FAIL);
 		} catch (RedisConnectionFailureException e) {
-			log.info("Redis connect Error");
 			throw new BusinessException(GlobalErrorCodes.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -59,6 +58,5 @@ public class RefreshTokenStore {
 
 	public void removeToken(String refreshToken) {
 		redisTemplate.delete(REDIS_PREFIX + refreshToken);
-		System.out.println(redisTemplate.opsForValue().get(REDIS_PREFIX + refreshToken));
 	}
 }

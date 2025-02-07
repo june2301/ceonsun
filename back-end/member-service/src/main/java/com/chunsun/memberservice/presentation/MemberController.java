@@ -2,9 +2,9 @@ package com.chunsun.memberservice.presentation;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,15 +14,18 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.chunsun.memberservice.application.dto.MemberDto;
 import com.chunsun.memberservice.application.service.MemberService;
+import com.chunsun.memberservice.domain.Repository.MemberRepository;
 
 @RestController
 @RequestMapping("/members")
 public class MemberController {
 
 	private final MemberService memberService;
+	private final MemberRepository memberRepository;
 
-	public MemberController(MemberService memberService) {
+	public MemberController(MemberService memberService, MemberRepository memberRepository) {
 		this.memberService = memberService;
+		this.memberRepository = memberRepository;
 	}
 
 	/*
@@ -32,6 +35,7 @@ public class MemberController {
 	* 회원 탈퇴
 	* 닉네임 중복 체크
 	* 학생 또는 선생 검색
+	* 회원 존재 유무 확인
 	* */
 
 	@PostMapping
@@ -43,34 +47,35 @@ public class MemberController {
 		return ResponseEntity.ok(response);
 	}
 
-	@PutMapping
+	@PutMapping("/{id}")
 	public ResponseEntity<MemberDto.UpdateInfoResponse> updateInfo(
+		@PathVariable Long id,
 		@RequestBody MemberDto.UpdateInfoRequest request) {
 
-		MemberDto.UpdateInfoResponse updateInfo = memberService.updateMemberInfo(request);
+		MemberDto.UpdateInfoResponse updateInfo = memberService.updateMemberInfo(id, request);
 
 		return ResponseEntity.ok(updateInfo);
 	}
 
-	@GetMapping
+	@GetMapping("/{id}")
 	public ResponseEntity<MemberDto.GetInfoResponse> getInfo(
-		@RequestBody MemberDto.GetInfoRequest request) {
+		@PathVariable Long id) {
 
-		MemberDto.GetInfoResponse getInfo = memberService.getMemberInfo(request.id());
+		MemberDto.GetInfoResponse getInfo = memberService.getMemberInfo(id);
 
 		return ResponseEntity.ok(getInfo);
 	}
 
-	@DeleteMapping
+	@DeleteMapping("/{id}")
 	public ResponseEntity<Void> withdraw(
-		@RequestBody MemberDto.GetInfoRequest request) {
+		@PathVariable Long id) {
 
-		memberService.deleteMember(request.id());
+		memberService.deleteMember(id);
 
 		return ResponseEntity.ok().build();
 	}
 
-	@GetMapping("/nickname")
+	@GetMapping()
 	public ResponseEntity<Void> nicknameCheck(
 		@RequestParam String nickname) {
 
@@ -79,7 +84,7 @@ public class MemberController {
 		return ResponseEntity.ok().build();
 	}
 
-	@GetMapping("/search") // 개인정보 공개 여부 추가
+	@GetMapping("/search")
 	public ResponseEntity<Page<MemberDto.MemberListItem>> searchMembers(
 		@RequestBody MemberDto.GetInfoRequest request,
 		@RequestParam(required = false) String category,
@@ -92,4 +97,11 @@ public class MemberController {
 
 		return ResponseEntity.ok(result);
 	}
+
+	@GetMapping("/exist/{id}")
+	public boolean isExist(
+		@PathVariable Long id) {
+		return memberRepository.existsById(id);
+	}
 }
+

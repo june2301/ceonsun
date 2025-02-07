@@ -2,6 +2,7 @@ package com.chunsun.memberservice.domain.Entity;
 
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.Where;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
@@ -21,6 +22,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "students")
 @Getter
 @NoArgsConstructor
+@Where(clause = "deleted_at IS NULL")
 public class Student {
 	@Id
 	@JoinColumn(name = "member_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))

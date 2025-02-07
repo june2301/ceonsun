@@ -30,7 +30,6 @@ spring:
           predicates:
             - Path=/member-service/**
           filters:
-            - RemoveRequestHeader=Cookie
             - RewritePath=/member-service/(?<segment>/.*)?, /$\{segment}
 
         - id: coupon-service

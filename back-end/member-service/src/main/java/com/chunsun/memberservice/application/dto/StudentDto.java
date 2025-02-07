@@ -6,19 +6,20 @@ import com.chunsun.memberservice.domain.Entity.Category;
 import com.chunsun.memberservice.domain.Enum.Gender;
 
 public record StudentDto() {
-	public record CardRequest(
+	public record CreateCardRequest(
 		Long id,
 		Boolean isExposed,
 		String description) {
 	}
 
-	public record CardResponse(
-		String message) {
+	public record UpdateCardRequest(
+		Boolean isExposed,
+		String description
+	) {
 	}
 
-	public record GetCardRequest(
-		Long id
-	) {
+	public record CardResponse(
+		String message) {
 	}
 
 	public record GetCardResponse(

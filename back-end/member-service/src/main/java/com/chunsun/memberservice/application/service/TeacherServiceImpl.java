@@ -16,22 +16,16 @@ import com.chunsun.memberservice.domain.Enum.Role;
 import com.chunsun.memberservice.domain.Entity.Teacher;
 import com.chunsun.memberservice.domain.Repository.TeacherRepository;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class TeacherServiceImpl implements TeacherService {
 
 	private final TeacherRepository teacherRepository;
 	private final MemberRepository memberRepository;
-	private final CategoryRepository categoryRepository;
 	private final CategoryService categoryService;
-
-	public TeacherServiceImpl(TeacherRepository teacherRepository, MemberRepository memberRepository,
-		CategoryRepository categoryRepository, CategoryService categoryService) {
-		this.teacherRepository = teacherRepository;
-		this.memberRepository = memberRepository;
-		this.categoryRepository = categoryRepository;
-		this.categoryService = categoryService;
-	}
 
 	// 카드 생성
 	@Override
@@ -60,15 +54,15 @@ public class TeacherServiceImpl implements TeacherService {
 		);
 		teacherRepository.save(teacher);
 
-		return new TeacherDto.CreateCardResponse("선생 카드 생성 완료 : " + request.id());
+		return new TeacherDto.CreateCardResponse("선생 카드 생성 완료");
 	}
 
 	// 카드 업데이트
 	@Override
 	@Transactional
-	public TeacherDto.UpdateCardResponse updateCard(TeacherDto.UpdateCardRequest request) {
+	public TeacherDto.UpdateCardResponse updateCard(Long id, TeacherDto.UpdateCardRequest request) {
 
-		Teacher teacher = teacherRepository.findById(request.id()).orElseThrow(()
+		Teacher teacher = teacherRepository.findById(id).orElseThrow(()
 			-> new BusinessException(GlobalErrorCodes.TEACHER_NOT_FOUND));
 
 		if (teacher.getMember().getRole() != Role.TEACHER) {
@@ -87,7 +81,7 @@ public class TeacherServiceImpl implements TeacherService {
 		);
 		teacherRepository.save(teacher);
 
-		return new TeacherDto.UpdateCardResponse("선생 카드 업데이트 완료 : " + request.id());
+		return new TeacherDto.UpdateCardResponse("선생 카드 업데이트 완료");
 	}
 
 	// 카드 조회
@@ -141,9 +135,9 @@ public class TeacherServiceImpl implements TeacherService {
 	// 누적 수업 횟수, 시간 업데이트
 	@Override
 	@Transactional
-	public TeacherDto.ClassFinishResponse updateClass(TeacherDto.ClassFinishRequest request) {
+	public TeacherDto.ClassFinishResponse updateClass(Long id, TeacherDto.ClassFinishRequest request) {
 
-		Teacher teacher = teacherRepository.findById(request.id()).orElseThrow(()
+		Teacher teacher = teacherRepository.findById(id).orElseThrow(()
 			-> new BusinessException(GlobalErrorCodes.TEACHER_NOT_FOUND));
 
 		if (request.time() <= 0) {

@@ -16,27 +16,21 @@ import com.chunsun.memberservice.domain.Enum.Role;
 import com.chunsun.memberservice.domain.Entity.Student;
 import com.chunsun.memberservice.domain.Repository.StudentRepository;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class StudentServiceImpl implements StudentService {
 
 	private final StudentRepository studentRepository;
 	private final MemberRepository memberRepository;
-	private final CategoryRepository categoryRepository;
 	private final CategoryService categoryService;
-
-	public StudentServiceImpl(StudentRepository studentRepository, MemberRepository memberRepository,
-		CategoryRepository categoryRepository, CategoryService categoryService) {
-		this.studentRepository = studentRepository;
-		this.memberRepository = memberRepository;
-		this.categoryRepository = categoryRepository;
-		this.categoryService = categoryService;
-	}
 
 	// 카드 생성
 	@Override
 	@Transactional
-	public StudentDto.CardResponse createCard(StudentDto.CardRequest request) {
+	public StudentDto.CardResponse createCard(StudentDto.CreateCardRequest request) {
 
 		Member member = memberRepository.findById(request.id()).orElseThrow(()
 			-> new BusinessException(GlobalErrorCodes.USER_NOT_FOUND));
@@ -55,15 +49,14 @@ public class StudentServiceImpl implements StudentService {
 
 		studentRepository.save(student);
 
-		return new StudentDto.CardResponse("학생 카드 생성 완료 : " + request.id());
+		return new StudentDto.CardResponse("학생 카드 생성 완료");
 	}
 
 	// 카드 업데이트
 	@Override
 	@Transactional
-	public StudentDto.CardResponse updateCard(StudentDto.CardRequest request) {
-
-		Student student = studentRepository.findById(request.id()).orElseThrow(()
+	public StudentDto.CardResponse updateCard(Long id, StudentDto.UpdateCardRequest request) {
+		Student student = studentRepository.findById(id).orElseThrow(()
 			-> new BusinessException(GlobalErrorCodes.STUDENT_NOT_FOUND));
 
 		if(student.getMember().getRole() != Role.STUDENT) {
@@ -77,20 +70,20 @@ public class StudentServiceImpl implements StudentService {
 
 		studentRepository.save(student);
 
-		return new StudentDto.CardResponse("학생 카드 업데이트 완료 : " + request.id());
+		return new StudentDto.CardResponse("학생 카드 업데이트 완료");
 	}
 
 	// 카드 조회
 	@Override
-	public StudentDto.GetCardResponse getCard(StudentDto.GetCardRequest request) {
+	public StudentDto.GetCardResponse getCard(Long id) {
 
-		Student student = studentRepository.findById(request.id()).orElseThrow(()
+		Student student = studentRepository.findById(id).orElseThrow(()
 			-> new BusinessException(GlobalErrorCodes.STUDENT_NOT_FOUND));
 
 		return new StudentDto.GetCardResponse(
 			student.getIsExposed(),
 			student.getDescription(),
-			categoryService.getUserCategories(request.id())
+			categoryService.getUserCategories(id)
 		);
 	}
 

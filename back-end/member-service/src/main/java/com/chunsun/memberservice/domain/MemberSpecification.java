@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Subquery;
 
 import org.springframework.data.jpa.domain.Specification;
@@ -11,16 +12,26 @@ import org.springframework.data.jpa.domain.Specification;
 import com.chunsun.memberservice.domain.Entity.Category;
 import com.chunsun.memberservice.domain.Entity.Member;
 import com.chunsun.memberservice.domain.Entity.MemberCategory;
+import com.chunsun.memberservice.domain.Entity.Student;
 import com.chunsun.memberservice.domain.Enum.Gender;
 import com.chunsun.memberservice.domain.Enum.Role;
 
 public class MemberSpecification {
 
-	// 학생
+	// 역할
 	public static Specification<Member> memberIdEquals(Role role) {
 		return (root, query, criteriaBuilder) ->
 			criteriaBuilder.equal(root.get("role"), role);
 	}
+
+	// 학생일 경우 isExposed에 따라 노출 여부 결정됨
+	public static Specification<Member> isExposedTrue() {
+		return (root, query, criteriaBuilder) -> {
+			Join<Member, Student> studentJoin = root.join("student");
+			return criteriaBuilder.equal(studentJoin.get("isExposed"), true);
+		};
+	}
+
 
 	// 성별 필터
 	public static Specification<Member> hasGender(Gender gender) {

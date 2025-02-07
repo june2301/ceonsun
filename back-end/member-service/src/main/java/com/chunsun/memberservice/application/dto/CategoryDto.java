@@ -10,11 +10,6 @@ public record CategoryDto() {
 	){
 	}
 
-	public record GetCategoryRequest(
-		Long id
-	) {
-	}
-
 	public record CategoryResponse(
 		String message,
 		List<Long> categoryIds
