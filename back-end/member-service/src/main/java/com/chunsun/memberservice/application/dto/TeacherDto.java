@@ -24,7 +24,6 @@ public record TeacherDto() {
 	}
 
 	public record UpdateCardRequest(
-		Long id,
 		String description,
 		String careerDescription,
 		String careerProgress,
@@ -74,7 +73,6 @@ public record TeacherDto() {
 	}
 
 	public record ClassFinishRequest(
-		Long id,
 		Integer time
 	) {
 	}
@@ -84,10 +82,4 @@ public record TeacherDto() {
 		Integer totalClassHours
 	){
 	}
-
-	public record GetClassRequest(
-		Long id
-	){
-	}
-
 }

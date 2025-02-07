@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -49,17 +50,17 @@ public class CommonController {
 
 		// 기존 카테고리 정보 삭제
 		categoryService.deleteCategory(request.id());
-
+		// 카테고리 생성
 		createCategory(request);
 
 		return ResponseEntity.ok().body(new CategoryDto.CategoryResponse("카테고리 업데이트 완료", request.categoryIds()));
 	}
 
-	@GetMapping("/category")
+	@GetMapping("/category/{id}")
 	public List<Category> getUserCategories(
-		@RequestBody CategoryDto.GetCategoryRequest request) {
+		@PathVariable long id) {
 
-		return categoryService.getUserCategories(request.id());
+		return categoryService.getUserCategories(id);
 	}
 
 	@GetMapping("/categories")
@@ -69,14 +70,15 @@ public class CommonController {
 	}
 
 	@PostMapping("/like")
-	public ResponseEntity<LikeDto.GetLikeResponse> like(
-		@RequestBody LikeDto.GetLikeRequest request) {
+	public ResponseEntity<LikeDto.LikeResponse> like(
+		@RequestBody LikeDto.LikeRequest request) {
 
 		// 이미 찜했다면 삭제, 안했다면 찜
 		Boolean isLike = likeService.getLike(request);
 
 		String message = isLike? (request.likerId() + "가 찜했습니다.") : (request.likerId() + "가 찜을 해제했습니다.");
 
-		return ResponseEntity.ok(new LikeDto.GetLikeResponse(isLike, message));
+		return ResponseEntity.ok(new LikeDto.LikeResponse(isLike, message));
 	}
+
 }

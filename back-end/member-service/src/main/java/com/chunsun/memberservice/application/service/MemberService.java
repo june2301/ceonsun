@@ -8,7 +8,7 @@ public interface MemberService {
 
 	MemberDto.SignUpResponse signUp(MemberDto.SignUpRequest request);
 
-	MemberDto.UpdateInfoResponse updateMemberInfo(MemberDto.UpdateInfoRequest request);
+	MemberDto.UpdateInfoResponse updateMemberInfo(Long id, MemberDto.UpdateInfoRequest request);
 
 	MemberDto.GetInfoResponse getMemberInfo(Long id);
 

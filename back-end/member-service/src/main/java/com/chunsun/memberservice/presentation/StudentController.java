@@ -32,33 +32,34 @@ public class StudentController {
 
 	@PostMapping
 	public ResponseEntity<StudentDto.CardResponse> addCard(
-		@RequestBody StudentDto.CardRequest request) {
+		@RequestBody StudentDto.CreateCardRequest request) {
 
 		StudentDto.CardResponse response = studentService.createCard(request);
 		return ResponseEntity.ok(response);
 	}
 
-	@PutMapping
+	@PutMapping("/{id}")
 	public ResponseEntity<StudentDto.CardResponse> updateCard(
-		@RequestBody StudentDto.CardRequest request) {
+		@PathVariable Long id,
+		@RequestBody StudentDto.UpdateCardRequest request) {
 
-		StudentDto.CardResponse response = studentService.updateCard(request);
+		StudentDto.CardResponse response = studentService.updateCard(id, request);
 		return ResponseEntity.ok(response);
 	}
 
-	@GetMapping
+	@GetMapping("/{id}")
 	public ResponseEntity<StudentDto.GetCardResponse> getCard(
-		@RequestBody StudentDto.GetCardRequest request) {
+		@PathVariable Long id) {
 
-		StudentDto.GetCardResponse response = studentService.getCard(request);
+		StudentDto.GetCardResponse response = studentService.getCard(id);
 		return ResponseEntity.ok(response);
 	}
 
-	@GetMapping("/{studentId}")
+	@GetMapping("/details/{id}")
 	public ResponseEntity<StudentDto.GetDetailResponse> getDetail(
-		@PathVariable Long studentId) {
+		@PathVariable Long id) {
 
-		StudentDto.GetDetailResponse response = studentService.getDetail(studentId);
+		StudentDto.GetDetailResponse response = studentService.getDetail(id);
 		return ResponseEntity.ok(response);
 	}
 }

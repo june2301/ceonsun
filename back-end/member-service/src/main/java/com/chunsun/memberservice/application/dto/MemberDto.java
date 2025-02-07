@@ -22,7 +22,6 @@ public record MemberDto() {
 	}
 
 	public record UpdateInfoRequest(
-		Long id,
 		String nickname,
 		String profileImage
 	) {
@@ -53,5 +52,4 @@ public record MemberDto() {
 		Gender gender,
 		List<Category> categories){
 	}
-
 }
