@@ -16,7 +16,7 @@ public interface MemberRepository extends JpaRepository<Member, Long>, JpaSpecif
 
 	boolean existsByNickname(String nickname);
 
-	Member findByKakaoId(String kakaoId);
+	boolean existsById(Long id);
 
 	Page<Member> findAll(Specification<Member> spec, Pageable pageable);
 }

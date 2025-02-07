@@ -28,7 +28,7 @@ spring:
           kakao:
             client-id: 2fe64602abc1d89964ca3c7c83cf840c
             client-secret: puvc6vnidXq1Rq6NvIYOZtIafcymsTRc
-            redirect-uri: "http://i12a505.p.ssafy.io/auth-service/login" ## 이후 프론트 인가 코드 리다이렉트 URL로 변경
+            redirect-uri: "http://i12a505.p.ssafy.io:8080/auth-service/login" ## 이후 프론트 인가 코드 리다이렉트 URL로 변경
             authorization-grant-type: authorization_code
             scope: profile_nickname, account_email
             client-name: kakao

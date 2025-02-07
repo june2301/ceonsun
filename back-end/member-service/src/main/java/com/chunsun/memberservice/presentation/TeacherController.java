@@ -40,44 +40,46 @@ public class TeacherController {
 		return ResponseEntity.ok(response);
 	}
 
-	@PutMapping
+	@PutMapping("/{id}")
 	public ResponseEntity<TeacherDto.UpdateCardResponse> updateCard(
+		@PathVariable Long id,
 		@RequestBody TeacherDto.UpdateCardRequest request) {
 
-		TeacherDto.UpdateCardResponse response = teacherService.updateCard(request);
+		TeacherDto.UpdateCardResponse response = teacherService.updateCard(id, request);
 		return ResponseEntity.ok(response);
 	}
 
-	@GetMapping
+	@GetMapping("/{id}")
 	public ResponseEntity<TeacherDto.GetCardResponse> getCard(
-		@RequestBody TeacherDto.GetCardRequest request) {
+		@PathVariable Long id) {
 
-		TeacherDto.GetCardResponse response = teacherService.getCard(request.id());
+		TeacherDto.GetCardResponse response = teacherService.getCard(id);
 		return ResponseEntity.ok(response);
 	}
 
-	@GetMapping("/{teacherId}")
+	@GetMapping("/details/{id}")
 	public ResponseEntity<TeacherDto.GetDetailResponse> getDetail(
-		@PathVariable Long teacherId) {
+		@PathVariable Long id) {
 
-		TeacherDto.GetDetailResponse response = teacherService.getDetail(teacherId);
+		TeacherDto.GetDetailResponse response = teacherService.getDetail(id);
 		return ResponseEntity.ok(response);
 	}
 
-	@PutMapping("/class")
+	@PutMapping("/class/{id}")
 	public ResponseEntity<TeacherDto.ClassFinishResponse> classCountUpdate(
+		@PathVariable Long id,
 		@RequestBody TeacherDto.ClassFinishRequest request){
 
-		TeacherDto.ClassFinishResponse response = teacherService.updateClass(request);
+		TeacherDto.ClassFinishResponse response = teacherService.updateClass(id, request);
 
 		return ResponseEntity.ok(response);
 	}
 
-	@GetMapping("/class")
+	@GetMapping("/class/{id}")
 	public ResponseEntity<TeacherDto.ClassFinishResponse> getClassCount(
-		@RequestBody TeacherDto.GetClassRequest request) {
+		@PathVariable Long id) {
 
-		TeacherDto.ClassFinishResponse response = teacherService.getClass(request.id());
+		TeacherDto.ClassFinishResponse response = teacherService.getClass(id);
 
 		return ResponseEntity.ok(response);
 	}

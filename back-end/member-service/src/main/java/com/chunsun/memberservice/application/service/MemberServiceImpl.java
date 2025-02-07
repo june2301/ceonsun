@@ -31,7 +31,10 @@ import com.chunsun.memberservice.domain.MemberSpecification;
 import com.chunsun.memberservice.domain.Entity.Teacher;
 import com.chunsun.memberservice.domain.Repository.TeacherRepository;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class MemberServiceImpl implements MemberService {
 
@@ -40,16 +43,6 @@ public class MemberServiceImpl implements MemberService {
 	private final StudentRepository studentRepository;
 	private final TeacherRepository teacherRepository;
 	private final MemberCategoryRepository memberCategoryRepository;
-
-	public MemberServiceImpl(MemberRepository memberRepository, CategoryRepository categoryRepository,
-		StudentRepository studentRepository, TeacherRepository teacherRepository,
-		MemberCategoryRepository memberCategoryRepository) {
-		this.memberRepository = memberRepository;
-		this.categoryRepository = categoryRepository;
-		this.studentRepository = studentRepository;
-		this.teacherRepository = teacherRepository;
-		this.memberCategoryRepository = memberCategoryRepository;
-	}
 
 	// 회원 가입
 	@Override
@@ -117,9 +110,9 @@ public class MemberServiceImpl implements MemberService {
 	// 개인정보 수정
 	@Override
 	@Transactional
-	public MemberDto.UpdateInfoResponse updateMemberInfo(MemberDto.UpdateInfoRequest request) {
+	public MemberDto.UpdateInfoResponse updateMemberInfo(Long id, MemberDto.UpdateInfoRequest request) {
 
-		Member member = memberRepository.findById(request.id())
+		Member member = memberRepository.findById(id)
 			.orElseThrow(() -> new BusinessException(GlobalErrorCodes.USER_NOT_FOUND));
 
 		member.updateInfo(request.nickname(), request.profileImage());
@@ -177,6 +170,11 @@ public class MemberServiceImpl implements MemberService {
 
 		// 기본 조건: 검색 대상 Role로 필터 (요청자의 반대 Role)
 		Specification<Member> spec = Specification.where(MemberSpecification.memberIdEquals(searchTargetRole));
+
+		// 만약 검색 대상이 STUDENT라면 isExposed 필터 추가 (true인 경우만)
+		if (searchTargetRole == Role.STUDENT) {
+			spec = spec.and(MemberSpecification.isExposedTrue());
+		}
 
 		// 성별 필터 (예: MALE 또는 FEMALE)
 		if (gender != null && !gender.isEmpty()) {

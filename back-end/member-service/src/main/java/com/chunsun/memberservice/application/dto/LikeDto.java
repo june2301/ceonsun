@@ -2,13 +2,13 @@ package com.chunsun.memberservice.application.dto;
 
 public record LikeDto() {
 
-	public record GetLikeRequest(
+	public record LikeRequest(
 		Long likerId,
 		Long likeeId
 	){
 	}
 
-	public record GetLikeResponse(
+	public record LikeResponse(
 		Boolean isLike,
 		String message
 	){

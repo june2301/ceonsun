@@ -7,13 +7,13 @@ public interface TeacherService {
 
 	TeacherDto.CreateCardResponse createCard(TeacherDto.CreateCardRequest request);
 
-	TeacherDto.UpdateCardResponse updateCard(TeacherDto.UpdateCardRequest request);
+	TeacherDto.UpdateCardResponse updateCard(Long id, TeacherDto.UpdateCardRequest request);
 
 	TeacherDto.GetCardResponse getCard(Long id);
 
 	TeacherDto.GetDetailResponse getDetail(Long id);
 
-	TeacherDto.ClassFinishResponse updateClass(TeacherDto.ClassFinishRequest request);
+	TeacherDto.ClassFinishResponse updateClass(Long id, TeacherDto.ClassFinishRequest request);
 
 	TeacherDto.ClassFinishResponse getClass(Long id);
 }

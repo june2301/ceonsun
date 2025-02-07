@@ -17,17 +17,15 @@ import com.chunsun.memberservice.domain.Entity.MemberCategory;
 import com.chunsun.memberservice.domain.Repository.MemberCategoryRepository;
 import com.chunsun.memberservice.domain.Repository.MemberRepository;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class CategoryServiceImpl implements CategoryService {
 
 	private final MemberCategoryRepository memberCategoryRepository;
 	private final CategoryRepository categoryRepository;
-
-	public CategoryServiceImpl(CategoryRepository categoryRepository, MemberCategoryRepository memberCategoryRepository) {
-		this.categoryRepository = categoryRepository;
-		this.memberCategoryRepository = memberCategoryRepository;
-	}
 
 	// 카테고리 목록 불러오기
 	@Override
