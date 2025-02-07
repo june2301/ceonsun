@@ -1,4 +1,4 @@
-package com.chunsun.authservice.controller;
+package com.chunsun.authservice.presentation;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
