@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SockJS WebSocket Test</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+</head>
+<body>
+<h2>SockJS WebSocket 테스트</h2>
+
+<label for="username">사용자 이름:</label>
+<input type="text" id="username" placeholder="사용자 이름 입력" />
+
+<label for="roomId">채팅방 번호:</label>
+<input type="text" id="roomId" placeholder="채팅방 번호 입력" />
+<button onclick="connect()">연결하기</button>
+
+<br /><br />
+
+<label for="messageInput">메시지 입력:</label>
+<input type="text" id="messageInput" placeholder="메시지를 입력하세요" />
+<button onclick="sendMessage()">메시지 보내기</button>
+
+<div id="messages"></div>
+
+<script>
+    // const BASE_URL = "http://localhost:8080/chat-service"; // 서버 URL을 변수로 관리
+    const BASE_URL = "http://i12a505.p.ssafy.io:8080/chat-service";
+
+    let stompClient = null;
+    let subscribedRoomId = null;
+    let username = ""; // 사용자 이름 저장
+
+    function connect() {
+        const inputUsername = document.getElementById("username").value;
+        const roomId = document.getElementById("roomId").value;
+
+        if (!inputUsername) {
+            alert("사용자 이름을 입력하세요.");
+            return;
+        }
+
+        if (!roomId) {
+            alert("채팅방 번호를 입력하세요.");
+            return;
+        }
+
+        username = inputUsername; // 입력한 사용자 이름 저장
+
+        // const socket = new SockJS("http://localhost:8080/ws");
+        const token = "Bearer " + username;
+        const socket = new SockJS(
+            `${BASE_URL}/ws?token=${encodeURIComponent(token)}`
+        );
+
+        stompClient = Stomp.over(socket);
+
+        // username은 나중에 token으로 수정해야함
+        stompClient.connect({}, function (frame) {
+            console.log("Connected: " + frame);
+
+            // 기존 구독을 해제하고 새 채팅방 구독
+            if (subscribedRoomId) {
+                stompClient.unsubscribe(subscribedRoomId);
+            }
+
+            subscribedRoomId = `/queue/chat/${roomId}`;
+            stompClient.subscribe(subscribedRoomId, function (message) {
+                const receivedMsg = JSON.parse(message.body);
+                document.getElementById(
+                    "messages"
+                ).innerHTML += `<p><b>${receivedMsg.senderId}:</b> ${receivedMsg.message}</p>`;
+            });
+
+            alert(`채팅방 ${roomId}에 연결되었습니다. 사용자: ${username}`);
+        });
+    }
+
+    function sendMessage() {
+        if (!stompClient || !subscribedRoomId) {
+            alert("먼저 채팅방에 연결하세요.");
+            return;
+        }
+
+        if (!username) {
+            alert("사용자 이름을 입력하고 연결하세요.");
+            return;
+        }
+
+        const messageContent = document.getElementById("messageInput").value;
+        if (!messageContent) {
+            alert("메시지를 입력하세요.");
+            return;
+        }
+
+        const roomId = document.getElementById("roomId").value;
+        stompClient.send(
+            "/app/chat.sendMessage",
+            {},
+            JSON.stringify({
+                roomId: roomId,
+                senderId: username, // 사용자가 입력한 이름을 senderId로 설정
+                message: messageContent,
+                sentAt: new Date().toISOString(),
+            })
+        );
+
+        document.getElementById("messageInput").value = ""; // 입력 필드 초기화
+    }
+</script>
+</body>
+</html>
