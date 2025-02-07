@@ -21,6 +21,20 @@ services:
       timeout: 5s
       retries: 5
 
+  auth-redis:
+    image: redis:7.0
+    container_name: auth-redis-db
+    restart: always
+    ports:
+      - "6378:6379"
+    networks:
+      - chunsun-network
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   rabbitmq:
     image: rabbitmq:3-management
     container_name: rabbitmq
@@ -103,6 +117,8 @@ services:
       context: ./auth-service
       dockerfile: Dockerfile
     environment:
+      spring.data.redis.host: auth-redis-db
+      spring.data.redis.port: 6379
       spring.rabbitmq.host: rabbitmq
       spring.cloud.config.uri: http://config-service:8888
       eureka.client.serviceUrl.defaultZone: http://discovery-service:8761/eureka/
@@ -112,6 +128,7 @@ services:
       - config-service
       - discovery-service
       - gateway-service
+      - auth-redis
 
   member-service:
     container_name: member-service
