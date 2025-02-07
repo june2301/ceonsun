@@ -4,7 +4,7 @@ function LeftBar({ userRole, selectedMenu, onMenuSelect }) {
   let menuItems = [];
 
   if (userRole === "none") {
-    menuItems = ["내 정보", "수강 정보", "수업 정보"];
+    menuItems = ["내 정보", "수강 정보", "수업 정보", "내 학생 목록"];
   } else if (userRole === "student") {
     menuItems = ["내 정보", "수강 정보"];
   } else if (userRole === "teacher") {

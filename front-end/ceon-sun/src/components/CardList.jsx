@@ -8,8 +8,15 @@ function CardList({
   type = "teacher", // "teacher" | "student"
   showDetail = true,
   onDetailClick,
-  // 학생 카드에서 확장된 카드의 인덱스 (type이 "student"일 때만 사용)
   expandedStudentIndex = null,
+  isBackArrow = false,
+  isMyDetail = false,
+  isInquiryMode = false,
+  onAccept,
+  onReject,
+  onClassEnter,
+  onInquiry,
+  onEndClass,
 }) {
   return (
     <div className="flex flex-col gap-4">
@@ -39,7 +46,7 @@ function CardList({
           if (expandedStudentIndex === idx) {
             return (
               <StudentCardDetail
-                key={idx}
+                key={`detail-${idx}`}
                 nickname={card.nickname}
                 name={card.name}
                 age={card.age}
@@ -47,9 +54,16 @@ function CardList({
                 profileImage={card.profileImage}
                 subjects={card.subjects}
                 introduction={card.introduction}
+                studentStatus={card.studentStatus}
                 showDetail={showDetail}
-                onClose={() => onDetailClick && onDetailClick(card, idx)} // 변경: onDetailClick 대신 onClose로 전달
-                isListDetail={true}
+                onClose={() => onDetailClick(card, idx)}
+                isListDetail={isInquiryMode}
+                isMyDetail={isMyDetail}
+                onAccept={() => onAccept && onAccept(card)}
+                onReject={() => onReject && onReject(card)}
+                onClassEnter={() => onClassEnter && onClassEnter(card)}
+                onInquiry={() => onInquiry && onInquiry(card)}
+                onEndClass={() => onEndClass && onEndClass(card)}
               />
             );
           } else {
@@ -59,11 +73,21 @@ function CardList({
                 nickname={card.nickname}
                 profileImage={card.profileImage}
                 subjects={card.subjects}
+                introduction={card.introduction}
                 showDetail={showDetail}
-                onDetailClick={() => onDetailClick && onDetailClick(card, idx)}
+                onDetailClick={() => onDetailClick(card, idx)}
+                studentStatus={card.studentStatus}
+                showRemainLessons={card.showRemainLessons}
+                remainLessonsCnt={card.remainLessonsCnt}
+                showClassroomButton={card.showClassroomButton}
+                showAcceptButton={card.showAcceptButton}
+                showRejectButton={card.showRejectButton}
                 isOwner={card.isOwner}
                 cardPublic={card.cardPublic}
                 isListDetail={card.isListDetail}
+                onAccept={() => onAccept && onAccept(card)}
+                onReject={() => onReject && onReject(card)}
+                onClassEnter={() => onClassEnter && onClassEnter(card)}
               />
             );
           }

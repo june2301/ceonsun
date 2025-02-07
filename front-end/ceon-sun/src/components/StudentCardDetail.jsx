@@ -4,44 +4,138 @@ import { ArrowUpIcon, ArrowLongLeftIcon } from "@heroicons/react/24/solid";
 
 function StudentCardDetail({
   nickname,
-  name, // DefaultProfile에 전달할 이름
-  age, // DefaultProfile에 전달할 나이
-  gender, // DefaultProfile에 전달할 성별
+  name,
+  age,
+  gender,
   profileImage,
   subjects = [],
   introduction = "",
-  // 구분 플래그: 리스트 내 확장인지 (Scenario 1) 또는 내 Detail 모드인지 (Scenario 2)
-  isListDetail = false,
-  isMyDetail = false,
-  // 닫기(Detail 종료) 함수 – 상황에 맞게 전달됨
+  // 구분 플래그
+  isListDetail = false, // CardListPage에서 접근
+  isMyDetail = false, // MyLecture에서 접근
+  studentStatus = "", // MyStudentList에서 접근시 사용
+  // 닫기(Detail 종료) 함수
   onClose,
-  // 수정하기 버튼 클릭 함수 (내 Detail 모드에서만 사용)
+  // 버튼 클릭 핸들러들
+  onAccept, // 수락하기
+  onReject, // 거절하기
+  onClassEnter, // 수업방 접속
+  onInquiry, // 문의하기
+  // 내 Detail 모드 전용
   onUpdate,
-  // 카드 공개 여부 (내 학생 카드 Detail 모드에서 조회용)
   cardPublic,
+  onEndClass,
 }) {
-  return (
-    <div className="bg-white rounded-md p-4 shadow-[0_2px_8px_rgba(0,0,0,0.1)] relative">
-      {/* 상단 버튼 영역 */}
-      {isListDetail && (
-        // Scenario 1: 우측 상단 닫기 버튼 (ArrowUpIcon)
-        <div className="absolute top-4 right-4">
-          <button onClick={onClose} title="닫기">
-            <ArrowUpIcon className="w-5 h-5 text-gray-600 hover:text-gray-800" />
+  // 상태에 따른 스타일 결정
+  const getStatusStyle = () => {
+    switch (studentStatus) {
+      case "신청중":
+        return { color: "#FFA500" };
+      case "과외중":
+        return { color: "#007BFF" };
+      case "과외 종료":
+        return { color: "#A89F91" };
+      default:
+        return { color: "#6B7280" }; // text-gray-500에 해당하는 색상
+    }
+  };
+
+  // 하단 버튼 영역 렌더링 함수
+  const renderBottomButtons = () => {
+    if (isMyDetail) {
+      return (
+        <div className="flex justify-end">
+          <button
+            onClick={onUpdate}
+            className="px-4 py-2 bg-amber-200 font-semibold rounded shadow hover:bg-amber-300 transition"
+          >
+            수정하기
           </button>
         </div>
-      )}
-      {isMyDetail && (
-        // Scenario 2: 좌측 상단에 왼쪽 화살표와 "수강 정보" 텍스트 전체가 버튼으로 동작
+      );
+    }
+
+    if (isListDetail) {
+      return (
+        <div className="flex justify-end">
+          <button
+            onClick={onInquiry}
+            className="px-4 py-2 bg-green-300 hover:bg-green-400 font-semibold rounded shadow transition"
+          >
+            문의하기
+          </button>
+        </div>
+      );
+    }
+
+    // MyStudentList의 경우
+    switch (studentStatus) {
+      case "신청중":
+        return (
+          <div className="flex justify-end space-x-2">
+            <button
+              onClick={onAccept}
+              className="whitespace-nowrap text-sm font-semibold rounded px-3 py-2 bg-blue-400 hover:bg-blue-500 text-white"
+            >
+              수락하기
+            </button>
+            <button
+              onClick={onReject}
+              className="whitespace-nowrap text-sm font-semibold rounded px-3 py-2 bg-gray-400 hover:bg-gray-600 text-white"
+            >
+              거절하기
+            </button>
+          </div>
+        );
+      case "과외중":
+        return (
+          <div className="flex justify-between">
+            <button
+              onClick={onEndClass}
+              className="whitespace-nowrap text-sm font-semibold rounded px-3 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700"
+            >
+              과외 종료하기
+            </button>
+            <button
+              onClick={onClassEnter}
+              className="whitespace-nowrap text-sm text-gray-700 font-semibold rounded px-3 py-2 border-2 border-gray-300 bg-white hover:bg-gray-300"
+            >
+              수업방 접속
+            </button>
+          </div>
+        );
+      case "과외 종료":
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div className="bg-white rounded-md p-4 shadow-[0_2px_8px_rgba(0,0,0,0.1)] relative">
+      {/* 상단 닫기 버튼과 상태 표시 */}
+      {isMyDetail ? (
         <div className="pb-3 text-gray-600 hover:text-gray-800">
           <button onClick={onClose} className="flex items-center space-x-1">
             <ArrowLongLeftIcon className="w-7 h-7" />
             <span className="font-bold">수강 정보</span>
           </button>
         </div>
+      ) : (
+        <div className="absolute top-4 right-4 flex items-center space-x-3">
+          {/* 상태 텍스트 - studentStatus가 있을 때만 표시 */}
+          {studentStatus && (
+            <span className="text-sm font-semibold" style={getStatusStyle()}>
+              {studentStatus}
+            </span>
+          )}
+          {/* 닫기 버튼 */}
+          <button onClick={onClose} title="닫기">
+            <ArrowUpIcon className="w-5 h-5 text-gray-600 hover:text-gray-800" />
+          </button>
+        </div>
       )}
 
-      {/* 상단: DefaultProfile (작은 버전) */}
+      {/* DefaultProfile (작은 버전) */}
       <div className="mb-5">
         <DefaultProfile
           name={name}
@@ -56,7 +150,7 @@ function StudentCardDetail({
       {/* 구분선 */}
       <hr className="mb-5 border-t border-gray-300" />
 
-      {/* (Scenario 2) 카드 공개 정보 표시 */}
+      {/* 카드 공개 정보 (MyLecture에서만 표시) */}
       {isMyDetail && (
         <div className="mb-8 flex items-center">
           <div className="flex items-center space-x-2">
@@ -99,41 +193,7 @@ function StudentCardDetail({
       </div>
 
       {/* 하단 버튼 영역 */}
-      {isMyDetail ? (
-        // Scenario 2: 우측 하단 문의하기 버튼 대신 수정하기 버튼.
-        // 수정하기 버튼을 누르면 onUpdate 함수가 호출되면서,
-        // 현재 Detail 데이터를 객체로 전달하여 MyLecture가 StudentCardCreate(업데이트 모드)로 전환됨.
-        <div className="flex justify-end">
-          <button
-            onClick={() =>
-              onUpdate &&
-              onUpdate({
-                nickname,
-                name,
-                age,
-                gender,
-                profileImage,
-                subjects,
-                introduction,
-                cardPublic,
-              })
-            }
-            className="px-4 py-2 bg-amber-200 font-semibold rounded shadow hover:bg-amber-300 transition"
-          >
-            수정하기
-          </button>
-        </div>
-      ) : isListDetail ? (
-        // Scenario 1: 우측 하단 문의하기 버튼
-        <div className="flex justify-end">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 bg-green-300 hover:bg-green-400 font-semibold rounded shadow transition"
-          >
-            문의하기
-          </button>
-        </div>
-      ) : null}
+      {renderBottomButtons()}
     </div>
   );
 }

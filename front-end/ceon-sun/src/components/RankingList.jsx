@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import DefaultProfile from "@/assets/img/default-profile.png";
+import { InformationCircleIcon } from "@heroicons/react/24/outline";
 
 function RankingList({ rankingData = [] }) {
   // 랭킹 설명 팝업 표시 여부
@@ -17,10 +18,11 @@ function RankingList({ rankingData = [] }) {
 
         {/* 랭킹 설명 (마우스 오버 시 팝업) */}
         <div
-          className="text-sm text-gray-500 relative cursor-pointer"
+          className="mt-1 text-sm text-gray-500 relative cursor-pointer flex items-center"
           onMouseEnter={() => setShowTooltip(true)}
           onMouseLeave={() => setShowTooltip(false)}
         >
+          <InformationCircleIcon className="w-5 h-5" />
           랭킹 설명
           {showTooltip && (
             <div

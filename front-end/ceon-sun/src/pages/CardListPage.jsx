@@ -7,7 +7,7 @@ import CardList from "../components/CardList";
 
 function CardListPage() {
   const navigate = useNavigate();
-  const userRole = "student"; // "student" 또는 "teacher"
+  const userRole = "teacher"; // "student" 또는 "teacher"
 
   // TopBar 메뉴 항목 (학생이 "선생님 리스트" 볼 때만 사용)
   const topBarItems = ["선생님 목록", "찜한 선생님", "선생님 랭킹"];
@@ -180,6 +180,8 @@ function CardListPage() {
                 cards={currentList}
                 onDetailClick={handleStudentListDetail}
                 expandedStudentIndex={expandedStudentIndex}
+                isBackArrow={false}
+                isInquiryMode={true}
               />
             )}
           </div>

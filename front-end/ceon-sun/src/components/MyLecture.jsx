@@ -25,7 +25,8 @@ function MyLecture() {
     gender: "남",
     profileImage: "",
     subjects: ["Python", "JavaScript"],
-    introduction: "내 소개글 내용",
+    introduction:
+      "내 소개글 내용\n내 소개글 내용\n내 소개글 내용\n내 소개글 내용\n내 소개글 내용\n내 소개글 내용\n내 소개글 내용\n",
     cardPublic: true,
   };
 
@@ -49,7 +50,8 @@ function MyLecture() {
       showPaymentButton: true,
       introduction:
         "안녕하세요, 저는 Teacher1입니다. 열정적으로 학생들을 지도하고 있습니다.",
-      experience: "2010 ~ 2015: Company A\n2015 ~ 2020: Company B",
+      experience:
+        "2010 ~ 2015: Company A\n2010 ~ 2015: Company A\n2010 ~ 2015: Company A\n2010 ~ 2015: Company A\n2010 ~ 2015: Company A\n2015 ~ 2020: Company B\n2015 ~ 2020: Company B\n2015 ~ 2020: Company B\n2015 ~ 2020: Company B\n2015 ~ 2020: Company B",
       lessonFee: 50000,
       lessonInfo: "주 3회, 1시간 수업 진행, 온라인/오프라인 가능",
       materials: [
@@ -124,12 +126,10 @@ function MyLecture() {
 
   // 렌더링 분기
   if (teacherDetailMode) {
-    // 시나리오 2: 선생님 상세 보기 모드가 활성화되면 MyLecture 전체를 TeacherDetail로 전환
-    // TeacherDetail 컴포넌트는 내부 TopBar 탭 전환으로 TeacherInfoA, TeacherInfoB, TeacherInfoC를 표시합니다.
     const topBarItems = ["선생님 소개", "수업 설명", "수업 자료"];
     return (
-      <div className="">
-        <div className="ml-4 my-3 flex items-center justify-between">
+      <div className="h-full flex flex-col">
+        <div className="flex-none ml-4 my-3 flex items-center justify-between">
           <button
             onClick={handleTeacherDetailClose}
             className="flex items-center space-x-1 text-gray-500 hover:text-gray-700"
@@ -144,101 +144,100 @@ function MyLecture() {
             <span className="font-bold text-gray-600 pr-4">
               {selectedTeacher.remainLessonsCnt}
             </span>
-            <button className="px-3 py-1.5 border-2 border-purple-600 bg-purple-500 hover:bg-purple-600 font-bold text-white rounded">
+            <button className="mr-2 px-3 py-1.5 border-2 border-purple-600 bg-purple-500 hover:bg-purple-600 font-bold text-white rounded">
               수강료 결제하기
             </button>
           </span>
         </div>
-        {/* 뒤로가기 영역 하단에 전체 너비 가로선 추가 */}
-        <hr className="w-full mt-2 border-t-2 border-gray-300" />
-        {/* TeacherDetail 컴포넌트 */}
-        <TeacherDetail
-          teacher={selectedTeacher}
-          topBarItems={topBarItems}
-          onBack={handleTeacherDetailClose}
-        />
-        <div className="flex justify-end pt-4">
-          <button className="px-4 py-2 border-2 border-gray-300 bg-white hover:bg-gray-300 font-bold text-gray-700 rounded">
-            수업방 접속
-          </button>
+        <hr className="w-full border-t-2 border-gray-300" />
+
+        {/* TeacherDetail 영역 */}
+        <div className="flex-1 px-4 pt-2 min-h-0">
+          <TeacherDetail
+            teacher={selectedTeacher}
+            topBarItems={topBarItems}
+            showClassButton={true}
+            onBack={handleTeacherDetailClose}
+          />
         </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-8 pl-6 pr-4 py-6">
-      {!studentCardExists ? (
-        // 학생 카드가 없으면 StudentCardCreate 컴포넌트를 보여줌
-        <StudentCardCreate
-          name="홍길동"
-          nickname="홍길동"
-          age="25"
-          birthdate="1998.01.01"
-          gender="남"
-          profileImage=""
-        />
-      ) : isMyDetailMode ? (
-        // Detail 모드: 내 학생 카드 Detail 또는 업데이트 모드 전환
-        isUpdateMode ? (
-          // 업데이트(수정) 모드: StudentCardCreate 컴포넌트를 updateMode로 전환하여 사용
-          <StudentCardCreate
-            name={myStudentCard.name}
-            nickname={myStudentCard.nickname}
-            age={myStudentCard.age}
-            gender={myStudentCard.gender}
-            profileImage={myStudentCard.profileImage}
-            subjects={myStudentCard.subjects}
-            introduction={myStudentCard.introduction}
-            updateMode={true} // 업데이트 모드임을 표시
-            onClose={() => {
-              // 수정 모드 종료 후 Detail 모드로 돌아가려면:
-              setIsUpdateMode(false);
-            }}
-          />
+    <div className="h-full flex flex-col">
+      <div className="flex-1 overflow-y-auto custom-scrollbar">
+        {!studentCardExists ? (
+          // 학생 카드가 없으면 StudentCardCreate 컴포넌트를 보여줌
+          <div className="p-4 min-h-full">
+            <StudentCardCreate
+              name="홍길동"
+              nickname="홍길동"
+              age="25"
+              birthdate="1998.01.01"
+              gender="남"
+              profileImage=""
+            />
+          </div>
+        ) : isMyDetailMode ? (
+          // Detail 모드 또는 수정 모드
+          <div className="p-4 min-h-full">
+            {isUpdateMode ? (
+              <StudentCardCreate
+                name={myStudentCard.name}
+                nickname={myStudentCard.nickname}
+                age={myStudentCard.age}
+                gender={myStudentCard.gender}
+                profileImage={myStudentCard.profileImage}
+                subjects={myStudentCard.subjects}
+                introduction={myStudentCard.introduction}
+                updateMode={true}
+                onClose={() => setIsUpdateMode(false)}
+              />
+            ) : (
+              <StudentCardDetail
+                nickname={myStudentCard.nickname}
+                name={myStudentCard.name}
+                age={myStudentCard.age}
+                gender={myStudentCard.gender}
+                profileImage={myStudentCard.profileImage}
+                subjects={myStudentCard.subjects}
+                introduction={myStudentCard.introduction}
+                isMyDetail={true}
+                onClose={handleMyDetailClose}
+                onUpdate={handleStudentUpdate}
+                cardPublic={myStudentCard.cardPublic}
+              />
+            )}
+          </div>
         ) : (
-          // Detail 모드: 내 학생 카드 Detail만 보여줌
-          <StudentCardDetail
-            nickname={myStudentCard.nickname}
-            name={myStudentCard.name}
-            age={myStudentCard.age}
-            gender={myStudentCard.gender}
-            profileImage={myStudentCard.profileImage}
-            subjects={myStudentCard.subjects}
-            introduction={myStudentCard.introduction}
-            isMyDetail={true}
-            onClose={handleMyDetailClose}
-            onUpdate={handleStudentUpdate}
-            cardPublic={myStudentCard.cardPublic}
-          />
-        )
-      ) : (
-        // 기본 상태: 내 학생 카드와 수강 정보(CardList) 영역을 보여줌
-        <>
-          <div className="mb-8">
-            <h2 className="text-xl font-bold mb-4">나의 학생 카드</h2>
-            <StudentCard
-              nickname={myStudentCard.nickname}
-              subjects={myStudentCard.subjects}
-              profileImage={myStudentCard.profileImage}
-              isOwner={true}
-              cardPublic={myStudentCard.cardPublic}
-              showDetail={true}
-              onDetailClick={handleStudentMyDetail}
-            />
+          // 기본 상태 - 내 학생 카드와 선생님 카드 목록
+          <div className="space-y-8 pl-6 pr-4 py-6">
+            <div>
+              <h2 className="text-xl font-bold mb-4">나의 학생 카드</h2>
+              <StudentCard
+                nickname={myStudentCard.nickname}
+                subjects={myStudentCard.subjects}
+                profileImage={myStudentCard.profileImage}
+                isOwner={true}
+                cardPublic={myStudentCard.cardPublic}
+                showDetail={true}
+                onDetailClick={handleStudentMyDetail}
+              />
+            </div>
+            <hr className="border-t border-gray-300" />
+            <div>
+              <h2 className="text-xl font-bold mb-4">수강 정보</h2>
+              <CardList
+                cards={teacherList}
+                type="teacher"
+                showDetail={true}
+                onDetailClick={handleTeacherDetail}
+              />
+            </div>
           </div>
-          <hr className="my-8 border-t border-gray-300" />
-          <div>
-            <h2 className="text-xl font-bold mb-4">수강 정보</h2>
-            <CardList
-              cards={teacherList}
-              type="teacher"
-              showDetail={true}
-              onDetailClick={(card) => handleTeacherDetail(card)}
-            />
-          </div>
-        </>
-      )}
+        )}
+      </div>
     </div>
   );
 }
