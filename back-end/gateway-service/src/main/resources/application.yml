@@ -23,7 +23,6 @@ spring:
           predicates:
             - Path=/auth-service/**
           filters:
-            - RemoveRequestHeader=Cookie
             - RewritePath=/auth-service/(?<segment>/.*)?, /$\{segment}
 
         - id: member-service
