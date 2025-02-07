@@ -1,8 +1,40 @@
+server:
+  port: 8089
+
 spring:
+  cloud:
+    stream:
+      default-binder: rabbit
+
   application:
     name: chat-service
+  datasource:
+    url: jdbc:mysql://localhost:3306/chat?serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true&useSSL=false
+    username: chunsun
+    password: chunsun
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    database: mysql
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+    show-sql: true
+    # MongoDB 설정
+  data:
+    mongodb:
+      uri: mongodb://chunsun:chunsun@localhost:27017/chatdb?authSource=chatdb
+#        database: chatdb
 
-server:
-  port: 8087
+  kafka:
+    producer:
+      bootstrap-servers: localhost:29092,localhost:29093,localhost:29094  # ✅ 로컬에서도 kafka에 접근 가능하도록 변경
+      #   bootstrap-servers: kafka1:9092,kafka2:9092,kafka3:9092
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer  # ✅ JSON 직렬화
 
-
+# 🔥🔥docker build 할때 주석 처리 해야함🔥🔥
+eureka:
+  client:
+    enabled: false  # Eureka Client 완전 비활성화
