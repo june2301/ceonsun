@@ -60,7 +60,7 @@ function StudentCard({
   return (
     <div className="bg-white rounded-md p-4 shadow-[0_2px_8px_rgba(0,0,0,0.1)]">
       {/* 상단 영역 */}
-      <div className="flex items-start">
+      <div className="pl-1 flex items-start">
         {/* 프로필 이미지 */}
         <div
           className="
@@ -144,7 +144,7 @@ function StudentCard({
           <div className="mt-3 flex justify-between items-center">
             {/* 잔여 수업 횟수 (0이어도 표시) */}
             {showRemainLessons && (
-              <span className="text-sm text-gray-500 whitespace-nowrap">
+              <span className="ml-2 text-sm text-gray-500 whitespace-nowrap">
                 잔여 수업 횟수 :{" "}
                 <span className="text-gray-600 font-bold">
                   {remainLessonsCnt}
@@ -153,55 +153,24 @@ function StudentCard({
             )}
 
             {/* 버튼들 (오른쪽 정렬) */}
-            <div className="flex space-x-2">
+            <div className="flex justify-end space-x-2 ml-auto">
               {/* 수업방 접속 */}
               {showClassroomButton && (
-                <button
-                  className="
-                    whitespace-nowrap
-                    min-w-[90px]
-                    py-1 px-2
-                    bg-white-200 hover:bg-gray-200
-                    text-sm text-gray-600
-                    font-semibold
-                    shadow-[0_2px_5px_rgba(0,0,0,0.2)]
-                    rounded
-                  "
-                >
+                <button className="whitespace-nowrap text-sm text-gray-700 font-semibold rounded px-3 py-2 border-2 border-gray-300 bg-white hover:bg-gray-300 mr-1">
                   수업방 접속
                 </button>
               )}
 
               {/* 수락하기 */}
               {showAcceptButton && (
-                <button
-                  className="
-                    whitespace-nowrap
-                    min-w-[70px]
-                    py-1 px-2
-                    bg-blue-400 hover:bg-blue-500
-                    text-white text-sm
-                    font-semibold
-                    rounded
-                  "
-                >
+                <button className="whitespace-nowrap text-sm font-semibold rounded px-3 py-2 bg-blue-400 hover:bg-blue-500 text-white">
                   수락하기
                 </button>
               )}
 
               {/* 거절하기 */}
               {showRejectButton && (
-                <button
-                  className="
-                    whitespace-nowrap
-                    min-w-[70px]
-                    py-1 px-2
-                    bg-gray-400 hover:bg-gray-600
-                    text-white text-sm
-                    font-semibold
-                    rounded
-                  "
-                >
+                <button className="whitespace-nowrap text-sm font-semibold rounded px-3 py-2 bg-gray-400 hover:bg-gray-600 text-white">
                   거절하기
                 </button>
               )}

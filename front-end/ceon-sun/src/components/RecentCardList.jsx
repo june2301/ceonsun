@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import TeacherCard from "../components/TeacherCard";
+import { PlayIcon } from "@heroicons/react/24/solid";
 
 function RecentCardList({
   title = "최근 등록된 수업",
@@ -24,10 +25,11 @@ function RecentCardList({
         <h2 className="text-lg font-semibold mr-2">{title}</h2>
         {onClickMore && (
           <button
-            className="text-sm text-gray-500 hover:text-gray-700"
+            className="text-sm text-gray-500 hover:text-gray-700 flex items-center"
             onClick={onClickMore}
           >
-            이동하기 &gt;
+            이동하기
+            <PlayIcon className="w-3.5 h-3.5 ml-0.5" />
           </button>
         )}
       </div>

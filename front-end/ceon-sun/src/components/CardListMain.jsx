@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import TeacherCard from "../components/TeacherCard";
 import StudentCard from "../components/StudentCard";
+import { PlayIcon } from "@heroicons/react/24/solid";
+import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
 
 function CardListMain({
   userRole = "student", // "teacher" or "student"
@@ -12,7 +14,7 @@ function CardListMain({
   const PAGE_SIZE = 2;
   const [currentPage, setCurrentPage] = useState(0);
 
-  // 사용자 역할에 맞게 “현재 보여줄 카드 배열” 결정
+  // 사용자 역할에 맞게 "현재 보여줄 카드 배열" 결정
   const dataToShow = userRole === "teacher" ? studentCards : teacherCards;
 
   const totalPages = Math.ceil(dataToShow.length / PAGE_SIZE);
@@ -38,10 +40,11 @@ function CardListMain({
         <h2 className="text-lg font-semibold mr-2">{title}</h2>
         {onClickMore && (
           <button
-            className="text-sm text-gray-500 hover:text-gray-700"
+            className="text-sm text-gray-500 hover:text-gray-700 flex items-center"
             onClick={onClickMore}
           >
-            이동하기 &gt;
+            이동하기
+            <PlayIcon className="w-3.5 h-3.5 ml-0.5" />
           </button>
         )}
       </div>
@@ -53,12 +56,12 @@ function CardListMain({
           className="
             absolute left-0
             top-1/2 -translate-y-1/2
-            bg-white shadow px-2 py-1
-            rounded text-gray-700 font-semibold
+            px-2 py-1
+            text-gray-700
             z-10
           "
         >
-          &lt;
+          <ChevronLeftIcon className="w-5 h-5" />
         </button>
 
         <button
@@ -66,12 +69,12 @@ function CardListMain({
           className="
             absolute right-0
             top-1/2 -translate-y-1/2
-            bg-white shadow px-2 py-1
-            rounded text-gray-700 font-semibold
+            px-2 py-1
+            text-gray-700
             z-10
           "
         >
-          &gt;
+          <ChevronRightIcon className="w-5 h-5" />
         </button>
 
         <div className="overflow-hidden">

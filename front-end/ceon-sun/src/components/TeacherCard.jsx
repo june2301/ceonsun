@@ -40,7 +40,7 @@ function TeacherCard({
   return (
     <div className="bg-white rounded-md p-4 shadow-[0_2px_8px_rgba(0,0,0,0.1)]">
       {/* 상단 영역 */}
-      <div className="relative flex items-start">
+      <div className="pl-1 relative flex items-start">
         {/* 프로필 이미지 */}
         <div
           className={`
@@ -151,7 +151,7 @@ function TeacherCard({
           <div className="mt-3 flex justify-between items-center">
             {/* 잔여 수업 횟수 (0이어도 표시) */}
             {showRemainLessons && (
-              <span className="text-sm text-gray-500 whitespace-nowrap">
+              <span className="ml-2 text-sm text-gray-500 whitespace-nowrap">
                 잔여 수업 횟수 :{" "}
                 <span className="text-gray-600 font-bold">
                   {remainLessonsCnt}
@@ -172,6 +172,7 @@ function TeacherCard({
                     py-2
                     border-2 border-gray-300
                     bg-white hover:bg-gray-300
+                    mr-1
                   "
                 >
                   수업방 접속
