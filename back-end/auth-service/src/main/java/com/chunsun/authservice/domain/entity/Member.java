@@ -46,9 +46,6 @@ public class Member {
 	private String profileImage;
 	private LocalDateTime birthdate;
 
-	@Column(nullable = false)
-	private boolean isExposed = true;
-
 	private LocalDateTime createdAt;
 	private LocalDateTime updatedAt;
 	private LocalDateTime deletedAt;
