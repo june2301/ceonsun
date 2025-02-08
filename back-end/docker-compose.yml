@@ -150,7 +150,8 @@ services:
         condition: service_healthy
       auth-redis:
         condition: service_healthy
-    restart: always
+      mysql:
+        condition: service_healthy
 
   member-service:
     container_name: member-service
