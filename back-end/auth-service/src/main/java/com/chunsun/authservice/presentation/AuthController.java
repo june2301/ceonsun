@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.chunsun.authservice.application.dto.AuthDto;
@@ -40,6 +41,8 @@ public class AuthController {
 		@RequestHeader("X-Chunsun-Kakao-Auth-Code") String authHeader,
 		HttpServletResponse response) {
 		var kakaoAuthCode = HeaderUtil.extractToken(authHeader);
+
+		log.info("accessCode : {}", kakaoAuthCode );
 
 		return kakaoAuthService.getKakaoToken(kakaoAuthCode)
 			.flatMap(tokenResponse -> {
@@ -119,6 +122,13 @@ public class AuthController {
 		return createAuthResponse(authResponse.getToken());
 	}
 
+	/**
+	 * 천선 리프레시 토큰 발급
+	 *
+	 * @param refreshToken  천선 리프레시 코드 ( 쿠키 )
+	 * @return accessToken 새로 생성된 천선 엑세스 코드 ( 헤더 )
+	 * @return refreshToken 새로 생성된 천선 리프레시 코드 ( 쿠키 )
+	 */
 	@PostMapping("/refresh")
 	public ResponseEntity<Void> refreshToken(
 		@CookieValue(value = "refreshToken", required = false) String refreshToken,
@@ -132,6 +142,16 @@ public class AuthController {
 		CookieUtil.addCookie(response, "refreshToken", authResponse.getRefreshToken());
 
 		return createAuthResponse(authResponse.getToken());
+	}
+
+	/**
+	 * 천선 인가 코드 테스트
+	 *
+	 * @param code  천선 엑세스 코드
+	 */
+	@GetMapping("/login")
+	public Mono<ResponseEntity<?>> kakaoLoginCallback(@RequestParam("code") String code) {
+		return Mono.just(ResponseEntity.ok(code));
 	}
 
 	private ResponseEntity<Void> createAuthResponse(String authToken) {
