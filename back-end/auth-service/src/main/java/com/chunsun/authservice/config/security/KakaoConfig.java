@@ -19,10 +19,6 @@ public class KakaoConfig {
 		return clientId;
 	}
 
-	public String getClientSecret() {
-		return clientSecret;
-	}
-
 	public String getRedirectUri() {
 		return redirectUri;
 	}
