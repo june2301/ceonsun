@@ -1,5 +1,4 @@
 import React from "react";
-import Header from "../components/Header";
 import TeacherAction from "../components/TeacherAction";
 import TeacherDetail from "../components/TeacherDetail";
 
@@ -34,8 +33,7 @@ function TeacherDetailPage() {
   const topBarItems = ["선생님 소개", "수업 설명"];
 
   return (
-    <div className="h-screen w-full flex flex-col overflow-hidden">
-      <Header />
+    <div className="h-[calc(100vh-96px)] w-full flex flex-col overflow-hidden">
       <div className="flex-1 flex justify-center overflow-hidden">
         <div className="flex w-[860px]">
           {/* 왼쪽: TeacherAction */}

@@ -1,8 +1,40 @@
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { BellIcon, ChatBubbleLeftRightIcon } from "@heroicons/react/24/outline";
 import logo from "../assets/img/logo.png";
+import ChatRoomList from "./ChatRoomList";
+import AlarmList from "./AlarmList";
 
 const Header = () => {
+  const [showChatModal, setShowChatModal] = useState(false);
+  const [showAlarmModal, setShowAlarmModal] = useState(false);
+  const chatButtonRef = useRef(null);
+  const chatModalRef = useRef(null);
+  const alarmButtonRef = useRef(null);
+  const alarmModalRef = useRef(null);
+
+  // 바깥 영역 클릭 감지를 위한 이벤트 핸들러
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        (showChatModal &&
+          !chatButtonRef.current?.contains(event.target) &&
+          !chatModalRef.current?.contains(event.target)) ||
+        (showAlarmModal &&
+          !alarmButtonRef.current?.contains(event.target) &&
+          !alarmModalRef.current?.contains(event.target))
+      ) {
+        setShowChatModal(false);
+        setShowAlarmModal(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showChatModal, showAlarmModal]);
+
   return (
     <div className="w-full bg-gray-100">
       <div className="max-w-[940px] mx-auto flex items-center justify-between h-24 px-4">
@@ -48,48 +80,60 @@ const Header = () => {
           </div>
 
           {/* 알림 확인 */}
-          <Link
-            to="#"
-            className="flex flex-col items-center text-gray-600 text-sm hover:text-blue-500"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="h-6 w-6 mb-1"
+          <div className="relative">
+            <button
+              ref={alarmButtonRef}
+              onClick={() => setShowAlarmModal(!showAlarmModal)}
+              className="flex flex-col items-center text-gray-600 text-sm hover:text-blue-500"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"
-              />
-            </svg>
-            알림 확인
-          </Link>
+              <BellIcon className="w-6 h-6 mb-1" />
+              알림 확인
+            </button>
 
-          {/* 문의 채팅 */}
-          <Link
-            to="#"
-            className="flex flex-col items-center text-gray-600 text-sm hover:text-blue-500"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="h-6 w-6 mb-1"
+            {/* 알림 모달 */}
+            {showAlarmModal && (
+              <div
+                ref={alarmModalRef}
+                className="absolute bg-white rounded-lg shadow-lg overflow-hidden z-50"
+                style={{
+                  width: "340px",
+                  height: "660px",
+                  top: "calc(100% + 8px)",
+                  right: "calc(100% - 200px)",
+                }}
+              >
+                <AlarmList onClose={() => setShowAlarmModal(false)} />
+              </div>
+            )}
+          </div>
+
+          {/* 문의 채팅 버튼과 모달을 감싸는 컨테이너 */}
+          <div className="relative">
+            <button
+              ref={chatButtonRef}
+              onClick={() => setShowChatModal(!showChatModal)}
+              className="flex flex-col items-center text-gray-600 text-sm hover:text-blue-500"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 0 1-.825-.242m9.345-8.334a2.126 2.126 0 0 0-.476-.095 48.64 48.64 0 0 0-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0 0 11.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155"
-              />
-            </svg>
-            문의 채팅
-          </Link>
+              <ChatBubbleLeftRightIcon className="w-6 h-6 mb-1" />
+              문의 채팅
+            </button>
+
+            {/* 채팅 모달 */}
+            {showChatModal && (
+              <div
+                ref={chatModalRef}
+                className="absolute bg-white rounded-lg shadow-lg overflow-hidden z-50"
+                style={{
+                  width: "340px",
+                  height: "660px",
+                  top: "calc(100% + 8px)", // 버튼 아래 8px 간격
+                  right: "calc(100% - 210px)", // 버튼 우측에서 약간 왼쪽으로
+                }}
+              >
+                <ChatRoomList onClose={() => setShowChatModal(false)} />
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

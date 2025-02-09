@@ -25,6 +25,20 @@ body,
   display: none;
 }
 
+.chatroom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.chatroom-scrollbar::-webkit-scrollbar-track {
+  background: rgb(255, 255, 255);
+}
+.chatroom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgb(187, 225, 255);
+  border-radius: 3px;
+}
+.chatroom-scrollbar::-webkit-scrollbar-button {
+  display: none;
+}
+
 .list-scrollbar {
   scrollbar-gutter: stable;
 }

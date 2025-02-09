@@ -1,5 +1,4 @@
 import React from "react";
-import Header from "../components/Header";
 import PromotionLink from "../components/PromotionLink";
 import CardListMain from "../components/CardListMain";
 import RecentCardList from "../components/RecentCardList";
@@ -113,7 +112,6 @@ function MainPage() {
 
   return (
     <div className="w-full">
-      <Header />
       <PromotionLink />
 
       {/* 내 수강 목록 or 내 학생 목록 */}
