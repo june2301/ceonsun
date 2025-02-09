@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Header from "../components/Header";
 import Filter from "../components/Filter";
 import TopBar from "../components/TopBar";
 import CardList from "../components/CardList";
@@ -143,10 +142,7 @@ function CardListPage() {
   };
 
   return (
-    <div className="h-screen w-full flex flex-col overflow-hidden">
-      <Header />
-
-      {/* 메인 영역: 중앙 정렬 + 좌측 필터, 우측 카드 리스트 */}
+    <div className="h-[calc(100vh-96px)] w-full flex flex-col overflow-hidden">
       <div className="flex-1 flex justify-center overflow-hidden pt-5">
         {/* 왼쪽: 필터 */}
         <div className="flex-none w-[280px] h-full overflow-auto mr-2 pb-4 list-scrollbar">

@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import Header from "../components/Header";
 import CardExistBar from "../components/CardExistBar";
 import LeftBar from "../components/LeftBar";
 import MyInfo from "../components/MyInfo";
@@ -31,8 +30,7 @@ function MyPage() {
   };
 
   return (
-    <div className="h-screen w-full flex flex-col overflow-hidden">
-      <Header />
+    <div className="h-[calc(100vh-96px)] w-full flex flex-col overflow-hidden">
       <div className="flex-1 w-[900px] mx-auto flex flex-col overflow-hidden">
         <CardExistBar userRole={userRole} />
         <div className="flex flex-1 overflow-hidden">
