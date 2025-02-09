@@ -8,7 +8,6 @@ RUN gradle clean build -x test
 FROM openjdk:17-jdk-slim
 WORKDIR /app
 COPY --from=builder /app/build/libs/rank-service.jar app.jar
-EXPOSE 8084
 
 # Run Application
 ENTRYPOINT ["java", "-jar", "app.jar"]

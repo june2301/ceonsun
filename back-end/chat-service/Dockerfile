@@ -7,8 +7,14 @@ RUN gradle clean build -x test
 # Step 2: Runtime Stage
 FROM openjdk:17-jdk-slim
 WORKDIR /app
+
+# Install curl
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+
 COPY --from=builder /app/build/libs/chat-service.jar app.jar
-EXPOSE 8087
+
+# Set active profile to 'prod'
+ENV SPRING_PROFILES_ACTIVE=prod
 
 # Run Application
 ENTRYPOINT ["java", "-jar", "app.jar"]

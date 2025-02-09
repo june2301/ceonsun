@@ -4,48 +4,87 @@ server:
 spring:
   application:
     name: gateway-service
+
+  rabbitmq:
+    host: 127.0.0.1
+    port: 5672
+    username: guest
+    password: guest
+  #    username: '{cipher}ac0d4fda7d75b7332ec46bdbc84c93ce47980011cf86d88e7e160b61b6a5d1c0'
+  #    password: '{cipher}ac0d4fda7d75b7332ec46bdbc84c93ce47980011cf86d88e7e160b61b6a5d1c0'
+  #    username: '{cipher}d79ddeb52eabe7f2a656753d8e65089861e6f273afb8aa2577aa08082cc0a118'
+  #    password: '{cipher}51552a12ded68918d03a41fecbf3afeeb213926916dc77125b08378a21a66d8e4ba5c9bf2d84603a7e08cc8f2061e91e'
+
   cloud:
     gateway:
       routes:
         - id: auth-service
-          uri: http://localhost:8081
+          uri: lb://AUTH-SERVICE
           predicates:
             - Path=/auth-service/**
           filters:
-            - RewritePath=/auth-service/(?<segment>.*), /$\{segment}
+            - RewritePath=/auth-service/(?<segment>/.*)?, /$\{segment}
+
         - id: member-service
-          uri: http://localhost:8082
+          uri: lb://MEMBER-SERVICE
           predicates:
             - Path=/member-service/**
           filters:
-            - RewritePath=/member-service/(?<segment>.*), /$\{segment}
+            - RewritePath=/member-service/(?<segment>/.*)?, /$\{segment}
+
         - id: coupon-service
-          uri: http://localhost:8083
+          uri: lb://COUPON-SERVICE
           predicates:
             - Path=/coupon-service/**
           filters:
+            - RemoveRequestHeader=Cookie
             - RewritePath=/coupon-service/(?<segment>.*), /$\{segment}
+
         - id: rank-service
-          uri: http://localhost:8084
+          uri: lb://RANK-SERVICE
           predicates:
             - Path=/rank-service/**
           filters:
-            - RewritePath=/rank-service/(?<segment>.*), /$\{segment}
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/rank-service/(?<segment>/.*)?, /$\{segment}
+
         - id: payment-service
-          uri: http://localhost:8085
+          uri: lb://PAYMENT-SERVICE
           predicates:
             - Path=/payment-service/**
           filters:
-            - RewritePath=/payment-service/(?<segment>.*), /$\{segment}
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/payment-service/(?<segment>/.*)?, /$\{segment}
+
         - id: class-service
-          uri: http://localhost:8086
+          uri: lb://CLASS-SERVICE
           predicates:
             - Path=/class-service/**
           filters:
-            - RewritePath=/class-service/(?<segment>.*), /$\{segment}
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/class-service/(?<segment>/.*)?, /$\{segment}
+
         - id: chat-service
-          uri: http://localhost:8087
+          uri: lb://CHAT-SERVICE
           predicates:
             - Path=/chat-service/**
           filters:
-            - RewritePath=/chat-service/(?<segment>.*), /$\{segment}
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/chat-service/(?<segment>/.*)?, /$\{segment}
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://127.0.0.1:8761/eureka
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: refresh, health, beans, busrefresh
+
+token:
+  expiration_time: 86400000
+  secret: user_token_test_123456789_test_0123456789_test_token
