@@ -33,16 +33,13 @@ public class AuthController {
 	/**
 	 * 카카오 인가 코드를 받아 엑세스 토큰 생성 및 유저 로그인
 	 *
-	 * @param authHeader  카카오에서 전달받은 인가 코드
+	 * @param  code  카카오에서 전달받은 인가 코드
 	 * @return AuthDto.AuthResponseDto 로그인 성공 시 accessToken, 실패 시 유저 정보 포함한 DTO 반환
 	 */
-	@PostMapping("/login")
-	public Mono<ResponseEntity<?>> login(
-		@RequestHeader("X-Chunsun-Kakao-Auth-Code") String authHeader,
+	@GetMapping("/login")
+	public Mono<ResponseEntity<?>> kakaoLoginCallback(@RequestParam("code") String code,
 		HttpServletResponse response) {
-		var kakaoAuthCode = HeaderUtil.extractToken(authHeader);
-
-		log.info("accessCode : {}", kakaoAuthCode );
+		var kakaoAuthCode = HeaderUtil.extractToken(code);
 
 		return kakaoAuthService.getKakaoToken(kakaoAuthCode)
 			.flatMap(tokenResponse -> {
@@ -142,16 +139,6 @@ public class AuthController {
 		CookieUtil.addCookie(response, "refreshToken", authResponse.getRefreshToken());
 
 		return createAuthResponse(authResponse.getToken());
-	}
-
-	/**
-	 * 천선 인가 코드 테스트
-	 *
-	 * @param code  천선 엑세스 코드
-	 */
-	@GetMapping("/login")
-	public Mono<ResponseEntity<?>> kakaoLoginCallback(@RequestParam("code") String code) {
-		return Mono.just(ResponseEntity.ok(code));
 	}
 
 	private ResponseEntity<Void> createAuthResponse(String authToken) {
