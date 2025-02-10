@@ -2,8 +2,6 @@ package com.chunsun.authservice.application.service;
 
 import java.util.Optional;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.chunsun.authservice.application.convert.AuthConverter;
@@ -21,7 +19,6 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
-	private static final Logger log = LoggerFactory.getLogger(AuthServiceImpl.class);
 	private final JwtTokenProvider jwtTokenProvider;
 	private final MemberRepository memberRepository;
 	private final RefreshTokenStore refreshTokenStore;
