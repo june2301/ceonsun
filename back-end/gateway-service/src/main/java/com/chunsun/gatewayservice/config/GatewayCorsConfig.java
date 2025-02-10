@@ -20,6 +20,7 @@ public class GatewayCorsConfig {
 		config.setAllowedOriginPatterns(List.of("*"));
 		config.setAllowedHeaders(List.of("*"));
 		config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+		config.setExposedHeaders(List.of("X-Chunsun-Authorization"));
 
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 		source.registerCorsConfiguration("/**", config);
