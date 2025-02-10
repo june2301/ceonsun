@@ -1,117 +1,67 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import useAuthStore from "../stores/authStore";
 import logo from "../assets/img/logo.png";
 import kakao_login from "../assets/img/kakao_login.png";
 
 function Login() {
   const navigate = useNavigate();
-  const [token, setToken] = useState("");
+  const location = useLocation();
+  const { handleKakaoLogin } = useAuthStore();
 
-  useEffect(() => {
-    if (!window.Kakao) {
-      const script = document.createElement("script");
-      script.src = "https://t1.kakaocdn.net/kakao_js_sdk/2.7.4/kakao.min.js";
-      script.integrity =
-        "sha384-DKYJZ8NLiK8MN4/C5P2dtSmLQ4KwPaoqAfyA/DfmEc1VDxu4yyC7wy6K1Hs90nka";
-      script.crossOrigin = "anonymous";
-      script.onload = () => {
-        window.Kakao.init("c089c8172def97eb00c07217cae17495");
-        displayToken();
-      };
-      document.head.appendChild(script);
-    } else {
-      displayToken();
-    }
-  }, []);
-
+  // 1. 카카오 로그인 버튼 클릭 시 카카오 인증 페이지로 이동
   const loginWithKakao = () => {
-    if (!window.Kakao) return;
-
-    window.Kakao.Auth.authorize({
-      redirectUri: "https://developers.kakao.com/tool/demo/oauth",
-    });
+    const KAKAO_AUTH_URL = `https://kauth.kakao.com/oauth/authorize?client_id=${
+      import.meta.env.VITE_KAKAO_CLIENT_ID
+    }&redirect_uri=${
+      import.meta.env.VITE_KAKAO_REDIRECT_URI
+    }&response_type=code`;
+    window.location.href = KAKAO_AUTH_URL;
   };
 
-  // 토큰이 있으면 로그인 상태로 간주하고, 필요시 회원정보 페이지로 이동
-  // (실제로는 백엔드 검증 후 이동하는 방식 등을 구현)
-  const displayToken = () => {
-    const existingToken = getCookie("authorize-access-token");
-    if (existingToken) {
-      window.Kakao.Auth.setAccessToken(existingToken);
-      window.Kakao.Auth.getStatusInfo()
-        .then((res) => {
-          if (res.status === "connected") {
-            const _token = window.Kakao.Auth.getAccessToken();
-            setToken(_token);
-            // 로그인 성공시 페이지 이동
-            // 추가 정보 입력X -> 추가 정보 입력 페이지
-            // 추가 정보 입력O -> 메인페이지지
+  // 3, 4. 리다이렉트 시 인가 코드를 받아서 백엔드 API 호출
+  useEffect(() => {
+    const code = new URLSearchParams(location.search).get("code");
+
+    if (code) {
+      const processLogin = async () => {
+        try {
+          const result = await handleKakaoLogin(code);
+          if (result.needsSignup) {
             navigate("/signup");
+          } else {
+            navigate("/");
           }
-        })
-        .catch((err) => {
-          console.error(err);
-          window.Kakao.Auth.setAccessToken(null);
-        });
-    }
-  };
+        } catch (error) {
+          console.error("Login failed:", error);
+        }
+      };
 
-  const getCookie = (name) => {
-    const parts = document.cookie.split(name + "=");
-    if (parts.length === 2) return parts[1].split(";")[0];
-    return "";
-  };
+      processLogin();
+    }
+  }, [location, handleKakaoLogin, navigate]);
 
   return (
-    <div
-      style={{
-        width: "100vw",
-        height: "100vh",
-        backgroundColor: "#ccc", // 추후 이미지로 교체
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      {/* 로그인 박스 */}
-      <div
-        style={{
-          width: "400px",
-          backgroundColor: "#fff",
-          borderRadius: "8px",
-          padding: "40px 30px",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-          textAlign: "center",
-        }}
-      >
-        <img
-          src={logo}
-          alt="ChunSun Logo"
-          style={{ width: "150px", marginBottom: "20px" }}
-        />
-        <p style={{ marginBottom: "50px", fontSize: "18px" }}>
-          개발자를 위한 과외 커넥팅 플랫폼
-        </p>
-
-        {/* 카카오 로그인 버튼 */}
-        <button
-          onClick={loginWithKakao}
-          style={{
-            border: "none",
-            background: "none",
-            padding: 0,
-            cursor: "pointer",
-          }}
-        >
-          <img src={kakao_login} alt="카카오 로그인 버튼" width="300" />
-        </button>
-
-        {/* 토큰 상태 표시 (데모용) */}
-        {token && (
-          <p style={{ marginTop: "20px" }}>
-            로그인 성공, 토큰: <b>{token}</b>
+    <div className="min-h-screen w-full flex items-center justify-center bg-gray-100">
+      <div className="w-[480px] h-[360px] bg-white rounded-lg shadow-md p-8 flex flex-col justify-around">
+        <div className="flex flex-col items-center">
+          <img src={logo} alt="ChunSun Logo" className="w-[150px] mb-6" />
+          <p className="text-lg text-gray-700 font-bold">
+            "개발자를 위한 과외 커넥팅 플랫폼"
           </p>
-        )}
+        </div>
+        <div className="w-full flex justify-center">
+          <button
+            onClick={loginWithKakao}
+            className="w-[90%] border-none bg-transparent p-0 cursor-pointer"
+          >
+            <img
+              src={kakao_login}
+              alt="카카오 로그인"
+              className="w-full cursor-pointer"
+            />
+          </button>
+        </div>
       </div>
     </div>
   );

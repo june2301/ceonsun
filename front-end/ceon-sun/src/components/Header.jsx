@@ -97,7 +97,7 @@ const Header = () => {
                 className="absolute bg-white rounded-lg shadow-lg overflow-hidden z-50"
                 style={{
                   width: "340px",
-                  height: "660px",
+                  height: "640px",
                   top: "calc(100% + 8px)",
                   right: "calc(100% - 200px)",
                 }}
@@ -125,7 +125,7 @@ const Header = () => {
                 className="absolute bg-white rounded-lg shadow-lg overflow-hidden z-50"
                 style={{
                   width: "340px",
-                  height: "660px",
+                  height: "640px",
                   top: "calc(100% + 8px)", // 버튼 아래 8px 간격
                   right: "calc(100% - 210px)", // 버튼 우측에서 약간 왼쪽으로
                 }}

@@ -1,46 +1,111 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import useAuthStore from "../stores/authStore";
+import { authAPI } from "../api/services/auth";
+import logo from "../assets/img/logo.png"; // 로고 이미지 import
 
 const SignUp = () => {
+  const navigate = useNavigate();
+  const { kakaoUserInfo } = useAuthStore();
   const [formData, setFormData] = useState({
     name: "",
     nickname: "",
-    birthday: "",
+    birthdate: "",
     gender: "",
   });
-  const navigate = useNavigate();
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    console.log("Current kakaoUserInfo:", kakaoUserInfo);
+  }, [kakaoUserInfo]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+    if (name === "birthdate") {
+      // 숫자만 입력 가능하도록
+      const numbersOnly = value.replace(/\D/g, "");
+      if (numbersOnly.length <= 8) {
+        setFormData({
+          ...formData,
+          [name]: numbersOnly,
+        });
+      }
+    } else {
+      setFormData({
+        ...formData,
+        [name]: value,
+      });
+    }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // 생년월일 확인 로직
-    if (formData.birthday.length !== 8) {
-      setError("생년월일을 다시 입력해 주세요.");
-      return;
-    }
+    try {
+      // YYYYMMDD를 YYYY-MM-DD로 변환
+      const birthdate = formData.birthdate;
+      if (birthdate.length !== 8) {
+        setError("생년월일은 8자리로 입력해주세요. (YYYYMMDD)");
+        return;
+      }
 
-    setError("");
-    console.log("Form submitted:", formData);
-    // 여기에 회원가입 API 호출 로직 추가
-    navigate("/mainpage");
+      const formattedBirthdate = `${birthdate.slice(0, 4)}-${birthdate.slice(
+        4,
+        6,
+      )}-${birthdate.slice(6, 8)}`;
+
+      // 변환된 날짜 유효성 검사
+      const birthdateRegex = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/;
+      if (!birthdateRegex.test(formattedBirthdate)) {
+        setError("올바르지 않은 생년월일입니다.");
+        return;
+      }
+
+      if (!formData.gender) {
+        setError("성별을 선택해주세요.");
+        return;
+      }
+
+      const signupData = {
+        kakaoId: kakaoUserInfo?.kakaoId || "test_kakao_id",
+        email: kakaoUserInfo?.email || "test@email.com",
+        name: formData.name,
+        nickname: formData.nickname,
+        birthdate: formattedBirthdate,
+        gender: formData.gender,
+      };
+
+      console.log("Sending signup data:", signupData);
+
+      const response = await authAPI.signup(signupData);
+      console.log("Signup response:", response);
+
+      if (response.data.message === "가입 완료") {
+        console.log("회원가입 성공, 메인 페이지로 이동");
+        navigate("/");
+      }
+    } catch (error) {
+      console.error("Signup failed:", error);
+      setError("회원가입 중 오류가 발생했습니다.");
+    }
   };
 
   return (
-    <>
-      <div style={styles.container}>
-        <p>* 필수 정보를 입력해주세요.</p>
-        <form onSubmit={handleSubmit} style={styles.form}>
-          <div style={styles.inputGroup}>
-            <label htmlFor="name">이름</label>
+    <div className="min-h-screen w-full flex items-center justify-center bg-gray-100">
+      <div className="w-[400px] bg-white rounded-lg shadow-md p-8">
+        <div className="flex flex-col items-center mb-6">
+          <img src={logo} alt="ChunSun Logo" className="w-[150px]" />
+          <p className="text-lg text-gray-700 mt-4 font-bold">추가 정보 입력</p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <label
+              htmlFor="name"
+              className="block text-sm font-medium text-gray-700"
+            >
+              이름
+            </label>
             <input
               type="text"
               id="name"
@@ -48,10 +113,17 @@ const SignUp = () => {
               value={formData.name}
               onChange={handleChange}
               required
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
-          <div style={styles.inputGroup}>
-            <label htmlFor="nickname">닉네임</label>
+
+          <div className="space-y-2">
+            <label
+              htmlFor="nickname"
+              className="block text-sm font-medium text-gray-700"
+            >
+              닉네임
+            </label>
             <input
               type="text"
               id="nickname"
@@ -59,68 +131,72 @@ const SignUp = () => {
               value={formData.nickname}
               onChange={handleChange}
               required
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
-          <div style={styles.inputGroup}>
-            <label htmlFor="birthday">생년월일</label>
+
+          <div className="space-y-2">
+            <label
+              htmlFor="birthdate"
+              className="block text-sm font-medium text-gray-700"
+            >
+              생년월일 (YYYYMMDD)
+            </label>
             <input
               type="text"
-              id="birthday"
-              name="birthday"
-              value={formData.birthday}
+              id="birthdate"
+              name="birthdate"
+              value={formData.birthdate}
               onChange={handleChange}
+              placeholder="YYYYMMDD"
+              maxLength="8"
               required
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
-          <div style={styles.inputGroup}>
-            <label htmlFor="gender">성별</label>
-            <input
-              type="text"
-              id="gender"
-              name="gender"
-              value={formData.gender}
-              onChange={handleChange}
-              required
-            />
+
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-700">
+              성별
+            </label>
+            <div className="flex space-x-4">
+              <label className="inline-flex items-center">
+                <input
+                  type="radio"
+                  name="gender"
+                  value="MALE"
+                  checked={formData.gender === "MALE"}
+                  onChange={handleChange}
+                  className="form-radio h-4 w-4 text-blue-600"
+                />
+                <span className="ml-2">남자</span>
+              </label>
+              <label className="inline-flex items-center">
+                <input
+                  type="radio"
+                  name="gender"
+                  value="FEMALE"
+                  checked={formData.gender === "FEMALE"}
+                  onChange={handleChange}
+                  className="form-radio h-4 w-4 text-blue-600"
+                />
+                <span className="ml-2">여자</span>
+              </label>
+            </div>
           </div>
-          {error && <p style={styles.error}>{error}</p>}
-          <button type="submit" style={styles.button}>
-            작성완료
+
+          {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+
+          <button
+            type="submit"
+            className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          >
+            가입하기
           </button>
         </form>
       </div>
-    </>
+    </div>
   );
-};
-
-const styles = {
-  container: {
-    maxWidth: "400px",
-    margin: "0 auto",
-    padding: "20px",
-    border: "1px solid #ccc",
-    borderRadius: "5px",
-    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-  },
-  form: {
-    display: "flex",
-    flexDirection: "column",
-  },
-  inputGroup: {
-    marginBottom: "15px",
-  },
-  button: {
-    padding: "10px",
-    backgroundColor: "#007BFF",
-    color: "white",
-    border: "none",
-    borderRadius: "5px",
-    cursor: "pointer",
-  },
-  error: {
-    color: "red",
-    fontSize: "14px",
-  },
 };
 
 export default SignUp;
