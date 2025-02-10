@@ -25,14 +25,6 @@ public class WebConfig implements WebMvcConfigurer {
     private final StudentIdArgumentResolver studentIdArgumentResolver;
     private final TeacherIdArgumentResolver teacherIdArgumentResolver;
 
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")
-            .allowedOriginPatterns("*")  // ✅ `allowedOrigins("*")` 대신 사용
-            .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-            .allowedHeaders("*")
-            .allowCredentials(true);
-    }
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
