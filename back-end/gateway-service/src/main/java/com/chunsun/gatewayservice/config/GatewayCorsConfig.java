@@ -5,14 +5,16 @@ import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import org.springframework.web.cors.reactive.CorsWebFilter;
+import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
 @Configuration
 public class GatewayCorsConfig {
 
 	@Bean
-	public CorsFilter corsFilter() {
+	public CorsWebFilter corsWebFilter() {
 		CorsConfiguration config = new CorsConfiguration();
 		config.setAllowCredentials(true);
 		config.setAllowedOriginPatterns(List.of("*"));
@@ -21,6 +23,6 @@ public class GatewayCorsConfig {
 
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 		source.registerCorsConfiguration("/**", config);
-		return new CorsFilter(source);
+		return new CorsWebFilter(source);
 	}
 }
