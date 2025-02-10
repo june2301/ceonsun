@@ -27,7 +27,7 @@ spring:
         registration:
           kakao:
             client-id: 2fe64602abc1d89964ca3c7c83cf840c
-            redirect-uri: http://i12a505.p.ssafy.io:8080/auth-service/login
+            redirect-uri: http://localhost:5173
             authorization-grant-type: authorization_code
             scope: profile_nickname, account_email
             client-name: kakao
