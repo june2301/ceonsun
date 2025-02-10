@@ -30,16 +30,19 @@ public class AuthController {
 	private final KakaoAuthService kakaoAuthService;
 	private final AuthService authService;
 
+
+
 	/**
 	 * 카카오 인가 코드를 받아 엑세스 토큰 생성 및 유저 로그인
 	 *
-	 * @param  code  카카오에서 전달받은 인가 코드
+	 * @param  authHeader 카카오에서 전달받은 인가 코드
 	 * @return AuthDto.AuthResponseDto 로그인 성공 시 accessToken, 실패 시 유저 정보 포함한 DTO 반환
 	 */
-	@GetMapping("/login")
-	public Mono<ResponseEntity<?>> kakaoLoginCallback(@RequestParam("code") String code,
+	@PostMapping("/login")
+	public Mono<ResponseEntity<?>> kakaoLoginCallback(
+		@RequestHeader("X-Chunsun-Kakao-Auth-Code") String authHeader,
 		HttpServletResponse response) {
-		var kakaoAuthCode = HeaderUtil.extractToken(code);
+		var kakaoAuthCode = HeaderUtil.extractToken(authHeader);
 
 		return kakaoAuthService.getKakaoToken(kakaoAuthCode)
 			.flatMap(tokenResponse -> {
