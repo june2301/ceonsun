@@ -25,23 +25,6 @@ public class WebConfig implements WebMvcConfigurer {
 	private final StudentIdArgumentResolver studentIdArgumentResolver;
 	private final TeacherIdArgumentResolver teacherIdArgumentResolver;
 
-	@Bean
-	@ConditionalOnMissingBean(UrlBasedCorsConfigurationSource.class)
-	public UrlBasedCorsConfigurationSource corsConfigurationSource() {
-		var corsConfig = new CorsConfiguration();
-
-		corsConfig.addAllowedOriginPattern(CorsConfiguration.ALL);
-		corsConfig.addAllowedHeader(CorsConfiguration.ALL);
-		corsConfig.addAllowedMethod(CorsConfiguration.ALL);
-
-		corsConfig.setAllowCredentials(true);
-		corsConfig.setMaxAge(3600L);
-
-		var corsConfigSource = new UrlBasedCorsConfigurationSource();
-		corsConfigSource.registerCorsConfiguration("/**", corsConfig);
-		return corsConfigSource;
-	}
-
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
 		registry.addInterceptor(userInterceptor)
