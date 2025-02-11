@@ -4,12 +4,33 @@ import defaultProfileImg from "@/assets/img/default-profile.png"; // 기본 프�
 function DefaultProfile({
   name,
   nickname,
-  age,
   birthdate,
   gender,
   profileImage,
   isLarge,
 }) {
+  // birthdate로부터 나이 계산
+  const calculateAge = (birthdate) => {
+    if (!birthdate) return null;
+
+    const today = new Date();
+    const birthDate = new Date(birthdate);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+
+    // 생일이 아직 지나지 않은 경우 1을 빼줌
+    if (
+      monthDiff < 0 ||
+      (monthDiff === 0 && today.getDate() < birthDate.getDate())
+    ) {
+      age--;
+    }
+
+    return age;
+  };
+
+  const age = calculateAge(birthdate);
+
   return (
     <div
       className={`flex ${
@@ -43,10 +64,11 @@ function DefaultProfile({
         </div>
         <div>
           <span className="font-bold">나이 :</span> {age}세{" "}
-          {birthdate && `(${birthdate})`}
+          {birthdate && `(${birthdate.split("-").join(".")})`}
         </div>
         <div>
-          <span className="font-bold">성별 :</span> {gender}
+          <span className="font-bold">성별 :</span>{" "}
+          {gender === "MALE" ? "남" : "여"}
         </div>
       </div>
     </div>

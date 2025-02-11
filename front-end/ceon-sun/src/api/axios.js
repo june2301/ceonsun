@@ -2,10 +2,10 @@ import axios from "axios";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
-  timeout: 10000,
   headers: {
     "Content-Type": "application/json",
   },
+  withCredentials: true, // 크로스 도메인 요청시 쿠키 전송 허용
 });
 
 // 요청 인터셉터
@@ -28,7 +28,7 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => {
     console.log("Response:", response);
-    return response.data; // 응답에서 data만 추출
+    return response;
   },
   (error) => {
     console.error("Response Error:", error);

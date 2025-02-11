@@ -1,45 +1,44 @@
-import React, { useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import useAuthStore from "../stores/authStore";
 import logo from "../assets/img/logo.png";
 import kakao_login from "../assets/img/kakao_login.png";
 
-function Login() {
-  const navigate = useNavigate();
+const Login = () => {
   const location = useLocation();
-  const { handleKakaoLogin } = useAuthStore();
+  const navigate = useNavigate();
+  const { kakaoLogin } = useAuthStore();
 
-  // 1. 카카오 로그인 버튼 클릭 시 카카오 인증 페이지로 이동
-  const loginWithKakao = () => {
-    const KAKAO_AUTH_URL = `https://kauth.kakao.com/oauth/authorize?client_id=${
-      import.meta.env.VITE_KAKAO_CLIENT_ID
-    }&redirect_uri=${
-      import.meta.env.VITE_KAKAO_REDIRECT_URI
-    }&response_type=code`;
-    window.location.href = KAKAO_AUTH_URL;
+  const KAKAO_AUTH_URL = "https://kauth.kakao.com/oauth/authorize";
+  const CLIENT_ID = import.meta.env.VITE_KAKAO_CLIENT_ID;
+  const REDIRECT_URI = import.meta.env.VITE_KAKAO_REDIRECT_URI;
+
+  const handleKakaoLoginClick = () => {
+    const kakaoURL = `${KAKAO_AUTH_URL}?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code`;
+    window.location.href = kakaoURL;
   };
 
-  // 3, 4. 리다이렉트 시 인가 코드를 받아서 백엔드 API 호출
   useEffect(() => {
+    // URL에서 인가 코드 추출
     const code = new URLSearchParams(location.search).get("code");
 
     if (code) {
-      const processLogin = async () => {
-        try {
-          const result = await handleKakaoLogin(code);
+      kakaoLogin(code)
+        .then((result) => {
           if (result.needsSignup) {
-            navigate("/signup");
+            navigate("/signup", {
+              state: { userInfo: result.userInfo, authCode: code },
+              replace: true,
+            });
           } else {
-            navigate("/");
+            navigate("/mainpage", { replace: true });
           }
-        } catch (error) {
-          console.error("Login failed:", error);
-        }
-      };
-
-      processLogin();
+        })
+        .catch((error) => {
+          console.error("로그인 처리 중 오류 발생:", error);
+        });
     }
-  }, [location, handleKakaoLogin, navigate]);
+  }, [location, navigate, kakaoLogin]);
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-gray-100">
@@ -52,7 +51,7 @@ function Login() {
         </div>
         <div className="w-full flex justify-center">
           <button
-            onClick={loginWithKakao}
+            onClick={handleKakaoLoginClick}
             className="w-[90%] border-none bg-transparent p-0 cursor-pointer"
           >
             <img
@@ -65,6 +64,6 @@ function Login() {
       </div>
     </div>
   );
-}
+};
 
 export default Login;

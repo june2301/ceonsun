@@ -1,17 +1,19 @@
 import React, { useState } from "react";
 import defaultProfileImg from "@/assets/img/default-profile.png";
+import { memberAPI } from "../api/services/member";
+import useAuthStore from "../stores/authStore";
 
-function UpdateProfile({ profileImage, nickname, onSave }) {
-  // 프로필사진과 닉네임만 수정합니다.
+function UpdateProfile({ userInfo, onSave }) {
+  const { user } = useAuthStore();
   const [formData, setFormData] = useState({
-    nickname: nickname || "",
-    profileImage: profileImage || null,
+    nickname: userInfo.nickname || "",
+    profileImage: userInfo.profileImage || null,
   });
   const [nicknameChecked, setNicknameChecked] = useState(false);
 
   const handleNicknameChange = (e) => {
     setFormData({ ...formData, nickname: e.target.value });
-    setNicknameChecked(false); // 입력 변경 시 중복체크 초기화
+    setNicknameChecked(false);
   };
 
   const handleProfileImageChange = (e) => {
@@ -19,19 +21,45 @@ function UpdateProfile({ profileImage, nickname, onSave }) {
     setFormData({ ...formData, profileImage: file });
   };
 
-  // 중복체크 버튼 클릭 (추후 백엔드 연동 시 API 호출로 대체)
-  const handleDuplicateCheck = () => {
-    // 임시로 항상 사용 가능하다고 처리
-    setNicknameChecked(true);
+  const handleDuplicateCheck = async () => {
+    if (!formData.nickname.trim()) {
+      alert("닉네임을 입력해주세요.");
+      return;
+    }
+
+    try {
+      const isAvailable = await memberAPI.checkNickname(formData.nickname);
+      if (isAvailable) {
+        setNicknameChecked(true);
+        alert("사용 가능한 닉네임입니다.");
+      } else {
+        setNicknameChecked(false);
+        alert("이미 사용 중인 닉네임입니다.");
+      }
+    } catch (error) {
+      console.error("닉네임 중복 체크 중 오류 발생:", error);
+      setNicknameChecked(false);
+      alert("닉네임 중복 체크 중 오류가 발생했습니다.");
+    }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!nicknameChecked) {
       alert("닉네임 중복체크를 해주세요.");
       return;
     }
-    onSave(formData);
+
+    try {
+      await memberAPI.updateProfile(21, {
+        nickname: formData.nickname,
+        profileImage: formData.profileImage,
+      });
+      onSave(formData);
+    } catch (error) {
+      console.error("프로필 수정 실패:", error);
+      alert("프로필 수정에 실패했습니다.");
+    }
   };
 
   // 프로필사진 미리보기 처리:
@@ -90,7 +118,6 @@ function UpdateProfile({ profileImage, nickname, onSave }) {
           </p>
         )}
       </div>
-      {/* 수정 컴포넌트 하단: 가로선과 우측의 저장하기 버튼 */}
       <div className="flex flex-col mt-6">
         <div className="flex justify-end mb-2">
           <button
