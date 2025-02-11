@@ -14,4 +14,4 @@ RUN npm install
 RUN npm run build
 
 # 6. EC2의 Nginx 정적 파일 디렉토리로 복사하기 위한 아티팩트 준비
-CMD ["cp", "-r", "/app/dist", "/home/ubuntu/nginx/html"]
+CMD ["cp", "-r", "/app/dist/*", "/home/ubuntu/nginx/html/"]
