@@ -1,23 +1,39 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import useAuthStore from "../stores/authStore";
-import { authAPI } from "../api/services/auth";
+import { useNavigate, useLocation } from "react-router-dom";
+import { memberAPI } from "../api/services/member";
 import logo from "../assets/img/logo.png"; // 로고 이미지 import
+import useAuthStore from "../stores/authStore";
+
+const KAKAO_AUTH_URL = "https://kauth.kakao.com/oauth/authorize";
+const CLIENT_ID = import.meta.env.VITE_KAKAO_CLIENT_ID;
+const REDIRECT_URI = import.meta.env.VITE_KAKAO_REDIRECT_URI;
 
 const SignUp = () => {
   const navigate = useNavigate();
-  const { kakaoUserInfo } = useAuthStore();
+  const location = useLocation();
+  const { userInfo } = location.state || {};
+  const [error, setError] = useState("");
+  const [nicknameChecked, setNicknameChecked] = useState(false);
+
+  const { user, updateUser } = useAuthStore();
+
   const [formData, setFormData] = useState({
     name: "",
     nickname: "",
     birthdate: "",
     gender: "",
   });
-  const [error, setError] = useState("");
 
+  // 컴포넌트 마운트 시 정보 확인
   useEffect(() => {
-    console.log("Current kakaoUserInfo:", kakaoUserInfo);
-  }, [kakaoUserInfo]);
+    console.log("SignUp 페이지 접근 시 user 정보:", user);
+  }, [user, location.state, userInfo]);
+
+  // userInfo가 없는 경우 로그인 페이지로 리다이렉트
+  if (!userInfo) {
+    navigate("/");
+    return null;
+  }
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -35,58 +51,82 @@ const SignUp = () => {
         ...formData,
         [name]: value,
       });
+      // 닉네임이 변경되면 중복체크 상태 초기화
+      if (name === "nickname") {
+        setNicknameChecked(false);
+      }
+    }
+  };
+
+  const handleNicknameCheck = async () => {
+    if (!formData.nickname.trim()) {
+      setError("닉네임을 입력해주세요.");
+      return;
+    }
+
+    try {
+      const isAvailable = await memberAPI.checkNickname(formData.nickname);
+      if (isAvailable) {
+        setNicknameChecked(true);
+        setError("사용 가능한 닉네임입니다.");
+      } else {
+        setNicknameChecked(false);
+        setError("이미 사용 중인 닉네임입니다.");
+      }
+    } catch (error) {
+      console.error("닉네임 중복 체크 실패:", error);
+      setNicknameChecked(false);
+      setError("닉네임 중복 체크 중 오류가 발생했습니다.");
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    if (!nicknameChecked) {
+      setError("닉네임 중복 체크를 해주세요.");
+      return;
+    }
     try {
-      // YYYYMMDD를 YYYY-MM-DD로 변환
-      const birthdate = formData.birthdate;
-      if (birthdate.length !== 8) {
-        setError("생년월일은 8자리로 입력해주세요. (YYYYMMDD)");
-        return;
+      // birthdate 형식 변환 (YYYYMMDD -> YYYY-MM-DD)
+      let birthdateFormatted = formData.birthdate;
+      if (/^\d{8}$/.test(birthdateFormatted)) {
+        const year = birthdateFormatted.slice(0, 4);
+        const month = birthdateFormatted.slice(4, 6);
+        const day = birthdateFormatted.slice(6, 8);
+        birthdateFormatted = `${year}-${month}-${day}`;
       }
 
-      const formattedBirthdate = `${birthdate.slice(0, 4)}-${birthdate.slice(
-        4,
-        6,
-      )}-${birthdate.slice(6, 8)}`;
-
-      // 변환된 날짜 유효성 검사
-      const birthdateRegex = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/;
-      if (!birthdateRegex.test(formattedBirthdate)) {
-        setError("올바르지 않은 생년월일입니다.");
-        return;
-      }
-
-      if (!formData.gender) {
-        setError("성별을 선택해주세요.");
-        return;
-      }
+      // userInfo에서 role을 제외한 나머지 정보만 추출
+      const { role, ...userInfoWithoutRole } = userInfo;
 
       const signupData = {
-        kakaoId: kakaoUserInfo?.kakaoId || "test_kakao_id",
-        email: kakaoUserInfo?.email || "test@email.com",
-        name: formData.name,
-        nickname: formData.nickname,
-        birthdate: formattedBirthdate,
-        gender: formData.gender,
+        ...userInfoWithoutRole,
+        ...formData,
+        birthdate: birthdateFormatted,
       };
 
-      console.log("Sending signup data:", signupData);
+      console.log("회원가입 시도:", {
+        formData: formData,
+        userInfoWithoutRole: userInfoWithoutRole,
+        signupData: signupData,
+      });
 
-      const response = await authAPI.signup(signupData);
-      console.log("Signup response:", response);
+      console.log("회원가입 시도 시 user 정보:", {
+        userId: user.userId,
+        nickname: formData.nickname,
+        role: user.role,
+      });
 
-      if (response.data.message === "가입 완료") {
-        console.log("회원가입 성공, 메인 페이지로 이동");
-        navigate("/");
-      }
+      const response = await memberAPI.completeSignup(signupData);
+
+      console.log("회원가입 성공 응답:", response);
+
+      // 카카오 로그인 버튼 클릭 시와 동일한 로직을 실행하여 OAuth 흐름을 재시작합니다.
+      const kakaoURL = `${KAKAO_AUTH_URL}?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code`;
+      window.location.href = kakaoURL; // → 사용자가 카카오 로그인 페이지에서 새 인가코드를 받아오면, Login 컴포넌트의 useEffect가 실행되어 API 호출을 진행합니다.
     } catch (error) {
-      console.error("Signup failed:", error);
-      setError("회원가입 중 오류가 발생했습니다.");
+      console.error("회원가입 실패:", error);
+      setError("회원가입에 실패했습니다. 다시 시도해주세요.");
     }
   };
 
@@ -124,15 +164,35 @@ const SignUp = () => {
             >
               닉네임
             </label>
-            <input
-              type="text"
-              id="nickname"
-              name="nickname"
-              value={formData.nickname}
-              onChange={handleChange}
-              required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+            <div className="flex items-center space-x-2">
+              <input
+                type="text"
+                id="nickname"
+                name="nickname"
+                value={formData.nickname}
+                onChange={handleChange}
+                required
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <button
+                type="button"
+                onClick={handleNicknameCheck}
+                className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500"
+              >
+                중복체크
+              </button>
+            </div>
+            {error && (
+              <p
+                className={`text-sm mt-1 ${
+                  error.includes("사용 가능")
+                    ? "text-green-600"
+                    : "text-red-500"
+                }`}
+              >
+                {error}
+              </p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -184,8 +244,6 @@ const SignUp = () => {
               </label>
             </div>
           </div>
-
-          {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
 
           <button
             type="submit"

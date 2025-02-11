@@ -14,6 +14,7 @@ import CardListPage from "./pages/CardListPage";
 import MyPage from "./pages/MyPage";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Payment from "./pages/Payment";
+
 // Header를 조건부로 표시하기 위한 래퍼 컴포넌트
 function AppContent() {
   const location = useLocation();
