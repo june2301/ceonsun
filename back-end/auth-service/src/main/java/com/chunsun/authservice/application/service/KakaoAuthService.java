@@ -37,7 +37,7 @@ public class KakaoAuthService {
 		Map<String, String> formData = Map.of(
 			"grant_type", "authorization_code",
 			"client_id", kakaoConfig.getClientId(),
-			"redirect_uri", requestDto.getRedirectUrl(),
+			"redirect_uri", kakaoConfig.getRedirectUri(),
 			"code", requestDto.getAuthCode()
 		);
 		return webClientUtil.postFormData(TOKEN_URI, formData, String.class)

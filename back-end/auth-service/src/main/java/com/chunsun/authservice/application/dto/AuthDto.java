@@ -20,7 +20,6 @@ public record AuthDto() {
 	@AllArgsConstructor
 	public static class KakaoLoginRequestDto {
 		private String authCode;
-		private String redirectUrl;
 	}
 
 	@Getter
