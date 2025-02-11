@@ -1,16 +1,71 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import useAuthStore from "../stores/authStore";
 import Filter from "../components/Filter";
 import TopBar from "../components/TopBar";
 import CardList from "../components/CardList";
+import { memberAPI } from "../api/services/member";
 
 function CardListPage() {
   const navigate = useNavigate();
-  const userRole = "teacher"; // "student" 또는 "teacher"
+  const { user } = useAuthStore();
+  const role = user.role;
 
   // TopBar 메뉴 항목 (학생이 "선생님 리스트" 볼 때만 사용)
   const topBarItems = ["선생님 목록", "찜한 선생님", "선생님 랭킹"];
   const [selectedMenu, setSelectedMenu] = useState(0);
+
+  // 카드 리스트 상태 관리
+  const [cardList, setCardList] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  // 필터 상태 관리
+  const [filterState, setFilterState] = useState({
+    categories: [],
+    gender: "all",
+    ageRange: { start: null, end: null },
+  });
+
+  // 페이지네이션 상태
+  const [page, setPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+
+  // API 호출 함수
+  const fetchCardList = async () => {
+    setLoading(true);
+    try {
+      const response = await memberAPI.searchMembers({
+        userId: user.id,
+        categories: filterState.categories,
+        gender: filterState.gender,
+        ageRange: filterState.ageRange,
+        page: 0,
+        size: 10,
+      });
+
+      setCardList(response.members);
+    } catch (err) {
+      setError(err.message);
+      console.error("카드 목록을 불러오는데 실패했습니다:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 필터 변경시 API 재호출
+  useEffect(() => {
+    fetchCardList();
+  }, [filterState]);
+
+  // 필터 적용 핸들러
+  const handleFilterChange = (newFilter) => {
+    setFilterState((prev) => ({ ...prev, ...newFilter }));
+  };
+
+  // 실제 렌더링할 카드 목록과 카드 타입 결정
+  let cardType = role === "STUDENT" ? "teacher" : "student";
+  let showTopBar = role === "STUDENT";
 
   // 1) 선생님 카드 리스트 예시 데이터
   const allTeachers = [
@@ -109,25 +164,6 @@ function CardListPage() {
     },
   ];
 
-  // 실제 렌더링할 카드 목록과 카드 타입 결정
-  let currentList = [];
-  let cardType = "";
-  let showTopBar = false;
-
-  if (userRole === "student") {
-    // 학생 → 선생님 카드 리스트 보여주기
-    showTopBar = true;
-    cardType = "teacher";
-    if (selectedMenu === 0) currentList = allTeachers;
-    else if (selectedMenu === 1) currentList = favoriteTeachers;
-    else currentList = rankingTeachers;
-  } else {
-    // 선생 → 학생 카드 리스트 보여주기
-    showTopBar = false;
-    cardType = "student";
-    currentList = studentList;
-  }
-
   // 선생 카드에서 "자세히 보기" 클릭 시 TeacherDetail 페이지로 이동하는 함수
   const handleTeacherDetail = (cardData) => {
     navigate("/teacherdetailpage", { state: { teacher: cardData } });
@@ -146,12 +182,14 @@ function CardListPage() {
       <div className="flex-1 flex justify-center overflow-hidden pt-5">
         {/* 왼쪽: 필터 */}
         <div className="flex-none w-[280px] h-full overflow-auto mr-2 pb-4 list-scrollbar">
-          <Filter />
+          <Filter
+            filterState={filterState}
+            onFilterChange={handleFilterChange}
+          />
         </div>
 
         {/* 오른쪽: 카드 리스트 영역 */}
         <div className="flex-none w-[620px] flex flex-col overflow-hidden">
-          {/* TopBar (학생 시점일 때만) */}
           {showTopBar && (
             <div className="flex-none px-2">
               <TopBar
@@ -164,20 +202,24 @@ function CardListPage() {
 
           {/* CardList */}
           <div className="flex-1 overflow-y-auto pt-2 pb-6 px-2 list-scrollbar">
-            {cardType === "teacher" ? (
-              <CardList
-                type={cardType}
-                cards={currentList}
-                onDetailClick={handleTeacherDetail}
-              />
+            {loading ? (
+              <div className="text-center py-4">로딩 중...</div>
+            ) : error ? (
+              <div className="text-center py-4 text-red-500">
+                에러가 발생했습니다: {error}
+              </div>
             ) : (
               <CardList
                 type={cardType}
-                cards={currentList}
-                onDetailClick={handleStudentListDetail}
+                cards={cardList}
+                onDetailClick={
+                  cardType === "teacher"
+                    ? handleTeacherDetail
+                    : handleStudentListDetail
+                }
                 expandedStudentIndex={expandedStudentIndex}
                 isBackArrow={false}
-                isInquiryMode={true}
+                isInquiryMode={cardType === "student"}
               />
             )}
           </div>

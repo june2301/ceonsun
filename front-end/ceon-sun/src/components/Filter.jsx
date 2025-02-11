@@ -16,21 +16,25 @@ const SUBJECTS = [
 // 나이 예시: 15 ~ 60
 const AGE_OPTIONS = Array.from({ length: 46 }, (_, i) => 15 + i);
 
-function Filter() {
+function Filter({ filterState, onFilterChange }) {
   // 필터 펼침 여부
   const [openSubject, setOpenSubject] = useState(false);
   const [openGender, setOpenGender] = useState(false);
   const [openAge, setOpenAge] = useState(false);
 
   // 과목 선택
-  const [selectedSubjects, setSelectedSubjects] = useState([]);
+  const [selectedSubjects, setSelectedSubjects] = useState(
+    filterState.categories || [],
+  );
 
   // 성별: "all" | "male" | "female"
-  const [selectedGender, setSelectedGender] = useState("all");
+  const [selectedGender, setSelectedGender] = useState(
+    filterState.gender || "all",
+  );
 
   // 나이
-  const [startAge, setStartAge] = useState(20);
-  const [endAge, setEndAge] = useState(20);
+  const [startAge, setStartAge] = useState(filterState.ageRange?.start || null);
+  const [endAge, setEndAge] = useState(filterState.ageRange?.end || null);
 
   // 나이 팝업
   const [openStartAgePopup, setOpenStartAgePopup] = useState(false);
@@ -42,16 +46,15 @@ function Filter() {
 
   const handleSubjectClick = (subj) => {
     if (selectedSubjects.includes(subj)) {
-      // 이미 있으면 해제
       setSelectedSubjects(selectedSubjects.filter((s) => s !== subj));
     } else {
-      // 없으면 추가
       setSelectedSubjects([...selectedSubjects, subj]);
     }
   };
 
   const applySubject = () => {
-    console.log("과목 필터 적용:", selectedSubjects);
+    onFilterChange({ categories: selectedSubjects });
+    setOpenSubject(false);
   };
 
   // -------------------
@@ -69,7 +72,8 @@ function Filter() {
   };
 
   const applyGender = () => {
-    console.log("성별 필터:", selectedGender);
+    onFilterChange({ gender: selectedGender });
+    setOpenGender(false);
   };
 
   // -------------------
@@ -80,13 +84,20 @@ function Filter() {
     setStartAge(age);
     setOpenStartAgePopup(false);
   };
+
   const onSelectEndAge = (age) => {
     setEndAge(age);
     setOpenEndAgePopup(false);
   };
 
   const applyAge = () => {
-    console.log(`나이 필터: ${startAge} ~ ${endAge}`);
+    onFilterChange({
+      ageRange: {
+        start: startAge,
+        end: endAge,
+      },
+    });
+    setOpenAge(false);
   };
 
   return (

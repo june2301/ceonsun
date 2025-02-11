@@ -6,8 +6,8 @@ import StudentCardDetail from "./StudentCardDetail";
 import TeacherDetail from "./TeacherDetail";
 import { ArrowLongLeftIcon } from "@heroicons/react/24/solid";
 
-function MyLecture() {
-  // DB에서 학생 카드가 존재하는지 여부 (임시 시뮬레이션)
+function MyLecture({ role }) {
+  // role이 GUEST면 studentCardExists는 false
   const [studentCardExists, setStudentCardExists] = useState(false);
   // 내 학생 카드 Detail 모드 여부 (내 학생 카드의 "자세히 보기" 클릭 시 전환)
   const [isMyDetailMode, setIsMyDetailMode] = useState(false);
@@ -91,10 +91,14 @@ function MyLecture() {
   ];
 
   useEffect(() => {
-    // TODO: 실제 API 호출 후 setStudentCardExists(true/false)
-    // 현재는 임시로 학생 카드가 존재하는 경우로 설정합니다.
-    setStudentCardExists(true);
-  }, []);
+    // role이 GUEST면 무조건 false, 아니면 API 호출하여 카드 존재 여부 확인
+    if (role === "GUEST") {
+      setStudentCardExists(false);
+    } else {
+      // TODO: 실제 API 호출 후 setStudentCardExists(true/false)
+      setStudentCardExists(true); // 임시로 true 설정
+    }
+  }, [role]);
 
   // 2번: 내 학생 카드 영역에서 "자세히 보기" 클릭 시 Detail 모드로 전환
   const handleStudentMyDetail = () => {

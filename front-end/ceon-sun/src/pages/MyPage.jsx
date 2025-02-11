@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import useAuthStore from "../stores/authStore";
+import { memberAPI } from "../api/services/member";
 import CardExistBar from "../components/CardExistBar";
 import LeftBar from "../components/LeftBar";
 import MyInfo from "../components/MyInfo";
@@ -7,21 +9,45 @@ import MyClass from "../components/MyClass";
 import MyStudentList from "../components/MyStudentList";
 
 function MyPage() {
-  // "student", "teacher", "none" 중 하나 (예제에서는 "none"으로 설정)
-  const [userRole, setUserRole] = useState("none");
-  // 좌측 메뉴 선택 상태 (초기값은 "내 정보")
+  const { user } = useAuthStore();
+  // const role = user.role; // store에서 role 가져오기
+  const role = "GUEST"; // store에서 role 가져오기
   const [selectedMenu, setSelectedMenu] = useState("내 정보");
+  const [userInfo, setUserInfo] = useState(null);
+
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      try {
+        const data = await memberAPI.getUserInfo(21);
+        setUserInfo(data);
+      } catch (error) {
+        console.error("사용자 정보 조회 실패:", error);
+      }
+    };
+
+    if (selectedMenu === "내 정보") {
+      fetchUserInfo();
+    }
+  }, [selectedMenu, user.userId]);
 
   const handleMenuSelect = (menu) => {
     setSelectedMenu(menu);
   };
 
+  const handleProfileUpdate = (updatedData) => {
+    setUserInfo({
+      ...userInfo,
+      nickname: updatedData.nickname,
+      profileImage: updatedData.profileImage,
+    });
+  };
+
   const renderContent = () => {
     switch (selectedMenu) {
       case "수강 정보":
-        return <MyLecture />;
+        return <MyLecture role={role} />;
       case "수업 정보":
-        return <MyClass />;
+        return <MyClass role={role} />;
       case "내 학생 목록":
         return <MyStudentList />;
       default:
@@ -32,31 +58,25 @@ function MyPage() {
   return (
     <div className="h-[calc(100vh-96px)] w-full flex flex-col overflow-hidden">
       <div className="flex-1 w-[900px] mx-auto flex flex-col overflow-hidden">
-        <CardExistBar userRole={userRole} />
+        <CardExistBar role={role} onMenuSelect={handleMenuSelect} />
         <div className="flex flex-1 overflow-hidden">
-          {/* 왼쪽 사이드바 */}
           <div className="w-[200px] flex-none">
             <LeftBar
-              userRole={userRole}
+              role={role}
               selectedMenu={selectedMenu}
               onMenuSelect={handleMenuSelect}
             />
           </div>
           <div className="w-[2px] bg-gray-300"></div>
-          {/* 오른쪽 메인 컨텐츠 영역 */}
           <div className="flex-1 overflow-hidden">
-            {selectedMenu === "내 정보" ? (
+            {selectedMenu === "내 정보" && userInfo ? (
               <div className="p-6">
                 <MyInfo
-                  userRole={userRole}
+                  role={role}
                   teacherLessonCount={5}
-                  name="김싸피"
-                  nickname="김김김"
-                  age="00"
-                  birthdate="0000.00.00"
-                  gender="남"
-                  profileImage=""
+                  userInfo={userInfo}
                   isLarge={true}
+                  onProfileUpdate={handleProfileUpdate}
                 />
               </div>
             ) : (
