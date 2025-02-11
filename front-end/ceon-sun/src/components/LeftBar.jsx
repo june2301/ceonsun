@@ -1,13 +1,13 @@
 import React from "react";
 
-function LeftBar({ userRole, selectedMenu, onMenuSelect }) {
+function LeftBar({ role, selectedMenu, onMenuSelect }) {
   let menuItems = [];
 
-  if (userRole === "none") {
+  if (role === "GUEST") {
     menuItems = ["내 정보", "수강 정보", "수업 정보", "내 학생 목록"];
-  } else if (userRole === "student") {
+  } else if (role === "STUDENT") {
     menuItems = ["내 정보", "수강 정보"];
-  } else if (userRole === "teacher") {
+  } else if (role === "TEACHER") {
     menuItems = ["내 정보", "수업 정보", "내 학생 목록"];
   }
 

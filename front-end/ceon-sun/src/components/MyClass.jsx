@@ -5,7 +5,7 @@ import TeacherInfoCreateB from "../components/TeacherInfoCreateB";
 import TeacherInfoA from "../components/TeacherInfoA";
 import TeacherInfoB from "../components/TeacherInfoB";
 
-function MyClass() {
+function MyClass({ role }) {
   const [teacherCardExists, setTeacherCardExists] = useState(false);
   const [selectedTab, setSelectedTab] = useState(0);
   const [isUpdateMode, setIsUpdateMode] = useState(false);
@@ -28,9 +28,14 @@ function MyClass() {
   };
 
   useEffect(() => {
-    // TODO: 실제 API 호출로 선생님 카드 존재 여부 확인
-    setTeacherCardExists(true); // true false
-  }, []);
+    // role이 GUEST면 무조건 false, 아니면 API 호출하여 카드 존재 여부 확인
+    if (role === "GUEST") {
+      setTeacherCardExists(false);
+    } else {
+      // TODO: 실제 API 호출 후 setTeacherCardExists(true/false)
+      setTeacherCardExists(true); // 임시로 true 설정
+    }
+  }, [role]);
 
   const handleTabSelect = (tabIndex) => {
     setSelectedTab(tabIndex);
