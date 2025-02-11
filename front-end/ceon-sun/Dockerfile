@@ -10,8 +10,11 @@ COPY . .
 # 4. 의존성 설치
 RUN npm install
 
-# 5. 빌드 실행
+# 5. React 빌드 실행
 RUN npm run build
 
-# 6. EC2의 Nginx 정적 파일 디렉토리로 복사하기 위한 아티팩트 준비
-CMD ["cp", "-r", "/app/dist/*", "/home/ubuntu/nginx/html/"]
+# 6. 빌드된 파일을 직접 복사
+RUN mkdir -p /home/ubuntu/nginx/html && cp -r /app/dist/* /home/ubuntu/nginx/html/
+
+# 7. 최종 컨테이너 실행 시 실행할 명령어 제거
+CMD [ "echo", "Build complete" ]
