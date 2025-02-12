@@ -57,11 +57,14 @@ const myStudentCards = [
 
 // 최근 등록된 수업(선생 카드) 예시 데이터
 const recentLessonData = [
-  { nickname: "선선선", subjects: ["Python", "JavaScript"] },
-  { nickname: "선선선", subjects: ["Python", "JavaScript"] },
-  { nickname: "선선선", subjects: ["Python", "JavaScript"] },
-  { nickname: "선선선", subjects: ["Python", "JavaScript"] },
-  { nickname: "선선선", subjects: ["Python", "JavaScript"] },
+  { nickname: "선선선1", subjects: ["Python", "JavaScript"] },
+  { nickname: "선선선2", subjects: ["Python", "JavaScript"] },
+  { nickname: "선선선3", subjects: ["Python", "JavaScript"] },
+  { nickname: "선선선4", subjects: ["Python", "JavaScript"] },
+  { nickname: "선선선5", subjects: ["Python", "JavaScript"] },
+  { nickname: "선선선6", subjects: ["Python", "JavaScript"] },
+  { nickname: "선선선7", subjects: ["Python", "JavaScript"] },
+  { nickname: "선선선8", subjects: ["Python", "JavaScript"] },
 ];
 
 // 랭킹 컴포넌트 예시

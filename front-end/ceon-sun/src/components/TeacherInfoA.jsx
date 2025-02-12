@@ -2,8 +2,8 @@ import React from "react";
 import DefaultProfile from "./DefaultProfile";
 
 function TeacherInfoA({
-  introduction = "",
-  experience = "",
+  description = "",
+  careerDescription = "",
   showProfile = false,
   teacher,
 }) {
@@ -27,7 +27,7 @@ function TeacherInfoA({
       <div className="flex">
         <div className="border-l-4 border-gray-400 pl-2">
           <p className="text-gray-800 leading-6 whitespace-pre-line pl-2">
-            {introduction}
+            {description}
           </p>
         </div>
       </div>
@@ -37,7 +37,7 @@ function TeacherInfoA({
       <div className="flex">
         <div className="border-l-4 border-gray-400 pl-2">
           <p className="text-gray-800 leading-6 whitespace-pre-line pl-2">
-            {experience}
+            {careerDescription}
           </p>
         </div>
       </div>

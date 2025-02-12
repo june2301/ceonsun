@@ -51,7 +51,7 @@ function UpdateProfile({ userInfo, onSave }) {
     }
 
     try {
-      await memberAPI.updateProfile(21, {
+      await memberAPI.updateProfile(user.userId, {
         nickname: formData.nickname,
         profileImage: formData.profileImage,
       });
