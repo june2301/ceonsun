@@ -10,15 +10,14 @@ import MyStudentList from "../components/MyStudentList";
 
 function MyPage() {
   const { user } = useAuthStore();
-  // const role = user.role; // store에서 role 가져오기
-  const role = "GUEST"; // store에서 role 가져오기
+  const role = user.role; // store에서 role 가져오기
   const [selectedMenu, setSelectedMenu] = useState("내 정보");
   const [userInfo, setUserInfo] = useState(null);
 
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
-        const data = await memberAPI.getUserInfo(21);
+        const data = await memberAPI.getUserInfo(user.userId);
         setUserInfo(data);
       } catch (error) {
         console.error("사용자 정보 조회 실패:", error);

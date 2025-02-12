@@ -84,7 +84,7 @@ function TeacherInfoCreateA({
             <InformationCircleIcon className="w-5 h-5 text-gray-400" />
             {showTooltip && (
               <div className="absolute bottom-full left-0 mb-2 w-[280px] p-3 bg-white border border-gray-300 rounded shadow-lg text-xs text-gray-700 z-20">
-                문의 연락을 허용하면 학생이 선생님께 연락할 수 있습니다.
+                문의 연락을 허용하면 학생이 선생님에게 연락할 수 있습니다.
               </div>
             )}
           </div>
