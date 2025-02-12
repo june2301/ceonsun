@@ -16,7 +16,7 @@ public class ChatMessageProducer {
 
 	public void send(MessageDto data) {
 		log.info("Producing message: {}", data);
-		kafkaTemplate.send("chat", data);
+		kafkaTemplate.send("chat",data.roomId(), data);
 	}
 
 }

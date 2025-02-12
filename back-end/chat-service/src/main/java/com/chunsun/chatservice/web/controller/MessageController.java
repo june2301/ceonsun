@@ -3,7 +3,9 @@ package com.chunsun.chatservice.web.controller;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 
+import com.chunsun.chatservice.kafka.ChatMessageProducer;
 import com.chunsun.chatservice.web.dto.MessageDto;
 import com.chunsun.chatservice.service.MessageService;
 
