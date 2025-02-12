@@ -40,6 +40,14 @@ spring:
             - RemoveRequestHeader=Cookie
             - RewritePath=/coupon-service/(?<segment>.*), /$\{segment}
 
+        - id: coupon-kafka-service
+          uri: lb://COUPON-KAFKA-SERVICE
+          predicates:
+            - Path=/coupon-kafka-service/**
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/coupon-kafka-service/(?<segment>.*), /$\{segment}
+
         - id: rank-service
           uri: lb://RANK-SERVICE
           predicates:

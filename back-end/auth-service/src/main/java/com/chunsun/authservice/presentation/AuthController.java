@@ -4,9 +4,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.chunsun.authservice.application.dto.AuthDto;
@@ -30,21 +30,20 @@ public class AuthController {
 	private final KakaoAuthService kakaoAuthService;
 	private final AuthService authService;
 
+
+
 	/**
 	 * 카카오 인가 코드를 받아 엑세스 토큰 생성 및 유저 로그인
 	 *
-	 * @param authHeader  카카오에서 전달받은 인가 코드
+	 * @param  requestDto 카카오에서 전달받은 인가 코드, 리다이렉트 주소
 	 * @return AuthDto.AuthResponseDto 로그인 성공 시 accessToken, 실패 시 유저 정보 포함한 DTO 반환
 	 */
 	@PostMapping("/login")
-	public Mono<ResponseEntity<?>> login(
-		@RequestHeader("X-Chunsun-Kakao-Auth-Code") String authHeader,
+	public Mono<ResponseEntity<?>> kakaoLoginCallback(
+		@RequestBody AuthDto.KakaoLoginRequestDto requestDto,
 		HttpServletResponse response) {
-		var kakaoAuthCode = HeaderUtil.extractToken(authHeader);
 
-		log.info("accessCode : {}", kakaoAuthCode );
-
-		return kakaoAuthService.getKakaoToken(kakaoAuthCode)
+		return kakaoAuthService.getKakaoToken(requestDto)
 			.flatMap(tokenResponse -> {
 				try {
 					var accessToken = tokenResponse.getAccessToken();
@@ -142,16 +141,6 @@ public class AuthController {
 		CookieUtil.addCookie(response, "refreshToken", authResponse.getRefreshToken());
 
 		return createAuthResponse(authResponse.getToken());
-	}
-
-	/**
-	 * 천선 인가 코드 테스트
-	 *
-	 * @param code  천선 엑세스 코드
-	 */
-	@GetMapping("/login")
-	public Mono<ResponseEntity<?>> kakaoLoginCallback(@RequestParam("code") String code) {
-		return Mono.just(ResponseEntity.ok(code));
 	}
 
 	private ResponseEntity<Void> createAuthResponse(String authToken) {

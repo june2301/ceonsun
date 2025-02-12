@@ -8,10 +8,18 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 public record AuthDto() {
 	public interface AuthResponse {
 		Role getRole();
+	}
+
+	@Getter
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class KakaoLoginRequestDto {
+		private String authCode;
 	}
 
 	@Getter
