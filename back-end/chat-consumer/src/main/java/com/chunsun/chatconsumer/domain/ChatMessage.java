@@ -1,4 +1,4 @@
-package com.chunsun.chatservice.domain;
+package com.chunsun.chatconsumer.domain;
 
 import java.time.LocalDateTime;
 
@@ -9,12 +9,14 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Document(collection = "chat_messages")
 @Getter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 public class ChatMessage {
 	@Id
 	private String id;
