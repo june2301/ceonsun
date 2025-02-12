@@ -9,7 +9,7 @@ public interface AuthService {
 
 	AuthDto.AuthLoginTokenResponseDto refreshAccessToken(String refreshToken);
 
-	AuthDto.AuthLoginTokenResponseDto replaceAllToken(String accessToken, String refreshToken);
+	AuthDto.AuthLoginTokenResponseDto changeRoleAndRefreshToken(String refreshToken);
 
 	void deleteRefreshToken(String refreshToken);
 }
