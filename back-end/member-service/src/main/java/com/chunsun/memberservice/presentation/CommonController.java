@@ -16,16 +16,15 @@ import com.chunsun.memberservice.application.service.CategoryService;
 import com.chunsun.memberservice.application.service.LikeService;
 import com.chunsun.memberservice.domain.Entity.Category;
 
+import lombok.RequiredArgsConstructor;
+
 @RestController
+@RequiredArgsConstructor
 public class CommonController {
 
 	private final CategoryService categoryService;
 	private final LikeService likeService;
 
-	public CommonController(CategoryService categoryService, LikeService likeService) {
-		this.categoryService = categoryService;
-		this.likeService = likeService;
-	}
 	/*
 	* 회원 카테고리 입력
 	* 회원 카테고리 수정
