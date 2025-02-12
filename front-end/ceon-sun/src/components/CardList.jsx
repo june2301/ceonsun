@@ -9,6 +9,7 @@ function CardList({
   showDetail = true,
   onDetailClick,
   expandedStudentIndex = null,
+  expandedStudentData = null,
   isBackArrow = false,
   isMyDetail = false,
   isInquiryMode = false,
@@ -47,15 +48,9 @@ function CardList({
             return (
               <StudentCardDetail
                 key={`detail-${idx}`}
-                nickname={card.nickname}
-                name={card.name}
-                age={card.age}
-                gender={card.gender}
-                profileImage={card.profileImage}
-                subjects={card.subjects}
-                introduction={card.introduction}
+                {...card}
+                {...expandedStudentData}
                 studentStatus={card.studentStatus}
-                showDetail={showDetail}
                 onClose={() => onDetailClick(card, idx)}
                 isListDetail={isInquiryMode}
                 isMyDetail={isMyDetail}

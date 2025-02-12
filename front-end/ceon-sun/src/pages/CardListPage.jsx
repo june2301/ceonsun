@@ -31,20 +31,35 @@ function CardListPage() {
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
 
+  // 학생 카드 상세 정보를 저장할 상태
+  const [expandedStudentData, setExpandedStudentData] = useState(null);
+
   // API 호출 함수
   const fetchCardList = async () => {
     setLoading(true);
     try {
+      console.log("API 호출 파라미터:", {
+        userId: user.id,
+        categories: filterState.categories,
+        gender: filterState.gender,
+        ageRange: filterState.ageRange,
+        page,
+      });
+
       const response = await memberAPI.searchMembers({
         userId: user.id,
         categories: filterState.categories,
         gender: filterState.gender,
         ageRange: filterState.ageRange,
-        page: 0,
+        page,
         size: 10,
       });
 
+      console.log("API 응답:", response);
+
+      // 응답 데이터 설정
       setCardList(response.members);
+      setTotalPages(response.pagination.totalPages);
     } catch (err) {
       setError(err.message);
       console.error("카드 목록을 불러오는데 실패했습니다:", err);
@@ -55,12 +70,16 @@ function CardListPage() {
 
   // 필터 변경시 API 재호출
   useEffect(() => {
+    console.log("필터 상태 변경:", filterState);
     fetchCardList();
-  }, [filterState]);
+  }, [filterState, page]);
 
   // 필터 적용 핸들러
   const handleFilterChange = (newFilter) => {
+    console.log("새로운 필터:", newFilter);
     setFilterState((prev) => ({ ...prev, ...newFilter }));
+    // 필터 변경 시 페이지 초기화
+    setPage(0);
   };
 
   // 실제 렌더링할 카드 목록과 카드 타입 결정
@@ -136,32 +155,6 @@ function CardListPage() {
       cardPublic: true,
       isListDetail: true,
     },
-    {
-      nickname: "학생A",
-      name: "학생A 이름",
-      age: 20,
-      gender: "여자",
-      profileImage: "",
-      subjects: ["Python", "Java"],
-      introduction: "학생A 소개글 내용",
-      // 추가 props (전체 목록 조회 시 사용)
-      isOwner: false,
-      cardPublic: true,
-      isListDetail: true,
-    },
-    {
-      nickname: "학생A",
-      name: "학생A 이름",
-      age: 20,
-      gender: "여자",
-      profileImage: "",
-      subjects: ["Python", "Java"],
-      introduction: "학생A 소개글 내용",
-      // 추가 props (전체 목록 조회 시 사용)
-      isOwner: false,
-      cardPublic: true,
-      isListDetail: true,
-    },
   ];
 
   // 선생 카드에서 "자세히 보기" 클릭 시 TeacherDetail 페이지로 이동하는 함수
@@ -171,10 +164,22 @@ function CardListPage() {
 
   // 학생 카드에서 "자세히 보기" 클릭 시 해당 카드가 확장되도록 처리하는 함수
   const [expandedStudentIndex, setExpandedStudentIndex] = useState(null);
-  const handleStudentListDetail = (cardData, index) => {
-    setExpandedStudentIndex((prevIndex) =>
-      prevIndex === index ? null : index,
-    );
+  const handleStudentListDetail = async (cardData, index) => {
+    try {
+      if (expandedStudentIndex === index) {
+        // 이미 확장된 카드를 다시 클릭한 경우 닫기
+        setExpandedStudentIndex(null);
+        setExpandedStudentData(null);
+      } else {
+        // 새로운 카드를 클릭한 경우 상세 정보 가져오기
+        const studentDetail = await memberAPI.getStudentDetail(cardData.id);
+        setExpandedStudentIndex(index);
+        setExpandedStudentData(studentDetail);
+      }
+    } catch (error) {
+      console.error("학생 상세 정보를 불러오는데 실패했습니다:", error);
+      // 에러 처리 (필요한 경우 사용자에게 알림)
+    }
   };
 
   return (
@@ -218,6 +223,7 @@ function CardListPage() {
                     : handleStudentListDetail
                 }
                 expandedStudentIndex={expandedStudentIndex}
+                expandedStudentData={expandedStudentData}
                 isBackArrow={false}
                 isInquiryMode={cardType === "student"}
               />

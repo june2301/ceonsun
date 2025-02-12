@@ -5,7 +5,40 @@ export const memberAPI = {
   getUserInfo: async (userId) => {
     try {
       const response = await api.get(`/member-service/members/${userId}`);
-      return response.data;
+
+      // 생년월일로 나이 계산
+      const birthdate = response.data.birthdate; // "YYYY-MM-DD" 또는 "YYYYMMDD" 형식
+      let age = null;
+
+      if (birthdate) {
+        // 생년월일 형식 통일 (YYYYMMDD)
+        const cleanBirthdate = birthdate.replace(/-/g, "");
+        const year = parseInt(cleanBirthdate.substring(0, 4));
+        const month = parseInt(cleanBirthdate.substring(4, 6));
+        const day = parseInt(cleanBirthdate.substring(6, 8));
+
+        // 현재 날짜
+        const today = new Date();
+        const currentYear = today.getFullYear();
+        const currentMonth = today.getMonth() + 1;
+        const currentDay = today.getDate();
+
+        // 나이 계산
+        age = currentYear - year;
+        if (
+          currentMonth < month ||
+          (currentMonth === month && currentDay < day)
+        ) {
+          age--;
+        }
+      }
+
+      // 응답 데이터에 나이 추가하고 gender 한글로 변환
+      return {
+        ...response.data,
+        age,
+        gender: response.data.gender === "MALE" ? "남자" : "여자",
+      };
     } catch (error) {
       console.error("사용자 정보 조회 실패:", error);
       throw error;
@@ -44,7 +77,7 @@ export const memberAPI = {
     }
   },
 
-  // 필터링된 멤버 검색 (선생/학생 리스트)
+  // 필터링된 멤버 검색
   searchMembers: async ({
     userId,
     categories = [],
@@ -61,7 +94,7 @@ export const memberAPI = {
       params.append("page", page);
       params.append("size", size);
 
-      // 필터 파라미터 추가
+      // 필터 파라미터 추가 (값이 있을 때만)
       if (categories.length > 0) {
         params.append("category", categories.join(","));
       }
@@ -74,34 +107,32 @@ export const memberAPI = {
         params.append("age", `${ageRange.start}-${ageRange.end}`);
       }
 
-      const response = await api.post(
-        `/member-service/members/search?${params.toString()}`,
-        { id: userId },
+      console.log(
+        "API 요청 URL:",
+        `/member-service/members/${userId}/search?${params.toString()}`,
       );
 
-      // 응답 데이터 가공
-      const { content, pageable, totalElements, totalPages } = response.data;
-
-      // CardList 컴포넌트에서 사용하기 쉽게 데이터 구조 변환
-      const formattedContent = content.map((member) => ({
-        id: member.id,
-        nickname: member.nickname,
-        age: member.age,
-        gender: member.gender === "MALE" ? "남자" : "여자",
-        subjects: member.categories.map((cat) => cat.name),
-        profileImage: member.profileImage || "",
-        showDetail: true,
-        showAge: true,
-        showGender: true,
-      }));
+      const response = await api.get(
+        `/member-service/members/${userId}/search?${params.toString()}`,
+      );
 
       return {
-        members: formattedContent,
+        members: response.data.content.map((member) => ({
+          id: member.id,
+          nickname: member.nickname,
+          age: member.age,
+          gender: member.gender === "MALE" ? "남자" : "여자",
+          subjects: member.categories.map((cat) => cat.name),
+          profileImage: member.profileImage || "",
+          showDetail: true,
+          showAge: true,
+          showGender: true,
+        })),
         pagination: {
-          currentPage: pageable.pageNumber,
-          totalPages,
-          totalElements,
-          pageSize: pageable.pageSize,
+          currentPage: response.data.pageable.pageNumber,
+          totalPages: response.data.totalPages,
+          totalElements: response.data.totalElements,
+          pageSize: response.data.pageable.pageSize,
         },
       };
     } catch (error) {
@@ -110,29 +141,137 @@ export const memberAPI = {
     }
   },
 
-  // 찜한 선생님 목록 조회
-  getFavoriteTeachers: async (userId, page = 0, size = 10) => {
+  // 선생님 상세 정보 조회
+  getTeacherDetail: async (teacherId) => {
     try {
       const response = await api.get(
-        `/member-service/members/favorites?page=${page}&size=${size}`,
-        { data: { id: userId } },
+        `/member-service/teachers/details/${teacherId}`,
       );
-      return response.data;
+
+      // 응답 데이터를 컴포넌트에서 사용할 형태로 변환
+      const teacherData = {
+        id: teacherId,
+        name: response.data.name,
+        nickname: response.data.nickname,
+        gender: response.data.gender === "MALE" ? "남자" : "여자",
+        age: response.data.age,
+        subjects: response.data.categories.map((cat) => cat.name),
+        description: response.data.description,
+        careerDescription: response.data.careerDescription,
+        careerProgress: response.data.careerProgress,
+        price: response.data.price,
+        totalClassCount: response.data.totalClassCount,
+        totalClassHours: response.data.totalClassHours,
+      };
+
+      return teacherData;
     } catch (error) {
-      console.error("찜한 선생님 목록 조회 실패:", error);
+      console.error("선생님 상세 정보 조회 실패:", error);
       throw error;
     }
   },
 
-  // 선생님 랭킹 목록 조회
-  getTeacherRanking: async (page = 0, size = 10) => {
+  // 학생 상세 정보 조회
+  getStudentDetail: async (studentId) => {
     try {
       const response = await api.get(
-        `/member-service/members/ranking?page=${page}&size=${size}`,
+        `/member-service/students/details/${studentId}`,
       );
+
+      // StudentCardDetail 컴포넌트에서 사용할 수 있도록 데이터 변환
+      const studentData = {
+        id: studentId,
+        name: response.data.name,
+        nickname: response.data.nickname,
+        gender: response.data.gender === "MALE" ? "남자" : "여자",
+        age: response.data.age,
+        subjects: response.data.categories.map((cat) => cat.name),
+        description: response.data.description,
+      };
+
+      return studentData;
+    } catch (error) {
+      console.error("학생 상세 정보 조회 실패:", error);
+      throw error;
+    }
+  },
+
+  // 카테고리 목록 조회
+  getCategories: async () => {
+    try {
+      const response = await api.get("/member-service/categories");
+      console.log("카테고리 목록:", response.data);
       return response.data;
     } catch (error) {
-      console.error("선생님 랭킹 목록 조회 실패:", error);
+      console.error("카테고리 목록 조회 실패:", error);
+      throw error;
+    }
+  },
+
+  // 회원 카테고리 입력 (최초 등록)
+  createMemberCategories: async (userId, categoryIds) => {
+    try {
+      const response = await api.post("/member-service/category", {
+        id: userId,
+        categoryIds: categoryIds,
+      });
+      return response.data;
+    } catch (error) {
+      console.error("카테고리 입력 실패:", error);
+      throw error;
+    }
+  },
+
+  // 회원 카테고리 수정
+  updateMemberCategories: async (userId, categoryIds) => {
+    try {
+      const response = await api.put("/member-service/category", {
+        id: userId,
+        categoryIds: categoryIds,
+      });
+      return response.data;
+    } catch (error) {
+      console.error("카테고리 수정 실패:", error);
+      throw error;
+    }
+  },
+
+  // 학생 카드 생성
+  createStudentCard: async (userId, isExposed, description) => {
+    try {
+      const response = await api.post("/member-service/students", {
+        id: userId,
+        isExposed: isExposed,
+        description: description,
+      });
+      return response.data;
+    } catch (error) {
+      console.error("학생 카드 생성 실패:", error);
+      throw error;
+    }
+  },
+
+  // 학생 카드 조회
+  getStudentCard: async (userId) => {
+    try {
+      const response = await api.get(`/member-service/students/${userId}`);
+      return response.data;
+    } catch (error) {
+      console.error("학생 카드 조회 실패:", error);
+      throw error;
+    }
+  },
+
+  // 학생 카드 수정
+  updateStudentCard: async (userId, cardData) => {
+    try {
+      const response = await api.put(`/member-service/students/${userId}`, {
+        isExposed: cardData.isExposed,
+        description: cardData.description,
+      });
+      return response.data;
+    } catch (error) {
+      console.error("학생 카드 수정 실패:", error);
       throw error;
     }
   },

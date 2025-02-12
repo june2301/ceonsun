@@ -2,18 +2,9 @@ import React, { useState, useEffect } from "react";
 import DefaultProfile from "./DefaultProfile";
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
 import { ArrowLongLeftIcon } from "@heroicons/react/24/solid";
-
-const SUBJECTS = [
-  "Python",
-  "Java",
-  "JavaScript",
-  "C",
-  "C#",
-  "C++",
-  "TypeScript",
-  "Kotlin",
-  "Swift",
-];
+import { memberAPI } from "../api/services/member";
+import { authAPI } from "../api/services/auth";
+import useAuthStore from "../stores/authStore";
 
 function StudentCardCreate({
   name,
@@ -25,59 +16,114 @@ function StudentCardCreate({
   // 업데이트 모드 여부. true이면 기존 데이터를 수정하는 모드로 전환
   updateMode = false,
   // 업데이트 모드일 때 초기 데이터 (있으면 props로 전달)
-  subjects: initialSubjects = [],
+  categoryIds: initialCategoryIds = [],
   introduction: initialIntroduction = "",
+  cardPublic: initialCardPublic = true,
   // 업데이트 모드에서 뒤로가기(수정 전 Detail로 돌아가기) 버튼 처리용 onClose
   onClose,
   // 업데이트 모드에서 "수정 완료" 버튼 클릭 시 실행할 함수
   onUpdate,
 }) {
-  // 카드 공개: true = 허용, false = 거부 (기본값은 허용)
-  const [cardPublic, setCardPublic] = useState(true);
-  const [selectedSubjects, setSelectedSubjects] = useState(initialSubjects);
+  const { user, setAuth } = useAuthStore();
+  const [cardPublic, setCardPublic] = useState(initialCardPublic);
+  const [selectedCategoryIds, setSelectedCategoryIds] =
+    useState(initialCategoryIds);
   const [introduction, setIntroduction] = useState(initialIntroduction);
   const [showTooltip, setShowTooltip] = useState(false);
+  const [categories, setCategories] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // 과목 버튼 클릭 시 선택/해제 처리
-  const handleSubjectClick = (subj) => {
-    if (selectedSubjects.includes(subj)) {
-      setSelectedSubjects(selectedSubjects.filter((s) => s !== subj));
+  // 카테고리 목록 조회
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const data = await memberAPI.getCategories();
+        console.log("카테고리 목록:", data);
+        if (data) {
+          setCategories(data);
+        }
+        setIsLoading(false);
+      } catch (error) {
+        console.error("카테고리 조회 실패:", error);
+        setIsLoading(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+  // 카테고리 선택/해제 처리
+  const handleCategoryClick = (categoryId) => {
+    if (selectedCategoryIds.includes(categoryId)) {
+      setSelectedCategoryIds(
+        selectedCategoryIds.filter((id) => id !== categoryId),
+      );
     } else {
-      setSelectedSubjects([...selectedSubjects, subj]);
+      setSelectedCategoryIds([...selectedCategoryIds, categoryId]);
     }
   };
 
   // 작성 모드 제출 함수
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const studentCardData = {
-      cardPublic,
-      selectedSubjects,
-      introduction,
-    };
-    console.log("Student Card Data (작성):", studentCardData);
-    // TODO: 입력 데이터를 백엔드로 전송하는 로직 추가
+    try {
+      // 1. 회원 카테고리 입력 (최초 등록)
+      await memberAPI.createMemberCategories(user.userId, selectedCategoryIds);
+
+      // 2. 학생 카드 생성
+      await memberAPI.createStudentCard(user.userId, cardPublic, introduction);
+
+      // 3. 토큰 재발급 요청 및 role 업데이트
+      const { token } = await authAPI.refreshToken();
+      if (token) {
+        setAuth(token); // store 업데이트
+
+        // 페이지 새로고침 없이 MyLecture 컴포넌트가 리렌더링되도록
+        // role이 변경되었음을 알림
+        if (onUpdate) {
+          onUpdate();
+        }
+      }
+
+      alert("학생으로 등록되었습니다!");
+    } catch (error) {
+      console.error("학생 카드 생성 중 오류 발생:", error);
+      alert("학생 카드 생성에 실패했습니다.");
+    }
   };
 
-  // 업데이트(수정) 모드 제출 함수
-  const handleUpdate = (e) => {
+  // 수정 모드 제출 함수
+  const handleUpdate = async (e) => {
     e.preventDefault();
-    const studentCardData = {
-      cardPublic,
-      selectedSubjects,
-      introduction,
-    };
-    console.log("Student Card Data (수정):", studentCardData);
-    if (onUpdate) onUpdate(studentCardData);
+    try {
+      // 1. 회원 카테고리 수정
+      await memberAPI.updateMemberCategories(user.userId, selectedCategoryIds);
+
+      // 2. 학생 카드 수정
+      await memberAPI.updateStudentCard(user.userId, {
+        isExposed: cardPublic,
+        description: introduction,
+      });
+
+      alert("학생 카드가 수정되었습니다.");
+
+      // 부모 컴포넌트의 onUpdate 호출 (데이터 새로고침)
+      if (onUpdate) {
+        onUpdate();
+      }
+    } catch (error) {
+      console.error("학생 카드 수정 중 오류 발생:", error);
+      alert("수정 중 오류가 발생했습니다.");
+    }
   };
 
   // updateMode가 변경되었을 때, 부모에서 전달한 초기값으로 상태를 업데이트
   useEffect(() => {
     if (updateMode) {
-      setSelectedSubjects(initialSubjects);
+      setSelectedCategoryIds(initialCategoryIds);
       setIntroduction(initialIntroduction);
     }
-  }, [updateMode, initialSubjects, initialIntroduction]);
+  }, [updateMode, initialCategoryIds, initialIntroduction]);
 
   return (
     <form
@@ -179,27 +225,29 @@ function StudentCardCreate({
           수강 희망 과목 선택
           <span className="text-gray-500 text-xs ml-2">복수 선택 가능</span>
         </label>
-        <div className="ml-4 flex flex-wrap gap-2 justify-start">
-          {SUBJECTS.map((subj) => {
-            const selected = selectedSubjects.includes(subj);
-            return (
+        <div className="ml-4 flex flex-wrap gap-2">
+          {isLoading ? (
+            <div>카테고리 로딩 중...</div>
+          ) : categories && categories.length > 0 ? (
+            categories.map((category) => (
               <button
-                key={subj}
+                key={category.id}
                 type="button"
-                onClick={() => handleSubjectClick(subj)}
-                className={`
-                  px-3 py-1 rounded-full border text-sm
+                onClick={() => handleCategoryClick(category.id)}
+                className={`px-3 py-1 rounded-full border text-sm
                   ${
-                    selected
+                    selectedCategoryIds.includes(category.id)
                       ? "bg-sky-100 border-blue-300"
-                      : "bg-white-100 border-gray-300"
+                      : "bg-white border-gray-300"
                   }
                 `}
               >
-                {subj}
+                {category.name}
               </button>
-            );
-          })}
+            ))
+          ) : (
+            <div>카테고리가 없습니다.</div>
+          )}
         </div>
       </div>
 
@@ -219,18 +267,15 @@ function StudentCardCreate({
         </div>
       </div>
 
-      {/* 하단 버튼 영역: updateMode에 따라 다른 버튼을 표시 */}
+      {/* 하단 버튼 영역 */}
       <div className="mx-2 flex justify-end space-x-4">
         {updateMode ? (
-          <>
-            <button
-              type="button"
-              onClick={handleUpdate}
-              className="px-4 py-2 bg-blue-500 text-white rounded shadow hover:bg-blue-600 transition"
-            >
-              수정 완료
-            </button>
-          </>
+          <button
+            type="submit"
+            className="px-4 py-2 bg-blue-500 text-white rounded shadow hover:bg-blue-600 transition"
+          >
+            수정 완료
+          </button>
         ) : (
           <button
             type="submit"
