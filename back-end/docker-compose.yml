@@ -1,5 +1,5 @@
 services:
-  mysql:
+  chunsun-db:
     image: mysql:8.0
     container_name: chunsun-db
     restart: always
@@ -21,6 +21,26 @@ services:
       timeout: 5s
       retries: 5
 
+  mongo-db:
+    image: mongo:6.0
+    container_name: mongo-db
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: 1234
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+      - ./db/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+    networks:
+      - chunsun-network
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh mongodb://root:1234@localhost:27017 --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   auth-redis:
     image: redis:7.0
     container_name: auth-redis-db
@@ -31,9 +51,6 @@ services:
       - chunsun-network
     healthcheck:
       test: [ "CMD", "redis-cli", "ping" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
   rabbitmq:
     image: rabbitmq:3-management
@@ -65,9 +82,10 @@ services:
     networks:
       - chunsun-network
     depends_on:
-      - rabbitmq
+      rabbitmq:
+        condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8888/actuator/health || exit 1"]
+      test: [ "CMD-SHELL", "curl -f http://localhost:8888/actuator/health || exit 1" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -82,9 +100,10 @@ services:
     networks:
       - chunsun-network
     depends_on:
-      - config-service
+      config-service:
+        condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8761/actuator/health || exit 1"]
+      test: [ "CMD-SHELL", "curl -f http://localhost:8761/actuator/health || exit 1" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -103,10 +122,12 @@ services:
     networks:
       - chunsun-network
     depends_on:
-      - config-service
-      - discovery-service
+      config-service:
+        condition: service_healthy
+      discovery-service:
+        condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8080/actuator/health || exit 1"]
+      test: [ "CMD-SHELL", "curl -f http://localhost:8080/actuator/health || exit 1" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -125,10 +146,16 @@ services:
     networks:
       - chunsun-network
     depends_on:
-      - config-service
-      - discovery-service
-      - gateway-service
-      - auth-redis
+      chunsun-db:
+        condition: service_healthy
+      config-service:
+        condition: service_healthy
+      discovery-service:
+        condition: service_healthy
+      gateway-service:
+        condition: service_healthy
+      auth-redis:
+        condition: service_healthy
 
   member-service:
     container_name: member-service
@@ -142,9 +169,26 @@ services:
     networks:
       - chunsun-network
     depends_on:
-      - config-service
-      - discovery-service
-      - gateway-service
+      chunsun-db:
+        condition: service_healthy
+      config-service:
+        condition: service_healthy
+      discovery-service:
+        condition: service_healthy
+      gateway-service:
+        condition: service_healthy
+
+  coupon-redis:
+    container_name: coupon-redis
+    image: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - chunsun-network
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      retries: 5
 
   coupon-service:
     container_name: coupon-service
@@ -152,15 +196,44 @@ services:
       context: ./coupon-service
       dockerfile: Dockerfile
     environment:
+      spring.datasource.url: jdbc:mysql://chunsun-db:3306/coupon?serverTimezone=UTC&characterEncoding=UTF-8
+      spring.data.redis.host: coupon-redis
       spring.rabbitmq.host: rabbitmq
       spring.cloud.config.uri: http://config-service:8888
       eureka.client.serviceUrl.defaultZone: http://discovery-service:8761/eureka/
     networks:
       - chunsun-network
     depends_on:
-      - config-service
-      - discovery-service
-      - gateway-service
+      chunsun-db:
+        condition: service_healthy
+      config-service:
+        condition: service_healthy
+      discovery-service:
+        condition: service_healthy
+      gateway-service:
+        condition: service_healthy
+
+  coupon-kafka-service:
+    container_name: coupon-kafka-service
+    build:
+      context: ./coupon-kafka-service
+      dockerfile: Dockerfile
+    environment:
+      spring.datasource.url: jdbc:mysql://chunsun-db:3306/coupon?serverTimezone=UTC&characterEncoding=UTF-8
+      spring.rabbitmq.host: rabbitmq
+      spring.cloud.config.uri: http://config-service:8888
+      eureka.client.serviceUrl.defaultZone: http://discovery-service:8761/eureka/
+    networks:
+      - chunsun-network
+    depends_on:
+      chunsun-db:
+        condition: service_healthy
+      config-service:
+        condition: service_healthy
+      discovery-service:
+        condition: service_healthy
+      gateway-service:
+        condition: service_healthy
 
   rank-service:
     container_name: rank-service
@@ -174,9 +247,14 @@ services:
     networks:
       - chunsun-network
     depends_on:
-      - config-service
-      - discovery-service
-      - gateway-service
+      chunsun-db:
+        condition: service_healthy
+      config-service:
+        condition: service_healthy
+      discovery-service:
+        condition: service_healthy
+      gateway-service:
+        condition: service_healthy
 
   payment-service:
     container_name: payment-service
@@ -190,9 +268,14 @@ services:
     networks:
       - chunsun-network
     depends_on:
-      - config-service
-      - discovery-service
-      - gateway-service
+      chunsun-db:
+        condition: service_healthy
+      config-service:
+        condition: service_healthy
+      discovery-service:
+        condition: service_healthy
+      gateway-service:
+        condition: service_healthy
 
   class-service:
     container_name: class-service
@@ -206,9 +289,14 @@ services:
     networks:
       - chunsun-network
     depends_on:
-      - config-service
-      - discovery-service
-      - gateway-service
+      chunsun-db:
+        condition: service_healthy
+      config-service:
+        condition: service_healthy
+      discovery-service:
+        condition: service_healthy
+      gateway-service:
+        condition: service_healthy
 
   chat-service:
     container_name: chat-service
@@ -222,12 +310,119 @@ services:
     networks:
       - chunsun-network
     depends_on:
-      - config-service
-      - discovery-service
-      - gateway-service
+      discovery-service:
+        condition: service_healthy
+      config-service:
+        condition: service_healthy
+      gateway-service:
+        condition: service_healthy
+      mongo-db:
+        condition: service_healthy
+      chunsun-db:
+        condition: service_healthy
+
+  ############################
+  # Kafka & Zookeeper 설정 추가
+  ############################
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    container_name: zookeeper
+    hostname: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+    networks:
+      - chunsun-network
+    healthcheck:
+      test: [ "CMD", "nc", "-z", "localhost", "2181" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  kafka1:
+    image: confluentinc/cp-kafka:latest
+    container_name: kafka1
+    restart: always
+    depends_on:
+      zookeeper:
+        condition: service_healthy
+    ports:
+      - "9092:9092"  # 내부 통신
+      - "29092:29092" # 외부 접근
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENERS: INTERNAL://0.0.0.0:9092,EXTERNAL://0.0.0.0:29092
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka1:9092,EXTERNAL://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks:
+      - chunsun-network
+
+  kafka2:
+    image: confluentinc/cp-kafka:latest
+    container_name: kafka2
+    restart: always
+    depends_on:
+      zookeeper:
+        condition: service_healthy
+    ports:
+      - "9093:9092"  # 내부 통신
+      - "29093:29092" # 외부 접근
+    environment:
+      KAFKA_BROKER_ID: 2
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENERS: INTERNAL://0.0.0.0:9092,EXTERNAL://0.0.0.0:29092
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka2:9092,EXTERNAL://localhost:29093
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks:
+      - chunsun-network
+
+  kafka3:
+    image: confluentinc/cp-kafka:latest
+    container_name: kafka3
+    restart: always
+    depends_on:
+      - zookeeper
+    ports:
+      - "9094:9092"
+      - "29094:29092"
+    environment:
+      KAFKA_BROKER_ID: 3
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENERS: INTERNAL://0.0.0.0:9092,EXTERNAL://0.0.0.0:29092
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka3:9092,EXTERNAL://localhost:29094
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks:
+      - chunsun-network
+
+  kafka-init:
+    image: confluentinc/cp-kafka:latest
+    container_name: kafka-init
+    depends_on:
+      - kafka1
+      - kafka2
+      - kafka3
+    entrypoint: [ "/bin/sh", "-c" ]
+    command: >
+      "sleep 20 &&
+        kafka-topics --create --bootstrap-server kafka1:9092 --replication-factor 1 --partitions 1 --topic chat || true &&
+        kafka-topics --create --bootstrap-server kafka1:9092 --replication-factor 1 --partitions 1 --topic coupon || true &&
+        kafka-topics --create --bootstrap-server kafka1:9092 --replication-factor 1 --partitions 1 --topic alarm || true"
+    networks:
+      - chunsun-network
 
 volumes:
   mysql_data:
+  mongo_data:
 
 networks:
   chunsun-network:
