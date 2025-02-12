@@ -21,10 +21,14 @@ CREATE TABLE teachers (
     career_description   TEXT DEFAULT NULL,
     class_contents       TEXT DEFAULT NULL,
     class_progress       TEXT DEFAULT NULL,
-    total_class_count    INT DEFAULT 0,
-    total_class_hours    INT DEFAULT 0,
+    total_class_count    INT NOT NULL DEFAULT 0,
+    total_class_hours    INT NOT NULL DEFAULT 0,
     is_wanted            BOOLEAN NOT NULL DEFAULT TRUE,
-    bank                 ENUM('KB', 'SHINHAN', 'WOORI') NOT NULL,
+    bank                 ENUM(
+        'KB', 'SC', 'KYUNGNAM', 'GWANGJU', 'IBK', 'NONGHYUP', 'DAEGU', 'BUSAN',
+        'KDB', 'SAEMAUL', 'SUHYUP', 'SHINHAN', 'SHINHYEOP', 'KEB', 'WOORI',
+        'POST', 'JEONBUK', 'CHUKHYUP', 'KAKAO', 'KEBANK', 'HANA', 'CITI', 'TOSS'
+    ) NOT NULL,
     account              VARCHAR(20) NOT NULL,
     price                INT NOT NULL DEFAULT 10000
 );

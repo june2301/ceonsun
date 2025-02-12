@@ -43,9 +43,9 @@ public class Teacher {
 
 	private String classProgress;
 
-	private Integer totalClassCount;
+	private Integer totalClassCount = 0;
 
-	private Integer totalClassHours;
+	private Integer totalClassHours = 0;
 
 	private Boolean isWanted;
 
