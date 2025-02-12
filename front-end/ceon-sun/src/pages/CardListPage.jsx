@@ -39,7 +39,7 @@ function CardListPage() {
     setLoading(true);
     try {
       console.log("API 호출 파라미터:", {
-        userId: user.id,
+        userId: user.userId,
         categories: filterState.categories,
         gender: filterState.gender,
         ageRange: filterState.ageRange,
@@ -47,7 +47,7 @@ function CardListPage() {
       });
 
       const response = await memberAPI.searchMembers({
-        userId: user.id,
+        userId: user.userId,
         categories: filterState.categories,
         gender: filterState.gender,
         ageRange: filterState.ageRange,
