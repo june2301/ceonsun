@@ -2,11 +2,11 @@ package com.chunsun.memberservice.config.web;
 
 import java.util.List;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -25,20 +25,16 @@ public class WebConfig implements WebMvcConfigurer {
     private final TeacherIdArgumentResolver teacherIdArgumentResolver;
 
     @Bean
-    @ConditionalOnMissingBean(UrlBasedCorsConfigurationSource.class)
-    public UrlBasedCorsConfigurationSource corsConfigurationSource() {
-        var corsConfig = new CorsConfiguration();
+    public CorsFilter corsFilter() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowCredentials(true);
+        config.setAllowedOrigins(List.of("*")); // 모든 도메인 허용
+        config.setAllowedHeaders(List.of("*"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 
-        corsConfig.addAllowedOriginPattern(CorsConfiguration.ALL);
-        corsConfig.addAllowedHeader(CorsConfiguration.ALL);
-        corsConfig.addAllowedMethod(CorsConfiguration.ALL);
-
-        corsConfig.setAllowCredentials(true);
-        corsConfig.setMaxAge(3600L);
-
-        var corsConfigSource = new UrlBasedCorsConfigurationSource();
-        corsConfigSource.registerCorsConfiguration("/**", corsConfig);
-        return corsConfigSource;
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return new CorsFilter(source);
     }
 
     @Override
