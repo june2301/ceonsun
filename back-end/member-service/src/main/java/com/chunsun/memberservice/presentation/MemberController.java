@@ -16,17 +16,15 @@ import com.chunsun.memberservice.application.dto.MemberDto;
 import com.chunsun.memberservice.application.service.MemberService;
 import com.chunsun.memberservice.domain.Repository.MemberRepository;
 
+import lombok.RequiredArgsConstructor;
+
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/members")
 public class MemberController {
 
 	private final MemberService memberService;
 	private final MemberRepository memberRepository;
-
-	public MemberController(MemberService memberService, MemberRepository memberRepository) {
-		this.memberService = memberService;
-		this.memberRepository = memberRepository;
-	}
 
 	/*
 	* 회원가입
@@ -84,7 +82,7 @@ public class MemberController {
 		return ResponseEntity.ok().build();
 	}
 
-	@GetMapping("/search/{id}")
+	@GetMapping("/{id}/search")
 	public ResponseEntity<Page<MemberDto.MemberListItem>> searchMembers(
 		@PathVariable Long id,
 		@RequestParam(required = false) String category,

@@ -1,7 +1,6 @@
 package com.chunsun.memberservice.presentation;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,15 +12,14 @@ import org.springframework.web.bind.annotation.RestController;
 import com.chunsun.memberservice.application.dto.TeacherDto;
 import com.chunsun.memberservice.application.service.TeacherService;
 
+import lombok.RequiredArgsConstructor;
+
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/teachers")
 public class TeacherController {
 
 	private final TeacherService teacherService;
-
-	public TeacherController(TeacherService teacherService) {
-		this.teacherService = teacherService;
-	}
 
 	/*
 	* 선생 카드 생성

@@ -77,6 +77,7 @@ public class Member {
 		this.role = role;
 		this.gender = gender;
 		this.createdAt = LocalDateTime.now();
+		this.updatedAt = LocalDateTime.now();
 	}
 
 	public Member(Long memberId) {
