@@ -30,8 +30,6 @@ public class AuthController {
 	private final KakaoAuthService kakaoAuthService;
 	private final AuthService authService;
 
-
-
 	/**
 	 * 카카오 인가 코드를 받아 엑세스 토큰 생성 및 유저 로그인
 	 *
@@ -104,18 +102,15 @@ public class AuthController {
 	}
 
 	/**
-	 * 천선 사용자 정보 변경으로 인한 엑세스 토큰 재발급
+	 * 천선 사용자 정보 변경으로 인한 리프레스 토큰 및 엑세스 토큰 재발급
 	 *
-	 * @param authHeader  천선 엑세스 토큰
+	 * @param refreshToken  천선 리프레시 토큰
 	 */
-	@PostMapping("/refreshAll")
-	public ResponseEntity<Void> refreshAllToken(
-		@RequestHeader("X-Chunsun-Authorization") String authHeader,
+	@PostMapping("/changeRole")
+	public ResponseEntity<Void> changeRoleAndRefreshToken(
 		@CookieValue(value = "refreshToken", required = false) String refreshToken,
 		HttpServletResponse response) {
-		var accessToken = HeaderUtil.extractToken(authHeader);
-
-		var authResponse = authService.replaceAllToken(accessToken, refreshToken);
+		var authResponse = authService.changeRoleAndRefreshToken(refreshToken);
 		CookieUtil.addCookie(response, "refreshToken", authResponse.getRefreshToken());
 
 		return createAuthResponse(authResponse.getToken());

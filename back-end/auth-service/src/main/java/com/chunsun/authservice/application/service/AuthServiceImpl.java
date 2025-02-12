@@ -15,7 +15,9 @@ import com.chunsun.authservice.infrastructure.security.JwtTokenProvider;
 import com.chunsun.authservice.infrastructure.security.RefreshTokenStore;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
@@ -28,6 +30,10 @@ public class AuthServiceImpl implements AuthService {
 		Optional<Member> searchMember = memberRepository.findByKakaoId(userInfoDto.getId());
 
 		if (searchMember.isPresent()) {
+			if (searchMember.get().getDeletedAt() != null) {
+				throw new BusinessException(AuthErrorCodes.ALREADY_DELETED_MEMBER);
+			}
+
 			MemberDto memberDto = AuthConverter.of(searchMember.get());
 			String accessToken = jwtTokenProvider.createToken(memberDto);
 			String refreshToken = jwtTokenProvider.createRefreshToken();
@@ -46,6 +52,7 @@ public class AuthServiceImpl implements AuthService {
 	}
 
 	public AuthDto.AuthLoginTokenResponseDto refreshAccessToken(String refreshToken) {
+		log.info("refresh token: {}", refreshToken);
 		MemberDto member = refreshTokenStore.getMemberByToken(refreshToken)
 			.orElseThrow(() -> new BusinessException(AuthErrorCodes.INVALID_AUTHORIZATION_REFRESH_TOKEN));
 
@@ -59,8 +66,11 @@ public class AuthServiceImpl implements AuthService {
 	}
 
 	@Override
-	public AuthDto.AuthLoginTokenResponseDto replaceAllToken(String accessToken, String refreshToken) {
-		long userId = Long.parseLong(jwtTokenProvider.getClaims(accessToken));
+	public AuthDto.AuthLoginTokenResponseDto changeRoleAndRefreshToken(String refreshToken) {
+		log.info("refresh token: {}", refreshToken);
+		Long userId = refreshTokenStore.getMemberByToken(refreshToken)
+			.orElseThrow(() -> new BusinessException(AuthErrorCodes.NOT_EXIST_AUTHORIZATION_REFRESH_TOKEN))
+			.id();
 
 		Member member = memberRepository.findById(userId)
 			.orElseThrow(() -> new BusinessException(AuthErrorCodes.NOT_EXIST_MEMBER));
@@ -72,7 +82,7 @@ public class AuthServiceImpl implements AuthService {
 		refreshTokenStore.removeToken(refreshToken);
 		refreshTokenStore.saveToken(newRefreshToken, memberDto);
 
-		return AuthConverter.toAuthLoginTokenResponse(newAccessToken, newRefreshToken, member.getRole());
+		return AuthConverter.toAuthLoginTokenResponse(newAccessToken, newRefreshToken, memberDto.role());
 	}
 
 	@Override
