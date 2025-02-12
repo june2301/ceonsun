@@ -128,7 +128,7 @@ const Header = () => {
         </div>
 
         {/* 메뉴 */}
-        <div className="flex gap-6">{renderMenus()}</div>
+        <div className="flex gap-12">{renderMenus()}</div>
 
         {/* 사용자 정보 */}
         <div className="flex items-center gap-6">

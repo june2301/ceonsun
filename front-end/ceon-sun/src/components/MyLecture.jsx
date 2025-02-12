@@ -1,34 +1,21 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import StudentCardCreate from "./StudentCardCreate";
 import StudentCard from "./StudentCard";
 import CardList from "./CardList"; // 재사용 가능한 리스트 컴포넌트 (선생님 카드 목록용)
 import StudentCardDetail from "./StudentCardDetail";
 import TeacherDetail from "./TeacherDetail";
 import { ArrowLongLeftIcon } from "@heroicons/react/24/solid";
+import useAuthStore from "../stores/authStore";
+import { memberAPI } from "../api/services/member";
 
 function MyLecture({ role }) {
-  // role이 GUEST면 studentCardExists는 false
-  const [studentCardExists, setStudentCardExists] = useState(false);
-  // 내 학생 카드 Detail 모드 여부 (내 학생 카드의 "자세히 보기" 클릭 시 전환)
   const [isMyDetailMode, setIsMyDetailMode] = useState(false);
-  // 내 학생 카드 업데이트(수정) 모드 여부 (Detail 모드에서 수정하기 버튼 클릭 시 전환)
   const [isUpdateMode, setIsUpdateMode] = useState(false);
-  // 선생님 상세 보기 모드
   const [teacherDetailMode, setTeacherDetailMode] = useState(false);
   const [selectedTeacher, setSelectedTeacher] = useState(null);
-
-  // DB에서 가져온 내 학생 카드 데이터 (존재할 경우)
-  const myStudentCard = {
-    nickname: "나의닉네임",
-    name: "나의 이름",
-    age: 25,
-    gender: "남",
-    profileImage: "",
-    subjects: ["Python", "JavaScript"],
-    introduction:
-      "내 소개글 내용\n내 소개글 내용\n내 소개글 내용\n내 소개글 내용\n내 소개글 내용\n내 소개글 내용\n내 소개글 내용\n",
-    cardPublic: true,
-  };
+  const [userInfo, setUserInfo] = useState(null);
+  const [studentCard, setStudentCard] = useState(null);
+  const { user } = useAuthStore();
 
   // DB에서 가져온 선생님 카드 리스트 데이터 (예시 데이터)
   const teacherList = [
@@ -90,15 +77,45 @@ function MyLecture({ role }) {
     // 추가 데이터가 있을 경우 목록이 길어집니다.
   ];
 
+  // userInfo와 studentCard 데이터 조회
   useEffect(() => {
-    // role이 GUEST면 무조건 false, 아니면 API 호출하여 카드 존재 여부 확인
-    if (role === "GUEST") {
-      setStudentCardExists(false);
-    } else {
-      // TODO: 실제 API 호출 후 setStudentCardExists(true/false)
-      setStudentCardExists(true); // 임시로 true 설정
-    }
-  }, [role]);
+    const fetchData = async () => {
+      try {
+        // 사용자 기본 정보 조회
+        const userInfoData = await memberAPI.getUserInfo(user.userId);
+        setUserInfo(userInfoData);
+
+        // role이 STUDENT일 때만 학생 카드 정보 조회
+        if (role === "STUDENT") {
+          const studentCardData = await memberAPI.getStudentCard(user.userId);
+          setStudentCard(studentCardData);
+          console.log("학생 카드 데이터:", studentCardData);
+          console.log("카테고리 목록:", studentCardData.categories);
+        }
+      } catch (error) {
+        console.error("데이터 조회 실패:", error);
+      }
+    };
+
+    fetchData();
+  }, [user.userId, role]);
+
+  // 학생 카드 데이터 조합
+  const myStudentCard = useMemo(() => {
+    if (!userInfo || !studentCard) return null;
+
+    return {
+      nickname: userInfo.nickname,
+      name: userInfo.name,
+      age: userInfo.age,
+      gender: userInfo.gender,
+      profileImage: userInfo.profileImage,
+      subjects: studentCard.categories.map((cat) => cat.name),
+      introduction: studentCard.description,
+      cardPublic: studentCard.isExposed,
+      categoryIds: studentCard.categories.map((cat) => cat.id),
+    };
+  }, [userInfo, studentCard]);
 
   // 2번: 내 학생 카드 영역에서 "자세히 보기" 클릭 시 Detail 모드로 전환
   const handleStudentMyDetail = () => {
@@ -126,6 +143,22 @@ function MyLecture({ role }) {
   const handleTeacherDetailClose = () => {
     setTeacherDetailMode(false);
     setSelectedTeacher(null);
+  };
+
+  // 학생 카드 데이터 새로고침
+  const refreshStudentCard = async () => {
+    try {
+      const studentCardData = await memberAPI.getStudentCard(user.userId);
+      setStudentCard(studentCardData);
+    } catch (error) {
+      console.error("학생 카드 데이터 새로고침 실패:", error);
+    }
+  };
+
+  // 수정 완료 핸들러
+  const handleUpdateComplete = async () => {
+    await refreshStudentCard();
+    setIsUpdateMode(false); // 수정 모드 종료
   };
 
   // 렌더링 분기
@@ -171,76 +204,81 @@ function MyLecture({ role }) {
   return (
     <div className="h-full flex flex-col">
       <div className="flex-1 overflow-y-auto custom-scrollbar">
-        {!studentCardExists ? (
-          // 학생 카드가 없으면 StudentCardCreate 컴포넌트를 보여줌
-          <div className="p-4 min-h-full">
-            <StudentCardCreate
-              name="홍길동"
-              nickname="홍길동"
-              age="25"
-              birthdate="1998.01.01"
-              gender="남"
-              profileImage=""
-            />
-          </div>
-        ) : isMyDetailMode ? (
-          // Detail 모드 또는 수정 모드
-          <div className="p-4 min-h-full">
-            {isUpdateMode ? (
-              <StudentCardCreate
-                name={myStudentCard.name}
-                nickname={myStudentCard.nickname}
-                age={myStudentCard.age}
-                gender={myStudentCard.gender}
-                profileImage={myStudentCard.profileImage}
-                subjects={myStudentCard.subjects}
-                introduction={myStudentCard.introduction}
-                updateMode={true}
-                onClose={() => setIsUpdateMode(false)}
-              />
+        {role === "GUEST"
+          ? // GUEST일 때는 StudentCardCreate 표시
+            userInfo && (
+              <div className="p-4 min-h-full">
+                <StudentCardCreate
+                  name={userInfo.name}
+                  nickname={userInfo.nickname}
+                  age={userInfo.age}
+                  birthdate={userInfo.birthdate}
+                  gender={userInfo.gender}
+                  profileImage={userInfo.profileImage}
+                />
+              </div>
+            )
+          : // STUDENT일 때는 학생 카드와 수강 정보 표시
+            myStudentCard &&
+            (isMyDetailMode ? (
+              <div className="p-4 min-h-full">
+                {isUpdateMode ? (
+                  <StudentCardCreate
+                    name={myStudentCard.name}
+                    nickname={myStudentCard.nickname}
+                    age={myStudentCard.age}
+                    gender={myStudentCard.gender}
+                    profileImage={myStudentCard.profileImage}
+                    categoryIds={myStudentCard.categoryIds}
+                    introduction={myStudentCard.introduction}
+                    cardPublic={myStudentCard.cardPublic}
+                    updateMode={true}
+                    onClose={() => setIsUpdateMode(false)}
+                    onUpdate={handleUpdateComplete}
+                  />
+                ) : (
+                  <StudentCardDetail
+                    nickname={myStudentCard.nickname}
+                    name={myStudentCard.name}
+                    age={myStudentCard.age}
+                    gender={myStudentCard.gender}
+                    profileImage={myStudentCard.profileImage}
+                    subjects={myStudentCard.subjects}
+                    introduction={myStudentCard.introduction}
+                    isMyDetail={true}
+                    onClose={handleMyDetailClose}
+                    onUpdate={handleStudentUpdate}
+                    cardPublic={myStudentCard.cardPublic}
+                  />
+                )}
+              </div>
             ) : (
-              <StudentCardDetail
-                nickname={myStudentCard.nickname}
-                name={myStudentCard.name}
-                age={myStudentCard.age}
-                gender={myStudentCard.gender}
-                profileImage={myStudentCard.profileImage}
-                subjects={myStudentCard.subjects}
-                introduction={myStudentCard.introduction}
-                isMyDetail={true}
-                onClose={handleMyDetailClose}
-                onUpdate={handleStudentUpdate}
-                cardPublic={myStudentCard.cardPublic}
-              />
-            )}
-          </div>
-        ) : (
-          // 기본 상태 - 내 학생 카드와 선생님 카드 목록
-          <div className="space-y-8 pl-6 pr-4 py-6">
-            <div>
-              <h2 className="text-xl font-bold mb-4">나의 학생 카드</h2>
-              <StudentCard
-                nickname={myStudentCard.nickname}
-                subjects={myStudentCard.subjects}
-                profileImage={myStudentCard.profileImage}
-                isOwner={true}
-                cardPublic={myStudentCard.cardPublic}
-                showDetail={true}
-                onDetailClick={handleStudentMyDetail}
-              />
-            </div>
-            <hr className="border-t border-gray-300" />
-            <div>
-              <h2 className="text-xl font-bold mb-4">수강 정보</h2>
-              <CardList
-                cards={teacherList}
-                type="teacher"
-                showDetail={true}
-                onDetailClick={handleTeacherDetail}
-              />
-            </div>
-          </div>
-        )}
+              // 기본 상태 - 내 학생 카드와 선생님 카드 목록
+              <div className="space-y-8 pl-6 pr-4 py-6">
+                <div>
+                  <h2 className="text-xl font-bold mb-4">나의 학생 카드</h2>
+                  <StudentCard
+                    nickname={myStudentCard.nickname}
+                    subjects={myStudentCard.subjects}
+                    profileImage={myStudentCard.profileImage}
+                    isOwner={true}
+                    cardPublic={myStudentCard.cardPublic}
+                    showDetail={true}
+                    onDetailClick={handleStudentMyDetail}
+                  />
+                </div>
+                <hr className="border-t border-gray-300" />
+                <div>
+                  <h2 className="text-xl font-bold mb-4">수강 정보</h2>
+                  <CardList
+                    cards={teacherList}
+                    type="teacher"
+                    showDetail={true}
+                    onDetailClick={handleTeacherDetail}
+                  />
+                </div>
+              </div>
+            ))}
       </div>
     </div>
   );

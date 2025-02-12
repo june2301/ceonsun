@@ -17,14 +17,14 @@ function TeacherDetail({ teacher, topBarItems, showClassButton = false }) {
     mainContent =
       selectedTab === 0 ? (
         <TeacherInfoA
-          introduction={teacher.introduction}
-          experience={teacher.experience}
+          description={teacher.description}
+          careerDescription={teacher.careerDescription}
         />
       ) : (
         <TeacherInfoB
           subjects={teacher.subjects}
           lessonFee={teacher.lessonFee}
-          lessonInfo={teacher.lessonInfo}
+          careerProgress={teacher.careerProgress}
         />
       );
   } else {
@@ -32,8 +32,8 @@ function TeacherDetail({ teacher, topBarItems, showClassButton = false }) {
     mainContent =
       selectedTab === 0 ? (
         <TeacherInfoA
-          introduction={teacher.introduction}
-          experience={teacher.experience}
+          description={teacher.description}
+          careerDescription={teacher.careerDescription}
           teacher={teacher}
           showProfile={true}
         />
@@ -41,7 +41,7 @@ function TeacherDetail({ teacher, topBarItems, showClassButton = false }) {
         <TeacherInfoB
           subjects={teacher.subjects}
           lessonFee={teacher.lessonFee}
-          lessonInfo={teacher.lessonInfo}
+          careerProgress={teacher.careerProgress}
         />
       ) : (
         <TeacherInfoC materials={teacher.materials} />

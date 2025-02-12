@@ -32,9 +32,9 @@ function Filter({ filterState, onFilterChange }) {
     filterState.gender || "all",
   );
 
-  // 나이
-  const [startAge, setStartAge] = useState(filterState.ageRange?.start || null);
-  const [endAge, setEndAge] = useState(filterState.ageRange?.end || null);
+  // 나이 초기값 설정
+  const [startAge, setStartAge] = useState(filterState.ageRange?.start || 20); // 기본값 20
+  const [endAge, setEndAge] = useState(filterState.ageRange?.end || 40); // 기본값 40
 
   // 나이 팝업
   const [openStartAgePopup, setOpenStartAgePopup] = useState(false);
@@ -54,7 +54,7 @@ function Filter({ filterState, onFilterChange }) {
 
   const applySubject = () => {
     onFilterChange({ categories: selectedSubjects });
-    setOpenSubject(false);
+    // setOpenSubject(false);  // 주석 처리하여 필터가 닫히지 않도록 함
   };
 
   // -------------------
@@ -73,7 +73,7 @@ function Filter({ filterState, onFilterChange }) {
 
   const applyGender = () => {
     onFilterChange({ gender: selectedGender });
-    setOpenGender(false);
+    // setOpenGender(false);  // 주석 처리
   };
 
   // -------------------
@@ -97,7 +97,7 @@ function Filter({ filterState, onFilterChange }) {
         end: endAge,
       },
     });
-    setOpenAge(false);
+    // setOpenAge(false);  // 주석 처리
   };
 
   return (

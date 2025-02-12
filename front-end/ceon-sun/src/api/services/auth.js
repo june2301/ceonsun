@@ -59,4 +59,18 @@ export const authAPI = {
     }
     throw new Error("Unexpected response");
   },
+
+  // 토큰 재발급
+  refreshToken: async () => {
+    try {
+      const response = await api.post("/auth-service/changeRole");
+      // 204 상태코드에서는 response.data가 비어있음
+      return {
+        token: response.headers["x-chunsun-authorization"],
+      };
+    } catch (error) {
+      console.error("토큰 재발급 실패:", error);
+      throw error;
+    }
+  },
 };

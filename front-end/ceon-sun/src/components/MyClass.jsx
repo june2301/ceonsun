@@ -4,28 +4,29 @@ import TeacherInfoCreateA from "../components/TeacherInfoCreateA";
 import TeacherInfoCreateB from "../components/TeacherInfoCreateB";
 import TeacherInfoA from "../components/TeacherInfoA";
 import TeacherInfoB from "../components/TeacherInfoB";
+import useAuthStore from "../stores/authStore";
+import { memberAPI } from "../api/services/member";
 
 function MyClass({ role }) {
   const [teacherCardExists, setTeacherCardExists] = useState(false);
   const [selectedTab, setSelectedTab] = useState(0);
   const [isUpdateMode, setIsUpdateMode] = useState(false);
+  const [userInfo, setUserInfo] = useState(null);
+  const { user } = useAuthStore();
 
-  // 예시 데이터 - 실제로는 API 응답으로 받아올 데이터
-  const teacherInfo = {
-    name: "김싸피",
-    nickname: "Teacher1",
-    age: "35",
-    birthdate: "1989.01.01",
-    gender: "여성",
-    profileImage: "",
-    introduction:
-      "안녕하세요, 저는 Teacher1입니다. 열정적으로 학생들을 지도하고 있습니다.",
-    experience: "2010 ~ 2015: Company A\n2015 ~ 2020: Company B",
-    subjects: ["Java", "C++", "Python"],
-    lessonFee: 50000,
-    lessonInfo: "주 3회, 1시간 수업 진행, 온라인/오프라인 가능",
-    contactPublic: true,
-  };
+  // 사용자 정보 가져오기
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      try {
+        const data = await memberAPI.getUserInfo(user.userId);
+        setUserInfo(data);
+      } catch (error) {
+        console.error("사용자 정보 조회 실패:", error);
+      }
+    };
+
+    fetchUserInfo();
+  }, [user.userId]);
 
   useEffect(() => {
     // role이 GUEST면 무조건 false, 아니면 API 호출하여 카드 존재 여부 확인
@@ -48,6 +49,21 @@ function MyClass({ role }) {
 
   const menuItems = ["선생님 소개", "수업 설명"];
 
+  // 예시 데이터 - 실제로는 API 응답으로 받아올 데이터
+  const teacherInfo = {
+    introduction:
+      "안녕하세요, 저는 Teacher1입니다. 열정적으로 학생들을 지도하고 있습니다.",
+    experience: "2010 ~ 2015: Company A\n2015 ~ 2020: Company B",
+    subjects: ["Java", "C++", "Python"],
+    lessonFee: 50000,
+    lessonInfo: "주 3회, 1시간 수업 진행, 온라인/오프라인 가능",
+    contactPublic: true,
+  };
+
+  if (!user?.userId) {
+    return null; // 또는 로딩 컴포넌트
+  }
+
   return (
     <div className="w-full h-full flex flex-col">
       <div className="p-4 pb-0">
@@ -61,29 +77,29 @@ function MyClass({ role }) {
       <div className="flex-1 relative">
         <div className="absolute inset-0 overflow-y-auto custom-scrollbar p-4 pt-4">
           {!teacherCardExists ? (
-            // 선생님 카드가 없으면 TeacherInfoCreate 컴포넌트를 보여줌
+            // 선생님 카드가 없을 때 TeacherInfoCreate 컴포넌트를 보여줌
             selectedTab === 0 ? (
               <TeacherInfoCreateA
-                name={teacherInfo.name}
-                nickname={teacherInfo.nickname}
-                age={teacherInfo.age}
-                birthdate={teacherInfo.birthdate}
-                gender={teacherInfo.gender}
-                profileImage={teacherInfo.profileImage}
+                name={userInfo?.name}
+                nickname={userInfo?.nickname}
+                age={userInfo?.age}
+                birthdate={userInfo?.birthdate}
+                gender={userInfo?.gender}
+                profileImage={userInfo?.profileImage}
               />
             ) : (
               <TeacherInfoCreateB />
             )
           ) : isUpdateMode ? (
-            // 업데이트(수정) 모드: TeacherInfoCreate 컴포넌트를 updateMode로 전환하여 사용
+            // 업데이트(수정) 모드
             selectedTab === 0 ? (
               <TeacherInfoCreateA
-                name={teacherInfo.name}
-                nickname={teacherInfo.nickname}
-                age={teacherInfo.age}
-                birthdate={teacherInfo.birthdate}
-                gender={teacherInfo.gender}
-                profileImage={teacherInfo.profileImage}
+                name={userInfo?.name}
+                nickname={userInfo?.nickname}
+                age={userInfo?.age}
+                birthdate={userInfo?.birthdate}
+                gender={userInfo?.gender}
+                profileImage={userInfo?.profileImage}
                 introduction={teacherInfo.introduction}
                 experience={teacherInfo.experience}
                 contactPublic={teacherInfo.contactPublic}
@@ -103,12 +119,12 @@ function MyClass({ role }) {
             <div className="flex flex-col">
               {selectedTab === 0 ? (
                 <TeacherInfoA
-                  name={teacherInfo.name}
-                  nickname={teacherInfo.nickname}
-                  age={teacherInfo.age}
-                  birthdate={teacherInfo.birthdate}
-                  gender={teacherInfo.gender}
-                  profileImage={teacherInfo.profileImage}
+                  name={userInfo?.name}
+                  nickname={userInfo?.nickname}
+                  age={userInfo?.age}
+                  birthdate={userInfo?.birthdate}
+                  gender={userInfo?.gender}
+                  profileImage={userInfo?.profileImage}
                   introduction={teacherInfo.introduction}
                   experience={teacherInfo.experience}
                   showProfile={true}
