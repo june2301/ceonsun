@@ -16,6 +16,7 @@ public enum AuthErrorCodes implements ErrorCode {
 	FORBIDDEN_ACCESS(HttpStatus.FORBIDDEN, "AUTH4006", "접근 권한이 없습니다"),
 	MEMBER_JSON_SERIALIZE_FAIL(HttpStatus.UNPROCESSABLE_ENTITY, "AUTH4007", "직렬화 혹은 역직렬화에 실패하였습니다"),
 	NOT_EXIST_MEMBER(HttpStatus.NOT_FOUND, "AUTH4008", "해당 유저 정보가 없습니다"),
+	ALREADY_DELETED_MEMBER(HttpStatus.BAD_REQUEST, "AUTH4009", "이미 삭제된 유저입니다."),
 	;
 
 	private final HttpStatus httpStatus;

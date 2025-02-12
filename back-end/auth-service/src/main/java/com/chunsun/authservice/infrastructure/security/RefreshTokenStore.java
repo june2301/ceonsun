@@ -3,8 +3,6 @@ package com.chunsun.authservice.infrastructure.security;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -18,12 +16,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class RefreshTokenStore {
 	private static final String REDIS_PREFIX = "chunsun_refresh";
-	private static final Logger log = LoggerFactory.getLogger(RefreshTokenStore.class);
 
 	private final StringRedisTemplate redisTemplate;
 	private final ObjectMapper objectMapper;
@@ -34,6 +33,9 @@ public class RefreshTokenStore {
 	public void saveToken(String refreshToken, MemberDto memberDto) {
 		try {
 			String memberJson = objectMapper.writeValueAsString(memberDto);
+
+			log.info("redis : 유저 정보 log 확인 : " + memberJson);
+
 			redisTemplate.opsForValue()
 				.set(REDIS_PREFIX + refreshToken, memberJson, refreshExpirationTime, TimeUnit.MILLISECONDS);
 		} catch (JsonProcessingException e) {
@@ -46,12 +48,17 @@ public class RefreshTokenStore {
 	public Optional<MemberDto> getMemberByToken(String refreshToken) {
 		try {
 			String memberJson = redisTemplate.opsForValue().get(REDIS_PREFIX + refreshToken);
+
+			log.info("redis : 유저 정보 log 확인 : " + memberJson);
+
 			if (memberJson == null) {
 				return Optional.empty();
 			}
 
 			return Optional.of(objectMapper.readValue(memberJson, MemberDto.class));
 		} catch (Exception e) {
+			log.error("error class : {}", e.getClass().getSimpleName());
+			log.error("error message: {}", e.getMessage());
 			throw new BusinessException(AuthErrorCodes.MEMBER_JSON_SERIALIZE_FAIL);
 		}
 	}
