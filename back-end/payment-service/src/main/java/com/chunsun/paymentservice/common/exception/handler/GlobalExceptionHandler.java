@@ -1,6 +1,6 @@
-package com.chunsun.couponkafkaservice.common.exception.handler;
+package com.chunsun.paymentservice.common.exception.handler;
 
-import static com.chunsun.couponkafkaservice.common.error.CouponKafkaErrorCodes.INVALID_REQUEST;
+import static com.chunsun.paymentservice.common.error.PaymentErrorCodes.INVALID_REQUEST;
 
 import java.time.LocalDateTime;
 
@@ -13,10 +13,10 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import com.chunsun.couponkafkaservice.common.error.ErrorResponseDto;
-import com.chunsun.couponkafkaservice.common.error.GlobalErrorCodes;
-import com.chunsun.couponkafkaservice.common.exception.BusinessException;
-import com.chunsun.couponkafkaservice.common.error.ErrorCode;
+import com.chunsun.paymentservice.common.error.ErrorCode;
+import com.chunsun.paymentservice.common.error.ErrorResponseDto;
+import com.chunsun.paymentservice.common.error.GlobalErrorCodes;
+import com.chunsun.paymentservice.common.exception.BusinessException;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
@@ -52,14 +52,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
 	@ExceptionHandler(BusinessException.class)
 	protected ResponseEntity<ErrorResponseDto> handleBusinessException(BusinessException e) {
-		log.warn(e.getMessage(), e);
+		log.error("BusinessException", e);
 		ErrorCode errorMessage = e.getErrorCode();
 		return ErrorResponseDto.of(errorMessage);
 	}
 
 	@ExceptionHandler(Exception.class)
 	protected ResponseEntity<ErrorResponseDto> handleException(Exception e) {
-		log.error(e.getMessage(), e);
+		log.error("Exception", e);
 		return ErrorResponseDto.of(GlobalErrorCodes.INTERNAL_SERVER_ERROR);
 	}
 }
