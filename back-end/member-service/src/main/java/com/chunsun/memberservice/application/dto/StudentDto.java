@@ -37,4 +37,8 @@ public record StudentDto() {
 		List<Category> categories) {
 	}
 
+	public record GetListResponse(
+		List<Long> studentsId
+	){
+	}
 }
