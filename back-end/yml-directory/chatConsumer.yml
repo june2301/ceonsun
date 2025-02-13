@@ -5,10 +5,6 @@ spring:
   application:
     name: chat-consumer
 
-  data:
-    mongodb:
-      uri: mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongo-db:27017/authdb?authSource=authdb
-
   kafka:
     consumer:
       bootstrap-servers: kafka1:9092,kafka2:9092,kafka3:9092
