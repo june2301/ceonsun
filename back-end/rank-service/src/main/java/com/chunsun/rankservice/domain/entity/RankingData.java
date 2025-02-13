@@ -21,13 +21,13 @@ public class RankingData {
 
 	@Id
 	@Column(name = "teacher_id")
-	private Long teacherId; // 선생 ID (Primary Key)
+	private Long teacherId;
 
 	@Column(name = "lessons", nullable = false)
-	private int totalLessons = 0; // 과거 과외 횟수
+	private int totalLessons = 0; // 총 과외 횟수
 
 	@Column(name = "views", nullable = false)
-	private int totalViews = 0; // 과거 조회수
+	private int totalViews = 0; // 총 조회수
 
 	@Column(name = "total_score", nullable = false)
 	private Long totalScore = 0L; // 최종 랭킹 점수
