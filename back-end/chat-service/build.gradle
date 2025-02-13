@@ -28,7 +28,6 @@ dependencies {
 
     // kafka 설정
     implementation 'org.springframework.kafka:spring-kafka'
-    implementation 'org.springframework.cloud:spring-cloud-stream-binder-kafka'
     testImplementation 'org.springframework.kafka:spring-kafka-test'
 
     // jackson
@@ -49,6 +48,9 @@ dependencies {
 
     //mysql
     implementation 'com.mysql:mysql-connector-j'
+
+    // mongodb
+    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
 
     // websocket
     implementation 'org.springframework.boot:spring-boot-starter-websocket'

@@ -13,8 +13,5 @@ RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /app/build/libs/chat-consumer.jar app.jar
 
-# Set active profile to 'prod'
-ENV SPRING_PROFILES_ACTIVE=prod
-
 # Run Application
 ENTRYPOINT ["java", "-jar", "app.jar"]
