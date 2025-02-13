@@ -9,7 +9,7 @@ function StudentCardDetail({
   gender,
   profileImage,
   subjects = [],
-  introduction = "",
+  description = "",
   // 구분 플래그
   isListDetail = false, // CardListPage에서 접근
   isMyDetail = false, // MyLecture에서 접근
@@ -186,7 +186,7 @@ function StudentCardDetail({
         <div className="flex pl-2">
           <div className="border-l-4 border-gray-400 pl-2">
             <p className="text-gray-800 leading-6 whitespace-pre-line pl-1">
-              {introduction}
+              {description}
             </p>
           </div>
         </div>

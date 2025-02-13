@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import defaultProfileImg from "@/assets/img/default-profile.png";
 import { memberAPI } from "../api/services/member";
+import { authAPI } from "../api/services/auth";
 import useAuthStore from "../stores/authStore";
 
 function UpdateProfile({ userInfo, onSave }) {
-  const { user } = useAuthStore();
+  const { user, setAuth } = useAuthStore();
   const [formData, setFormData] = useState({
     nickname: userInfo.nickname || "",
     profileImage: userInfo.profileImage || null,
@@ -55,7 +56,17 @@ function UpdateProfile({ userInfo, onSave }) {
         nickname: formData.nickname,
         profileImage: formData.profileImage,
       });
+
+      // 2. 토큰 재발급 요청 및 store 업데이트
+      const { token } = await authAPI.refreshToken();
+      if (token) {
+        setAuth(token);
+      }
+
+      // 3. 부모 컴포넌트에 알림
       onSave(formData);
+
+      alert("프로필이 성공적으로 수정되었습니다.");
     } catch (error) {
       console.error("프로필 수정 실패:", error);
       alert("프로필 수정에 실패했습니다.");

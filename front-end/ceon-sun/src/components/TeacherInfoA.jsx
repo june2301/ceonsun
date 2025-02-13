@@ -24,8 +24,8 @@ function TeacherInfoA({
       )}
       {/* 소개글 */}
       <h2 className="text-lg font-bold mb-2">소개글</h2>
-      <div className="flex">
-        <div className="border-l-4 border-gray-400 pl-2">
+      <div className="flex pl-1">
+        <div className="border-l-4 border-gray-400 pl-1">
           <p className="text-gray-800 leading-6 whitespace-pre-line pl-2">
             {description}
           </p>
@@ -34,8 +34,8 @@ function TeacherInfoA({
 
       {/* 기타 경력사항 */}
       <h2 className="text-lg font-bold mt-6 mb-2">기타 경력사항</h2>
-      <div className="flex">
-        <div className="border-l-4 border-gray-400 pl-2">
+      <div className="flex pl-1">
+        <div className="border-l-4 border-gray-400 pl-1">
           <p className="text-gray-800 leading-6 whitespace-pre-line pl-2">
             {careerDescription}
           </p>
