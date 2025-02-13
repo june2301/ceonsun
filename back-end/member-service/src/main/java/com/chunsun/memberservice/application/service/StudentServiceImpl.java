@@ -101,6 +101,7 @@ public class StudentServiceImpl implements StudentService {
 
 		return new StudentDto.GetDetailResponse(
 			memberInfo.getName(),
+			memberInfo.getProfileImage(),
 			memberInfo.getNickname(),
 			memberInfo.getGender(),
 			Period.between(memberInfo.getBirthdate(), LocalDate.now()).getYears(),

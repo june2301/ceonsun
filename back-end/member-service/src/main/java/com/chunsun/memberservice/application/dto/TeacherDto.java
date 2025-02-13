@@ -59,6 +59,7 @@ public record TeacherDto() {
 
 	public record GetDetailResponse(
 		String name,
+		String profileImage,
 		String nickname,
 		Gender gender,
 		Integer age,

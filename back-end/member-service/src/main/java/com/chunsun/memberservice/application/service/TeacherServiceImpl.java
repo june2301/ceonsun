@@ -118,6 +118,7 @@ public class TeacherServiceImpl implements TeacherService {
 
 		return new TeacherDto.GetDetailResponse(
 			memberInfo.getName(),
+			memberInfo.getProfileImage(),
 			memberInfo.getNickname(),
 			memberInfo.getGender(),
 			Period.between(memberInfo.getBirthdate(), LocalDate.now()).getYears(),

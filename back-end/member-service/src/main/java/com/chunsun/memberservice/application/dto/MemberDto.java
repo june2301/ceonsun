@@ -47,6 +47,7 @@ public record MemberDto() {
 
 	public record MemberListItem(
 		Long id,
+		String profileImage,
 		String nickname,
 		Integer age,
 		Gender gender,

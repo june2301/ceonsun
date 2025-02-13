@@ -220,6 +220,7 @@ public class MemberServiceImpl implements MemberService {
 
 		List<MemberDto.MemberListItem> dtoList = resultPage.getContent().stream().map(member -> {
 			Long memberId = member.getId();
+			String profileImage = member.getProfileImage();
 			String nickname = member.getNickname();
 			Integer memberAge = Period.between(member.getBirthdate(), LocalDate.now()).getYears();
 			Gender memberGender = member.getGender();
@@ -227,7 +228,7 @@ public class MemberServiceImpl implements MemberService {
 			List<Category> memberCategories = memberCategoryRepository.findByMember(member).stream()
 				.map(MemberCategory::getCategory)
 				.collect(Collectors.toList());
-			return new MemberDto.MemberListItem(memberId, nickname, memberAge, memberGender, memberCategories);
+			return new MemberDto.MemberListItem(memberId, profileImage, nickname, memberAge, memberGender, memberCategories);
 		}).collect(Collectors.toList());
 
 		return new PageImpl<>(dtoList, pageable, resultPage.getTotalElements());
