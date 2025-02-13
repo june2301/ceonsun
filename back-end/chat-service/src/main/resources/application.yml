@@ -21,11 +21,6 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
     show-sql: true
-    # MongoDB 설정
-  data:
-    mongodb:
-      uri: mongodb://chunsun:chunsun@localhost:27017/chatdb?authSource=chatdb
-#        database: chatdb
 
   kafka:
     producer:
@@ -33,6 +28,9 @@ spring:
       #   bootstrap-servers: kafka1:9092,kafka2:9092,kafka3:9092
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer  # ✅ JSON 직렬화
+      properties:
+        spring.json.add.type.headers: false  # ✅ JSON 타입 헤더 추가 비활성화
+
 
 # 🔥🔥docker build 할때 주석 처리 해야함🔥🔥
 eureka:

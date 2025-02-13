@@ -3,7 +3,7 @@ server:
 
 spring:
   application:
-    name: chat-service
+    name: chat-consumer
 
   cloud:
     config:
@@ -15,32 +15,22 @@ spring:
     username: guest
     password: guest
 
-  datasource:
-    url: jdbc:mysql://chunsun-db:3306/chat?serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true&useSSL=false
-    username: chunsun
-    password: chunsun
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    jpa:
-      database: mysql
-      hibernate:
-        ddl-auto: update
-      properties:
-        hibernate:
-          dialect: org.hibernate.dialect.MySQL8Dialect
-      show-sql: true
-
-    # MongoDB 설정
+  # MongoDB 설정
   data:
     mongodb:
       uri: mongodb://chunsun:chunsun@mongo-db:27017/chatdb?authSource=chatdb
 
   kafka:
-    producer:
+    consumer:
       bootstrap-servers: kafka1:9092,kafka2:9092,kafka3:9092
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer  # ✅ JSON 직렬화
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      #      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      group-id: chat-consumer  # ✅ 컨슈머 그룹 ID 설정
       properties:
-        spring.json.add.type.headers: false  # ✅ JSON 타입 헤더 추가 비활성화
+        spring.json.trusted.packages: "com.chunsun.chatservice.web.dto"
+        spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JsonDeserializer
+        spring.json.value.default.type: com.chunsun.chatconsumer.web.dto.MessageDto
 
 eureka:
   instance:
