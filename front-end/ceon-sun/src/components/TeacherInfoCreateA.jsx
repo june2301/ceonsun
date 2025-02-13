@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import DefaultProfile from "./DefaultProfile";
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
+import useTeacherCardStore from "../stores/teacherCardStore";
 
 function TeacherInfoCreateA({
   name,
@@ -12,49 +13,74 @@ function TeacherInfoCreateA({
   // 업데이트 모드 여부
   updateMode = false,
   // 업데이트 모드일 때 초기 데이터
-  introduction: initialIntroduction = "",
-  experience: initialExperience = "",
-  contactPublic: initialContactPublic = true,
+  description: initialDescription = "",
+  careerDescription: initialCareerDescription = "",
+  isWanted: initialIsWanted = true,
   // 업데이트 모드에서 뒤로가기 처리용
   onClose,
   // 업데이트 모드에서 수정 완료 처리용
   onUpdate,
+  onSubmit,
 }) {
-  // 문의 연락: true = 허용, false = 거부 (기본값은 허용)
-  const [contactPublic, setContactPublic] = useState(initialContactPublic);
-  const [introduction, setIntroduction] = useState(initialIntroduction);
-  const [experience, setExperience] = useState(initialExperience);
+  const { teacherCardData, updateTeacherCardA } = useTeacherCardStore();
+
+  // store의 데이터로 초기화
+  const [isWanted, setIsWanted] = useState(teacherCardData.isWanted);
+  const [description, setDescription] = useState(teacherCardData.description);
+  const [careerDescription, setCareerDescription] = useState(
+    teacherCardData.careerDescription,
+  );
   const [showTooltip, setShowTooltip] = useState(false);
 
-  // 작성 모드 제출 함수
+  // 입력값 변경 시마다 store 업데이트
+  const handleDescriptionChange = (e) => {
+    const newDescription = e.target.value;
+    setDescription(newDescription);
+    updateTeacherCardA({
+      description: newDescription,
+      careerDescription,
+      isWanted,
+    });
+  };
+
+  const handleCareerDescriptionChange = (e) => {
+    const newCareerDescription = e.target.value;
+    setCareerDescription(newCareerDescription);
+    updateTeacherCardA({
+      description,
+      careerDescription: newCareerDescription,
+      isWanted,
+    });
+  };
+
+  const handleIsWantedChange = (value) => {
+    setIsWanted(value);
+    updateTeacherCardA({
+      description,
+      careerDescription,
+      isWanted: value,
+    });
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    const teacherInfoData = {
-      contactPublic,
-      introduction,
-      experience,
-    };
-    console.log("Teacher Info Data (작성):", teacherInfoData);
-    // TODO: 입력 데이터를 백엔드로 전송하는 로직 추가
+    onSubmit?.();
   };
 
   // 업데이트 모드 제출 함수
   const handleUpdate = (e) => {
     e.preventDefault();
     const teacherInfoData = {
-      contactPublic,
-      introduction,
-      experience,
+      isWanted,
+      description,
+      careerDescription,
     };
     console.log("Teacher Info Data (수정):", teacherInfoData);
     if (onUpdate) onUpdate(teacherInfoData);
   };
 
   return (
-    <form
-      onSubmit={updateMode ? handleUpdate : handleSubmit}
-      className="bg-white p-2"
-    >
+    <form onSubmit={handleSubmit} className="bg-white p-2">
       {/* 상단에 DefaultProfile */}
       <div className="mb-5">
         <DefaultProfile
@@ -94,28 +120,24 @@ function TeacherInfoCreateA({
         <div className="flex flex-1 justify-evenly">
           <button
             type="button"
-            onClick={() => setContactPublic(true)}
+            onClick={() => handleIsWantedChange(true)}
             className="flex items-center space-x-2"
           >
             <span
               className={`w-4 h-4 rounded-full border-2 ${
-                contactPublic
-                  ? "bg-blue-500 border-blue-500"
-                  : "border-gray-400"
+                isWanted ? "bg-blue-500 border-blue-500" : "border-gray-400"
               }`}
             ></span>
             <span>허용</span>
           </button>
           <button
             type="button"
-            onClick={() => setContactPublic(false)}
+            onClick={() => handleIsWantedChange(false)}
             className="flex items-center space-x-2"
           >
             <span
               className={`w-4 h-4 rounded-full border-2 ${
-                !contactPublic
-                  ? "bg-blue-500 border-blue-500"
-                  : "border-gray-400"
+                !isWanted ? "bg-blue-500 border-blue-500" : "border-gray-400"
               }`}
             ></span>
             <span>거부</span>
@@ -128,8 +150,8 @@ function TeacherInfoCreateA({
         <label className="block text-gray-700 font-bold mb-2">소개글</label>
         <div className="ml-4">
           <textarea
-            value={introduction}
-            onChange={(e) => setIntroduction(e.target.value)}
+            value={description}
+            onChange={handleDescriptionChange}
             className="w-full p-2 border border-gray-300 rounded resize-none"
             rows="4"
             placeholder="선생님으로서의 강점이나 수업 스타일을 소개해주세요."
@@ -144,8 +166,8 @@ function TeacherInfoCreateA({
         </label>
         <div className="ml-4">
           <textarea
-            value={experience}
-            onChange={(e) => setExperience(e.target.value)}
+            value={careerDescription}
+            onChange={handleCareerDescriptionChange}
             className="w-full p-2 border border-gray-300 rounded resize-none"
             rows="4"
             placeholder="관련 자격증이나 경력을 작성해주세요."

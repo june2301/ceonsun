@@ -1,10 +1,38 @@
-import React from "react";
+import React, { useState } from "react";
 import { ArrowLongLeftIcon, StarIcon } from "@heroicons/react/24/solid";
 import DefaultProfile from "@/assets/img/default-profile.png";
-// 만약 루트 경로를 @로 지정했다면 아래처럼 사용 가능
-// import DefaultProfile from "@/assets/img/default-profile.png";
+import Modal from "./Modal";
+import { chatAPI } from "../api/services/chat";
+import useAuthStore from "../stores/authStore";
 
 function TeacherAction({ teacher, onBack }) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { user } = useAuthStore(); // 로그인한 사용자 정보 가져오기
+
+  const handleInquiryClick = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleModalConfirm = async () => {
+    try {
+      const response = await chatAPI.createInquiryRoom(user.userId, teacher.id);
+      console.log("채팅방 생성 응답:", response);
+
+      if (response === "문의 메시지 전송 완료") {
+        alert("문의 채팅방이 생성되었습니다.");
+      }
+    } catch (error) {
+      console.error("채팅방 생성 실패:", error);
+      alert("채팅방 생성에 실패했습니다. 다시 시도해주세요.");
+    } finally {
+      setIsModalOpen(false);
+    }
+  };
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+  };
+
   return (
     <div className="w-[240px] min-w-[240px] flex flex-col px-4 py-3 border-r-2 border-gray-300">
       {/* 뒤로가기 버튼 (오른쪽 정렬) */}
@@ -55,10 +83,13 @@ function TeacherAction({ teacher, onBack }) {
       {/* 문의, 찜하기, 과외신청 버튼 */}
       <div className="flex flex-col space-y-2">
         <div className="flex items-center space-x-2">
-          <button className="w-[100px] h-[40px] font-semibold border-2 border-green-300 rounded py-1 px-3 text-sm bg-green-200 hover:bg-green-300">
+          <button
+            onClick={handleInquiryClick}
+            className="w-[100px] h-[40px] font-semibold border-2 border-green-300 rounded py-1 px-3 text-sm bg-green-200 hover:bg-green-300"
+          >
             문의하기
           </button>
-          <button className="w-[100px] h-[40px] font-semibold border-2 border-gray-300 rounded py-1 px-3 text-sm bg-gray-100 hover:bg-gray-100 flex items-center justify-center">
+          <button className="w-[100px] h-[40px] font-semibold border-2 border-gray-300 rounded py-1 px-3 text-sm bg-gray-200 hover:bg-gray-100 flex items-center justify-center">
             <StarIcon className="w-5 h-5 mr-1 text-gray-400" />
             찜하기
           </button>
@@ -67,6 +98,17 @@ function TeacherAction({ teacher, onBack }) {
           과외 신청하기
         </button>
       </div>
+
+      {/* 모달 컴포넌트 */}
+      <Modal
+        isOpen={isModalOpen}
+        onClose={handleModalClose}
+        onConfirm={handleModalConfirm}
+        nickname={teacher.nickname}
+        who="선생님과"
+        what="문의 채팅방을 생성하시겠습니까?"
+        notice="*문의 채팅방을 생성하면 생성 메시지가 전송됩니다."
+      />
     </div>
   );
 }

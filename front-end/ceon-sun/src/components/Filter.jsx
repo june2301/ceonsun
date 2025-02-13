@@ -1,17 +1,5 @@
-import React, { useState } from "react";
-
-// 과목 예시
-const SUBJECTS = [
-  "Python",
-  "Java",
-  "JavaScript",
-  "C",
-  "C#",
-  "C++",
-  "TypeScript",
-  "Kotlin",
-  "Swift",
-];
+import React, { useState, useEffect } from "react";
+import { memberAPI } from "../api/services/member";
 
 // 나이 예시: 15 ~ 60
 const AGE_OPTIONS = Array.from({ length: 46 }, (_, i) => 15 + i);
@@ -40,15 +28,31 @@ function Filter({ filterState, onFilterChange }) {
   const [openStartAgePopup, setOpenStartAgePopup] = useState(false);
   const [openEndAgePopup, setOpenEndAgePopup] = useState(false);
 
+  // 과목 목록 상태 추가
+  const [subjects, setSubjects] = useState([]);
+
+  // 컴포넌트 마운트 시 카테고리 목록 조회
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const categories = await memberAPI.getCategories();
+        setSubjects(categories);
+      } catch (error) {
+        console.error("카테고리 목록 조회 실패:", error);
+      }
+    };
+    fetchCategories();
+  }, []);
+
   // -------------------
   // 과목 필터 관련
   const toggleSubject = () => setOpenSubject(!openSubject);
 
   const handleSubjectClick = (subj) => {
-    if (selectedSubjects.includes(subj)) {
-      setSelectedSubjects(selectedSubjects.filter((s) => s !== subj));
+    if (selectedSubjects.includes(subj.name)) {
+      setSelectedSubjects(selectedSubjects.filter((s) => s !== subj.name));
     } else {
-      setSelectedSubjects([...selectedSubjects, subj]);
+      setSelectedSubjects([...selectedSubjects, subj.name]);
     }
   };
 
@@ -61,7 +65,7 @@ function Filter({ filterState, onFilterChange }) {
   // 성별 필터 관련
   const toggleGender = () => setOpenGender(!openGender);
 
-  // “남자 / 여자” 중 하나만 선택 가능,
+  // "남자 / 여자" 중 하나만 선택 가능,
   // 이미 선택된 성별 다시 누르면 → "all"
   const handleGenderToggle = (gender) => {
     if (selectedGender === gender) {
@@ -118,11 +122,11 @@ function Filter({ filterState, onFilterChange }) {
           <div className="px-3 py-2 border-t border-gray-200">
             <div className="max-h-[140px] overflow-y-auto mb-3 custom-scrollbar">
               <div className="flex flex-wrap gap-2 justify-center">
-                {SUBJECTS.map((subj) => {
-                  const selected = selectedSubjects.includes(subj);
+                {subjects.map((subj) => {
+                  const selected = selectedSubjects.includes(subj.name);
                   return (
                     <button
-                      key={subj}
+                      key={subj.id}
                       onClick={() => handleSubjectClick(subj)}
                       className={`
                         mx-0.5
@@ -137,7 +141,7 @@ function Filter({ filterState, onFilterChange }) {
                         }
                       `}
                     >
-                      {subj}
+                      {subj.name}
                     </button>
                   );
                 })}

@@ -21,7 +21,7 @@ const useAuthStore = create(
           const pureToken = token.startsWith("Bearer ")
             ? token.slice(7)
             : token;
-          localStorage.setItem("token", token);
+          sessionStorage.setItem("token", token);
 
           const decoded = jwt_decode.jwtDecode(pureToken);
 
@@ -60,7 +60,7 @@ const useAuthStore = create(
       },
 
       logout: () => {
-        localStorage.removeItem("token");
+        sessionStorage.removeItem("token");
         set({
           isAuthenticated: false,
           token: null,
@@ -73,8 +73,8 @@ const useAuthStore = create(
       },
     }),
     {
-      name: "auth-storage", // localStorage에 저장될 키 이름
-      storage: createJSONStorage(() => localStorage), // 스토리지 엔진 설정
+      name: "auth-storage",
+      storage: createJSONStorage(() => sessionStorage),
     },
   ),
 );

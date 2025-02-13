@@ -87,22 +87,25 @@ export const memberAPI = {
     size = 10,
   }) => {
     try {
-      // URL 파라미터 구성
       const params = new URLSearchParams();
+
+      // 카테고리 파라미터 수정
+      // API 명세: /member-service/members/1/search?category=java,python,C
+      if (categories.length > 0) {
+        // 기존: categories.forEach(category => params.append("category", category));
+        params.append("category", categories.join(","));
+      }
 
       // 페이지네이션 파라미터
       params.append("page", page);
       params.append("size", size);
 
-      // 필터 파라미터 추가 (값이 있을 때만)
-      if (categories.length > 0) {
-        params.append("category", categories.join(","));
-      }
-
+      // gender 파라미터가 API 명세와 일치하는지 확인
       if (gender && gender !== "all") {
-        params.append("gender", gender.toUpperCase());
+        params.append("gender", gender.toUpperCase()); // male -> MALE, female -> FEMALE
       }
 
+      // age 파라미터가 API 명세와 일치하는지 확인
       if (ageRange && ageRange.start && ageRange.end) {
         params.append("age", `${ageRange.start}-${ageRange.end}`);
       }
@@ -272,6 +275,63 @@ export const memberAPI = {
       return response.data;
     } catch (error) {
       console.error("학생 카드 수정 실패:", error);
+      throw error;
+    }
+  },
+
+  // 선생님 카드 생성 API
+  createTeacherCard: async (teacherCardData) => {
+    try {
+      const response = await api.post("/member-service/teachers", {
+        id: Number(teacherCardData.id), // 사용자 ID
+        description: teacherCardData.description,
+        careerProgress: teacherCardData.careerProgress,
+        careerDescription: teacherCardData.careerDescription,
+        classContents: "없습니다",
+        isWanted: teacherCardData.isWanted,
+        bank: teacherCardData.bank,
+        account: teacherCardData.account,
+        price: Number(teacherCardData.price), // 숫자로 변환
+      });
+
+      return response.data;
+    } catch (error) {
+      console.error("선생님 카드 생성 실패:", error);
+      throw error;
+    }
+  },
+
+  // 선생 카드 조회
+  getTeacherCard: async (userId) => {
+    try {
+      const response = await api.get(`/member-service/teachers/${userId}`);
+      return response.data;
+    } catch (error) {
+      console.error("선생 카드 조회 실패:", error);
+      throw error;
+    }
+  },
+
+  // 선생님 카드 수정 API
+  updateTeacherCard: async (teacherCardData) => {
+    try {
+      const response = await api.put(
+        `/member-service/teachers/${teacherCardData.id}`,
+        {
+          id: Number(teacherCardData.id),
+          description: teacherCardData.description,
+          careerProgress: teacherCardData.careerProgress,
+          careerDescription: teacherCardData.careerDescription,
+          classContents: "없습니다", // 고정값으로 설정
+          isWanted: teacherCardData.isWanted,
+          bank: teacherCardData.bank,
+          account: teacherCardData.account,
+          price: Number(teacherCardData.price),
+        },
+      );
+      return response.data;
+    } catch (error) {
+      console.error("선생님 카드 수정 실패:", error);
       throw error;
     }
   },
