@@ -332,6 +332,27 @@ services:
       chunsun-db:
         condition: service_healthy
 
+  chat-consumer:
+    container_name: chat-consumer
+    build:
+      context: ./chat-consumer
+      dockerfile: Dockerfile
+    environment:
+      spring.rabbitmq.host: rabbitmq
+      spring.cloud.config.uri: http://config-service:8888
+      eureka.client.serviceUrl.defaultZone: http://discovery-service:8761/eureka/
+    networks:
+      - chunsun-network
+    depends_on:
+      discovery-service:
+        condition: service_healthy
+      config-service:
+        condition: service_healthy
+      gateway-service:
+        condition: service_healthy
+      mongo-db:
+        condition: service_healthy
+
   ############################
   # Kafka & Zookeeper 설정 추가
   ############################
