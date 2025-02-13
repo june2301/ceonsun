@@ -39,9 +39,9 @@ public class Teacher {
 
 	private String careerDescription;
 
-	private String classContents;
-
 	private String classProgress;
+
+	private String classContents;
 
 	private Integer totalClassCount = 0;
 
@@ -68,13 +68,13 @@ public class Teacher {
 
 	private LocalDateTime deletedAt;
 
-	public Teacher(Member member, String description, String careerDescription, String classContents, String classProgress, Boolean isWanted, Bank bank, String account, Integer price) {
+	public Teacher(Member member, String description, String careerDescription, String classProgress, String classContents, Boolean isWanted, Bank bank, String account, Integer price) {
 		this.member = member;
 		this.id = member.getId();
 		this.description = description;
-		this.classContents = classContents;
 		this.careerDescription = careerDescription;
 		this.classProgress = classProgress;
+		this.classContents = classContents;
 		this.isWanted = isWanted;
 		this.bank = bank;
 		this.account = account;
@@ -82,11 +82,11 @@ public class Teacher {
 		createdAt = LocalDateTime.now();
 	}
 
-	public void updateCard(String description, String classContents, String careerDescription, String classProgress, Boolean isWanted, Bank bank, String account, Integer price) {
+	public void updateCard(String description, String careerDescription, String classProgress, String classContents, Boolean isWanted, Bank bank, String account, Integer price) {
 		if (description != null) this.description = description;
-		if (classContents != null) this.classContents = classContents;
 		if (careerDescription != null) this.careerDescription = careerDescription;
 		if (classProgress != null) this.classProgress = classProgress;
+		if (classContents != null) this.classContents = classContents;
 		if (isWanted != null) this.isWanted = isWanted;
 		if (bank != null) this.bank = bank;
 		if (account != null) this.account = account;
