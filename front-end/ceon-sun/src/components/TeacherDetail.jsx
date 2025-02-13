@@ -23,7 +23,7 @@ function TeacherDetail({ teacher, topBarItems, showClassButton = false }) {
       ) : (
         <TeacherInfoB
           subjects={teacher.subjects}
-          lessonFee={teacher.lessonFee}
+          price={teacher.price}
           careerProgress={teacher.careerProgress}
         />
       );
@@ -40,7 +40,7 @@ function TeacherDetail({ teacher, topBarItems, showClassButton = false }) {
       ) : selectedTab === 1 ? (
         <TeacherInfoB
           subjects={teacher.subjects}
-          lessonFee={teacher.lessonFee}
+          price={teacher.price}
           careerProgress={teacher.careerProgress}
         />
       ) : (
