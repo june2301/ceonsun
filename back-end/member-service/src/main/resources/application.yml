@@ -7,7 +7,6 @@ spring:
 
   datasource:
     url: jdbc:mysql://chunsun-db:3306/member
-#    url: jdbc:mysql://localhost:3306/member
     username: root
     password: 1234
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -28,7 +27,6 @@ spring:
   hikari:
     maximum-pool-size: 10  # 커넥션 풀 크기 설정
 
-
   cloud:
     config:
       uri: http://127.0.0.1:8888
@@ -42,15 +40,6 @@ spring:
 #    password: '{cipher}ac0d4fda7d75b7332ec46bdbc84c93ce47980011cf86d88e7e160b61b6a5d1c0'
 #    username: '{cipher}d79ddeb52eabe7f2a656753d8e65089861e6f273afb8aa2577aa08082cc0a118'
 #    password: '{cipher}51552a12ded68918d03a41fecbf3afeeb213926916dc77125b08378a21a66d8e4ba5c9bf2d84603a7e08cc8f2061e91e'
-
-
-
-logging:
-  level:
-    org.hibernate.SQL: DEBUG
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
-    org.hibernate.orm.jdbc.bind: TRACE
-
 
 eureka:
   instance:
