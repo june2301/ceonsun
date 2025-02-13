@@ -14,6 +14,7 @@ import CardListPage from "./pages/CardListPage";
 import MyPage from "./pages/MyPage";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Payment from "./pages/Payment";
+import Promotion from "./pages/Promotion";
 
 // Header를 조건부로 표시하기 위한 래퍼 컴포넌트
 function AppContent() {
@@ -31,6 +32,7 @@ function AppContent() {
         <Route path="/teacherdetailpage" element={<TeacherDetailPage />} />
         <Route path="/mypage" element={<MyPage />} />
         <Route path="/payment" element={<Payment />} />
+        <Route path="/promotion" element={<Promotion />} />
       </Routes>
     </div>
   );
