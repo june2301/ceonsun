@@ -1,2 +1,2 @@
 encrypt:
-  key: ${ENCRYPT_KEY:my-secret-key-chunsun-moon-kim-um-yu-yun-hwang}
+  key: ${ENCRYPT_KEY}
