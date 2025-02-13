@@ -1,4 +1,4 @@
-package com.chunsun.rankservice.config;
+package com.chunsun.rankservice.config.database;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -14,15 +14,15 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @EnableRedisRepositories
 public class RedisConfig {
 
-	@Value("${spring.redis.port}")
+	@Value("${spring.data.redis.port}")
 	private int port;
 
-	@Value("${spring.redis.host}")
+	@Value("${spring.data.redis.host}")
 	private String host;
 
 	@Bean
 	public RedisConnectionFactory redisConnectionFactory() {
-		return new LettuceConnectionFactory();
+		return new LettuceConnectionFactory(host, port);
 	}
 
 	@Bean
