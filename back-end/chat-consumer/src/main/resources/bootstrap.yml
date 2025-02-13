@@ -1,12 +1,5 @@
-<<<<<<< HEAD
-#spring:
-#  cloud:
-#    config:
-#      uri: http://127.0.0.1:8888
-=======
 spring:
   cloud:
     config:
       uri: http://config-service:8888
       name: chatConsumer, discovery, management, rabbitmq, mongo
->>>>>>> 044cd807f709a564a81d0de9c3d4828c99924eed

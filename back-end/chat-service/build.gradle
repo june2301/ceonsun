@@ -48,12 +48,10 @@ dependencies {
 
     //mysql
     implementation 'com.mysql:mysql-connector-j'
-<<<<<<< HEAD
-=======
 
     // mongodb
     implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
->>>>>>> 044cd807f709a564a81d0de9c3d4828c99924eed
+
 
     // websocket
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
