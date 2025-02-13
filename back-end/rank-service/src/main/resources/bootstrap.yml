@@ -2,4 +2,4 @@ spring:
   cloud:
     config:
       uri: http://config-service:8888
-      name: gateway, discovery, management, rabbitmq, token
+      name: rank, datasourceInfo, discovery, management, rabbitmq
