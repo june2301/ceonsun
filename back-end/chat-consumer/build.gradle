@@ -28,7 +28,6 @@ dependencies {
 
 	// kafka 설정
 	implementation 'org.springframework.kafka:spring-kafka'
-	implementation 'org.springframework.cloud:spring-cloud-stream-binder-kafka'
 	testImplementation 'org.springframework.kafka:spring-kafka-test'
 
 	// jackson

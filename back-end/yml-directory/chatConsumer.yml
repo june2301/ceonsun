@@ -1,0 +1,22 @@
+server:
+  port: 0
+
+spring:
+  application:
+    name: chat-consumer
+
+  data:
+    mongodb:
+      uri: mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongo-db:27017/authdb?authSource=authdb
+
+  kafka:
+    consumer:
+      bootstrap-servers: kafka1:9092,kafka2:9092,kafka3:9092
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      #      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      group-id: chat-consumer  # ✅ 컨슈머 그룹 ID 설정
+      properties:
+        spring.json.trusted.packages: "com.chunsun.chatservice.web.dto"
+        spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JsonDeserializer
+        spring.json.value.default.type: com.chunsun.chatconsumer.web.dto.MessageDto

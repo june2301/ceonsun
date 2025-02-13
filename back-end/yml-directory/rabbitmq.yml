@@ -1,0 +1,6 @@
+spring:
+  rabbitmq:
+    host: rabbitmq
+    port: 5672
+    username: '{cipher}251c14591c8e02eb58634a299505965053c7f2ff0736eeb05d7ed4f6a72bdb32'
+    password: '{cipher}d8b83466428f1b55ccc9e61d853d439f4aaec705eb87e74e3578be7b7e54db47'

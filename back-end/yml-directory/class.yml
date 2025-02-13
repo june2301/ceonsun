@@ -1,0 +1,18 @@
+server:
+  port: 0
+
+spring:
+  application:
+    name: class-service
+
+  datasource:
+    url: jdbc:mysql://chunsun-db:3306/class?serverTimezone=UTC&characterEncoding=UTF-8
+
+  jpa:
+    database: mysql
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+    show-sql: true
