@@ -1,0 +1,5 @@
+spring:
+  datasource:
+    username: '{cipher}44f52a902ca5970dd7a995886c7dae47edf183415db196fcdcba79351453d9d0'
+    password: '{cipher}a88c5eda9289ed49ef60dfad5320d9c7653b4535bb3270b2b4b57b7cf4410325'
+    driver-class-name: com.mysql.cj.jdbc.Driver
