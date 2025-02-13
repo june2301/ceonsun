@@ -329,8 +329,8 @@ services:
     environment:
       spring.cloud.config.username: "${CONFIG_USER}"
       spring.cloud.config.password: "${CONFIG_PASSWORD}"
-      MONGO_INITDB_ROOT_USERNAME: "${MONGO_INITDB_ROOT_USERNAME}"
-      MONGO_INITDB_ROOT_PASSWORD: "${MONGO_INITDB_ROOT_PASSWORD}"
+      MONGO_USERNAME: "${MONGO_USERNAME}"
+      MONGO_PASSWORD: "${MONGO_PASSWORD}"
     networks:
       - chunsun-network
     depends_on:
@@ -355,8 +355,8 @@ services:
     environment:
       spring.cloud.config.username: "${CONFIG_USER}"
       spring.cloud.config.password: "${CONFIG_PASSWORD}"
-      MONGO_INITDB_ROOT_USERNAME: "${MONGO_INITDB_ROOT_USERNAME}"
-      MONGO_INITDB_ROOT_PASSWORD: "${MONGO_INITDB_ROOT_PASSWORD}"
+      MONGO_USERNAME: "${MONGO_USERNAME}"
+      MONGO_PASSWORD: "${MONGO_PASSWORD}"
     networks:
       - chunsun-network
     depends_on:
