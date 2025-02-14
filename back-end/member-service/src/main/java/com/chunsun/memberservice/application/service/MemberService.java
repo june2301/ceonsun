@@ -1,5 +1,6 @@
 package com.chunsun.memberservice.application.service;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -10,7 +11,7 @@ public interface MemberService {
 
 	MemberDto.SignUpResponse signUp(MemberDto.SignUpRequest request);
 
-	MemberDto.UpdateInfoResponse updateMemberInfo(Long id, MemberDto.UpdateInfoRequest request);
+	MemberDto.UpdateInfoResponse updateMemberInfo(MemberDto.UpdateInfoRequest request);
 
 	MemberDto.GetInfoResponse getMemberInfo(Long id);
 

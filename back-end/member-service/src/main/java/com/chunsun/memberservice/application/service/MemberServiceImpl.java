@@ -1,5 +1,6 @@
 package com.chunsun.memberservice.application.service;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.ArrayList;
@@ -17,6 +18,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.amazonaws.services.s3.AmazonS3;
 import com.chunsun.memberservice.application.dto.MemberDto;
 import com.chunsun.memberservice.common.error.GlobalErrorCodes;
 import com.chunsun.memberservice.common.exception.BusinessException;
@@ -46,6 +48,8 @@ public class MemberServiceImpl implements MemberService {
 	private final StudentRepository studentRepository;
 	private final TeacherRepository teacherRepository;
 	private final MemberCategoryRepository memberCategoryRepository;
+	private final S3Service s3Service;
+	private final AmazonS3 amazonS3;
 
 	// 회원 가입
 	@Override
@@ -113,12 +117,36 @@ public class MemberServiceImpl implements MemberService {
 	// 개인정보 수정
 	@Override
 	@Transactional
-	public MemberDto.UpdateInfoResponse updateMemberInfo(Long id, MemberDto.UpdateInfoRequest request) {
+	public MemberDto.UpdateInfoResponse updateMemberInfo(MemberDto.UpdateInfoRequest request) {
 
-		Member member = memberRepository.findById(id)
+
+		Member member = memberRepository.findById(request.id())
 			.orElseThrow(() -> new BusinessException(GlobalErrorCodes.USER_NOT_FOUND));
 
-		member.updateInfo(request.nickname(), request.profileImage());
+		String profile = member.getProfileImage();
+
+		System.out.println(request.profileImage().getOriginalFilename());
+		System.out.println(request.profileImage().getSize());
+		System.out.println(request.profileImage().getContentType());
+
+		if (request.profileImage() != null && !request.profileImage().isEmpty()) {
+			System.out.println("이프문에 들어왔는가");
+			try {
+				if(profile!=null && !profile.isEmpty()) {
+					System.out.println("여기 들어오는가?");
+					s3Service.deleteImage(profile);
+				}
+
+				profile = s3Service.uploadImage(request.profileImage());
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		} else {
+			System.out.println("엘스문에 들어왔는가");
+			profile = "";
+		}
+
+		member.updateInfo(request.nickname(), profile);
 		memberRepository.save(member);
 
 		return new MemberDto.UpdateInfoResponse();

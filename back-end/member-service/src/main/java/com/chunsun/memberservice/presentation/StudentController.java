@@ -65,7 +65,7 @@ public class StudentController {
 	}
 
 	@GetMapping
-	public ResponseEntity<StudentDto.GetListResponse> studentsId() {
+	public ResponseEntity<StudentDto.GetListResponse> getStudentsId() {
 		StudentDto.GetListResponse response = studentService.getList();
 
 		return ResponseEntity.ok(response);
