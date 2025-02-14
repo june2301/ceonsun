@@ -1,9 +1,9 @@
-package com.chunsun.couponservice.config;
+package com.chunsun.paymentservice.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.chunsun.couponservice.common.error.FeignErrorDecoder;
+import com.chunsun.paymentservice.common.error.FeignErrorDecoder;
 
 import feign.RequestInterceptor;
 import feign.codec.ErrorDecoder;
