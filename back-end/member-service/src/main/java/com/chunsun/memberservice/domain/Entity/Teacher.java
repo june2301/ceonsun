@@ -2,6 +2,7 @@ package com.chunsun.memberservice.domain.Entity;
 
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.Where;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
@@ -25,6 +26,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "teachers")
 @Getter
 @NoArgsConstructor
+@Where(clause = "deleted_at IS NULL")
 public class Teacher {
 	@Id
 	@JoinColumn(name = "member_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
@@ -80,6 +82,7 @@ public class Teacher {
 		this.account = account;
 		this.price = price;
 		createdAt = LocalDateTime.now();
+		updatedAt = LocalDateTime.now();
 	}
 
 	public void updateCard(String description, String careerDescription, String classProgress, String classContents, Boolean isWanted, Bank bank, String account, Integer price) {
