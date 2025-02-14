@@ -283,7 +283,23 @@ public class MemberServiceImpl implements MemberService {
 				rankedTeachers.add(item);
 			}
 		}
-
 		return rankedTeachers;
+	}
+
+	@Override
+	public List<MemberDto.MemberNickNameDto> getUserNicknames(List<Long> ids) {
+
+		List<MemberDto.MemberNickNameDto> nicknames = new ArrayList<>();
+		for (Long id : ids) {
+			Member member = memberRepository.findById(id).orElse(null);
+
+			MemberDto.MemberNickNameDto nickname = new MemberDto.MemberNickNameDto(
+				member.getId(),
+				member.getNickname(),
+				member.getProfileImage()
+			);
+			nicknames.add(nickname);
+		}
+		return nicknames;
 	}
 }

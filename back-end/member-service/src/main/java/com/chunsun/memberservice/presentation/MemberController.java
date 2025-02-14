@@ -115,4 +115,12 @@ public class MemberController {
 
 		return ResponseEntity.ok(result);
 	}
+
+	@GetMapping("/nicknames")
+	public List<MemberDto.MemberNickNameDto> getUserNicknames(@RequestParam List<Long> ids){
+
+		List<MemberDto.MemberNickNameDto> nicknameList = memberService.getUserNicknames(ids);
+
+		return nicknameList;
+	}
 }
