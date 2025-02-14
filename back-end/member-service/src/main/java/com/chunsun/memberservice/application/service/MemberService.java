@@ -24,4 +24,5 @@ public interface MemberService {
 
 	List<MemberDto.TeacherListItem> getTeachersRank(List<MemberDto.TeacherTupleDto> teachersRank);
 
+	List<MemberDto.MemberNickNameDto> getUserNicknames(List<Long> ids);
 }
