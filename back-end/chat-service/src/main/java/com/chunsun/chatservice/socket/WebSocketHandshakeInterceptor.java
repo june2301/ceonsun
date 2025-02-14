@@ -35,15 +35,15 @@ public class WebSocketHandshakeInterceptor implements HandshakeInterceptor {
 			String token = httpRequest.getParameter("token");
 			log.info("Extracted token: {}", token);
 
-			// if (token != null && token.startsWith("Bearer ")) {
-			// 	String userId = jwtUtil.getMemberId(token.substring(7)); // 토큰에서 userId 추출
-			// 	attributes.put("userId", userId); // WebSocket 세션에 userId 저장
-			// 	return true;
-			// }
+			if (token != null && token.startsWith("Bearer ")) {
+				String userId = jwtUtil.getId(token.substring(7)); // 토큰에서 userId 추출
+				attributes.put("userId", userId); // WebSocket 세션에 userId 저장
+				return true;
+			}
 
 			// 테스트용 코드
-			String userId = token.substring(7);
-			attributes.put("userId", userId); //  WebSocket 세션에 userId 저장
+			// String userId = token.substring(7);
+			// attributes.put("userId", userId); //  WebSocket 세션에 userId 저장
 		}
 		return true;
 	}
