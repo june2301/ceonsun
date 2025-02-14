@@ -67,8 +67,9 @@ public class ChatRoomController {
 	 */
 	@GetMapping("/chat-rooms")
 	public ResponseEntity<List<ChatRoomDto.ResponseDto>> getChatRooms(
-		@RequestHeader("X-Chunsun-Authorization") String token) {
+		@RequestHeader("Authorization") String token) {
 
+		token = token.substring(7);
 		log.info("token: {}", token);
 
 		String userId = jwtUtil.getId(token);
