@@ -70,4 +70,11 @@ public record MemberDto() {
 		Double score){
 	}
 
+	public record MemberNickNameDto(
+		Long id,
+		String nickname,
+		String profileImage
+	){
+	}
+
 }
