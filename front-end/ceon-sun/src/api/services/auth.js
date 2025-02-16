@@ -60,11 +60,23 @@ export const authAPI = {
     throw new Error("Unexpected response");
   },
 
-  // 토큰 재발급
-  refreshToken: async () => {
+  // role 변경 시 토큰 재발급
+  changeRole: async () => {
     try {
       const response = await api.post("/auth-service/changeRole");
-      // 204 상태코드에서는 response.data가 비어있음
+      return {
+        token: response.headers["x-chunsun-authorization"],
+      };
+    } catch (error) {
+      console.error("역할 변경 토큰 발급 실패:", error);
+      throw error;
+    }
+  },
+
+  // 토큰 재발급
+  refresh: async () => {
+    try {
+      const response = await api.post("/auth-service/refresh");
       return {
         token: response.headers["x-chunsun-authorization"],
       };

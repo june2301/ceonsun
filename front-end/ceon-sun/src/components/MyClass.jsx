@@ -104,7 +104,7 @@ function MyClass({ role }) {
       console.log("선생 카드 생성 응답:", response);
 
       if (response.message === "선생 카드 생성 완료") {
-        const { token } = await authAPI.refreshToken();
+        const { token } = await authAPI.changeRole();
         if (token) {
           setAuth(token);
           alert("선생 수업 등록에 성공하였습니다.");

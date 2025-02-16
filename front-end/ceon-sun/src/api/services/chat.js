@@ -14,4 +14,15 @@ export const chatAPI = {
       throw error;
     }
   },
+
+  // 채팅방 목록 조회
+  getChatRooms: async () => {
+    try {
+      const response = await api.get("/chat-service/chat-rooms");
+      return response.data;
+    } catch (error) {
+      console.error("채팅방 목록 조회 실패:", error);
+      throw error;
+    }
+  },
 };
