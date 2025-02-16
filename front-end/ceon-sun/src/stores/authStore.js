@@ -71,6 +71,31 @@ const useAuthStore = create(
           },
         });
       },
+
+      // 토큰 갱신 처리
+      updateToken: (token) => {
+        if (!token) return;
+
+        try {
+          const pureToken = token.startsWith("Bearer ")
+            ? token.slice(7)
+            : token;
+
+          const decoded = jwt_decode.jwtDecode(pureToken);
+
+          set({
+            isAuthenticated: true,
+            token,
+            user: {
+              userId: decoded.sub,
+              nickname: decoded.nickname,
+              role: decoded.role,
+            },
+          });
+        } catch (error) {
+          console.error("JWT 디코딩 에러:", error);
+        }
+      },
     }),
     {
       name: "auth-storage",

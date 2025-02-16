@@ -74,7 +74,7 @@ function StudentCardCreate({
       await memberAPI.createStudentCard(user.userId, cardPublic, introduction);
 
       // 3. 토큰 재발급 요청 및 role 업데이트
-      const { token } = await authAPI.refreshToken();
+      const { token } = await authAPI.changeRole();
       if (token) {
         setAuth(token); // store 업데이트
 

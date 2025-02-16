@@ -1,7 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { BellAlertIcon } from "@heroicons/react/24/solid";
 import { BellIcon, ChatBubbleLeftRightIcon } from "@heroicons/react/24/outline";
 import useAuthStore from "../stores/authStore";
+import { checkUnreadNotifications } from "../api/services/notification";
 import logo from "../assets/img/logo.png";
 import ChatRoomList from "./ChatRoomList";
 import AlarmList from "./AlarmList";
@@ -16,6 +18,7 @@ const Header = () => {
   const chatModalRef = useRef(null);
   const alarmButtonRef = useRef(null);
   const alarmModalRef = useRef(null);
+  const [hasUnread, setHasUnread] = useState(false);
 
   const handleLogout = () => {
     logout(); // localStorage의 토큰 제거 및 상태 초기화
@@ -49,6 +52,35 @@ const Header = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [showChatModal, showAlarmModal]);
+
+  // 안읽은 알림 확인
+  useEffect(() => {
+    const checkNotifications = async () => {
+      if (user.userId) {
+        const hasUnreadNotifications = await checkUnreadNotifications(
+          user.userId,
+        );
+        setHasUnread(hasUnreadNotifications);
+      }
+    };
+
+    checkNotifications();
+  }, [user.userId]);
+
+  // SSE 알림 업데이트 이벤트 리스너
+  useEffect(() => {
+    const handleUnreadUpdate = (event) => {
+      setHasUnread(event.detail);
+    };
+
+    window.addEventListener("unreadNotificationUpdate", handleUnreadUpdate);
+    return () => {
+      window.removeEventListener(
+        "unreadNotificationUpdate",
+        handleUnreadUpdate,
+      );
+    };
+  }, []);
 
   // role에 따른 메뉴 렌더링
   const renderMenus = () => {
@@ -152,7 +184,11 @@ const Header = () => {
               onClick={() => setShowAlarmModal(!showAlarmModal)}
               className="flex flex-col items-center text-gray-600 text-sm hover:text-blue-500"
             >
-              <BellIcon className="w-6 h-6 mb-1" />
+              {hasUnread ? (
+                <BellAlertIcon className="w-6 h-6 mb-1 text-red-500" />
+              ) : (
+                <BellIcon className="w-6 h-6 mb-1" />
+              )}
               알림 확인
             </button>
 

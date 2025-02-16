@@ -1,39 +1,57 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { LightBulbIcon } from "@heroicons/react/24/outline";
 import AlarmCard from "./AlarmCard";
+import {
+  getAllNotifications,
+  checkUnreadNotifications,
+} from "../api/services/notification";
+import useAuthStore from "../stores/authStore";
 
 function AlarmList({ onClose }) {
-  // 임시 알림 데이터
-  const alarms = [
-    {
-      id: 1,
-      type: "notification",
-      message: "새 과외신청이 왔습니다.",
-      isRead: false,
-      createdAt: "1분 전",
-    },
-    {
-      id: 2,
-      type: "chat",
-      message: "새 과외문의가 왔습니다.",
-      isRead: false,
-      createdAt: "10분 전",
-    },
-    {
-      id: 3,
-      type: "notification",
-      message: "새 과외신청이 왔습니다",
-      isRead: true,
-      createdAt: "1시간 전",
-    },
-    {
-      id: 4,
-      type: "chat",
-      message: "새 과외문의가 왔습니다.",
-      isRead: true,
-      createdAt: "2시간 전",
-    },
-  ];
+  const [alarms, setAlarms] = useState([]);
+  const { user } = useAuthStore();
+
+  // 알림 정렬 함수
+  const sortAlarms = (notifications) => {
+    return [...notifications].sort((a, b) => {
+      // 먼저 읽음 상태로 정렬
+      if (a.read !== b.read) {
+        return a.read ? 1 : -1; // 안읽은 알림이 위로
+      }
+      // 같은 읽음 상태 내에서는 시간순 정렬 (id로 대체)
+      return b.id.localeCompare(a.id);
+    });
+  };
+
+  useEffect(() => {
+    const fetchAlarms = async () => {
+      if (user.userId) {
+        const notifications = await getAllNotifications(user.userId);
+        setAlarms(sortAlarms(notifications));
+      }
+    };
+
+    fetchAlarms();
+  }, [user.userId]);
+
+  const handleAlarmRead = async (alarmId) => {
+    // 알림 목록 업데이트 및 재정렬
+    setAlarms((prevAlarms) => {
+      const updatedAlarms = prevAlarms.map((alarm) =>
+        alarm.id === alarmId ? { ...alarm, read: true } : alarm,
+      );
+      return sortAlarms(updatedAlarms);
+    });
+
+    // 안읽은 알림 상태 재확인
+    if (user.userId) {
+      const hasUnread = await checkUnreadNotifications(user.userId);
+      // Header 컴포넌트 상태 업데이트를 위한 이벤트 발생
+      window.dispatchEvent(
+        new CustomEvent("unreadNotificationUpdate", { detail: hasUnread }),
+      );
+    }
+  };
 
   return (
     <div className="flex flex-col h-full bg-white rounded-lg shadow-lg">
@@ -45,10 +63,10 @@ function AlarmList({ onClose }) {
         </div>
       </div>
 
-      {/* 알림 목록 */}
-      <div className="flex-1 overflow-y-auto">
+      {/* 알림 목록 - custom-scrollbar 클래스 추가 */}
+      <div className="flex-1 overflow-y-auto custom-scrollbar">
         {alarms.map((alarm) => (
-          <AlarmCard key={alarm.id} alarm={alarm} />
+          <AlarmCard key={alarm.id} alarm={alarm} onRead={handleAlarmRead} />
         ))}
       </div>
     </div>
