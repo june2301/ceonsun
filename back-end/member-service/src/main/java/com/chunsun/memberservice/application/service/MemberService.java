@@ -1,6 +1,5 @@
 package com.chunsun.memberservice.application.service;
 
-import java.io.IOException;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -26,4 +25,6 @@ public interface MemberService {
 	List<MemberDto.TeacherListItem> getTeachersRank(List<MemberDto.TeacherTupleDto> teachersRank);
 
 	List<MemberDto.MemberNickNameDto> getUserNicknames(List<Long> ids);
+
+	List<MemberDto.MemberListItem> getMembersInfo(List<Long> ids);
 }

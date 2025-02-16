@@ -23,17 +23,14 @@ public class S3ServiceImpl implements S3Service {
 	private String bucket;
 
 	public String uploadImage(MultipartFile image) throws IOException {
-		String fileName = UUID.randomUUID() + "_" + image.getOriginalFilename(); // 고유한 파일 이름 생성
+		String fileName = UUID.randomUUID() + "_" + image.getOriginalFilename();
 
-		// 메타데이터 설정
 		ObjectMetadata metadata = new ObjectMetadata();
 		metadata.setContentType(image.getContentType());
 		metadata.setContentLength(image.getSize());
 
-		// S3에 파일 업로드 요청 생성
 		PutObjectRequest putObjectRequest = new PutObjectRequest(bucket, fileName, image.getInputStream(), metadata);
 
-		// S3에 파일 업로드
 		amazonS3.putObject(putObjectRequest);
 
 		return getPublicUrl(fileName);

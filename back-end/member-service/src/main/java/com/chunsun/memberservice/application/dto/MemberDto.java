@@ -33,11 +33,6 @@ public record MemberDto() {
 	public record UpdateInfoResponse() {
 	}
 
-	public record GetInfoRequest(
-		Long id
-	) {
-	}
-
 	public record GetInfoResponse(
 		String name,
 		String nickname,

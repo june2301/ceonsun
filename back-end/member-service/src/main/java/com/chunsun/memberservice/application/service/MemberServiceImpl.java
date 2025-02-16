@@ -51,7 +51,6 @@ public class MemberServiceImpl implements MemberService {
 	private final S3Service s3Service;
 	private final AmazonS3 amazonS3;
 
-	// 회원 가입
 	@Override
 	@Transactional
 	public MemberDto.SignUpResponse signUp(MemberDto.SignUpRequest request) {
@@ -78,7 +77,6 @@ public class MemberServiceImpl implements MemberService {
 		return new MemberDto.SignUpResponse("가입 완료");
 	}
 
-	// 회원 탈퇴
 	@Override
 	@Transactional
 	public void deleteMember(Long id) {
@@ -105,7 +103,6 @@ public class MemberServiceImpl implements MemberService {
 		memberRepository.save(member);
 	}
 
-	// 닉네임 중복 체크
 	@Override
 	public void checkNicknameAvailability(String nickname) {
 
@@ -114,7 +111,6 @@ public class MemberServiceImpl implements MemberService {
 		}
 	}
 
-	// 개인정보 수정
 	@Override
 	@Transactional
 	public MemberDto.UpdateInfoResponse updateMemberInfo(MemberDto.UpdateInfoRequest request) {
@@ -125,15 +121,9 @@ public class MemberServiceImpl implements MemberService {
 
 		String profile = member.getProfileImage();
 
-		System.out.println(request.profileImage().getOriginalFilename());
-		System.out.println(request.profileImage().getSize());
-		System.out.println(request.profileImage().getContentType());
-
 		if (request.profileImage() != null && !request.profileImage().isEmpty()) {
-			System.out.println("이프문에 들어왔는가");
 			try {
 				if(profile!=null && !profile.isEmpty()) {
-					System.out.println("여기 들어오는가?");
 					s3Service.deleteImage(profile);
 				}
 
@@ -142,7 +132,6 @@ public class MemberServiceImpl implements MemberService {
 				throw new RuntimeException(e);
 			}
 		} else {
-			System.out.println("엘스문에 들어왔는가");
 			profile = "";
 		}
 
@@ -152,7 +141,6 @@ public class MemberServiceImpl implements MemberService {
 		return new MemberDto.UpdateInfoResponse();
 	}
 
-	// 개인정보 조회
 	@Override
 	public MemberDto.GetInfoResponse getMemberInfo(Long id) {
 
@@ -169,7 +157,6 @@ public class MemberServiceImpl implements MemberService {
 		);
 	}
 
-	// 탈퇴한 회원인지 확인
 	@Override
 	public Boolean isDeleted(Long id) {
 
@@ -183,7 +170,6 @@ public class MemberServiceImpl implements MemberService {
 	public Page<MemberDto.MemberListItem> getFilterMembers(
 		String category, String gender, String age, int page, int size, Long userId) {
 
-		// 현재 요청한 사용자의 정보 조회
 		Member requestingUser = memberRepository.findById(userId)
 			.orElseThrow(() -> new BusinessException(GlobalErrorCodes.USER_NOT_FOUND));
 
@@ -207,7 +193,7 @@ public class MemberServiceImpl implements MemberService {
 			spec = spec.and(MemberSpecification.isExposedTrue());
 		}
 
-		// 성별 필터 (예: MALE 또는 FEMALE)
+		// 성별 필터 (MALE 또는 FEMALE)
 		if (gender != null && !gender.isEmpty()) {
 			try {
 				Gender genderEnum = Gender.valueOf(gender.toUpperCase());
@@ -236,7 +222,7 @@ public class MemberServiceImpl implements MemberService {
 			}
 		}
 
-		// 카테고리 필터 (예: "python,java" -> AND 조건으로 모든 카테고리를 보유한 경우)
+		// 카테고리 필터(AND 조건)
 		if (category != null && !category.isEmpty() && !category.equalsIgnoreCase("none")) {
 			String[] categoryNames = category.split(",");
 			List<Category> categories = Arrays.stream(categoryNames)
@@ -319,7 +305,8 @@ public class MemberServiceImpl implements MemberService {
 
 		List<MemberDto.MemberNickNameDto> nicknames = new ArrayList<>();
 		for (Long id : ids) {
-			Member member = memberRepository.findById(id).orElse(null);
+			Member member = memberRepository.findById(id).
+				orElseThrow(() -> new BusinessException(GlobalErrorCodes.USER_NOT_FOUND));
 
 			MemberDto.MemberNickNameDto nickname = new MemberDto.MemberNickNameDto(
 				member.getId(),
@@ -329,5 +316,32 @@ public class MemberServiceImpl implements MemberService {
 			nicknames.add(nickname);
 		}
 		return nicknames;
+	}
+
+	@Override
+	public List<MemberDto.MemberListItem> getMembersInfo(List<Long> ids) {
+
+		List<MemberDto.MemberListItem> members = new ArrayList<>();
+		for(Long id : ids) {
+			Member member = memberRepository.findById(id).
+				orElseThrow(() -> new BusinessException(GlobalErrorCodes.USER_NOT_FOUND));
+
+			Integer age = Period.between(member.getBirthdate(), LocalDate.now()).getYears();
+
+			List<Category> memberCategories = memberCategoryRepository.findByMember(member).stream()
+				.map(MemberCategory::getCategory)
+				.collect(Collectors.toList());
+
+			MemberDto.MemberListItem item = new MemberDto.MemberListItem(
+				member.getId(),
+				member.getProfileImage(),
+				member.getNickname(),
+				age,
+				member.getGender(),
+				memberCategories
+			);
+			members.add(item);
+		}
+		return members;
 	}
 }
