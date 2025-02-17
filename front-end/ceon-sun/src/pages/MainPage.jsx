@@ -4,11 +4,12 @@ import CardListMain from "../components/CardListMain";
 import RecentCardList from "../components/RecentCardList";
 import RankingList from "../components/RankingList";
 import { memberAPI } from "../api/services/member";
+import { chatAPI } from "@/api/services/chat"; // 채팅방 목록 조회
 import useAuthStore from "../stores/authStore";
+import useWebSocketStore from "../stores/websocketStore";
 
 // 예시 데이터 (임시)
 const myTeacherCards = [
-  // 학생 입장에서 '내가 수강 중인 선생님들'
   {
     nickname: "선선선",
     subjects: ["Java", "Spring"],
@@ -33,7 +34,6 @@ const myTeacherCards = [
 ];
 
 const myStudentCards = [
-  // 선생 입장에서 '내가 가르치는 학생들' (예시)
   {
     nickname: "홍길동",
     subjects: ["Java", "Spring", "Python", "Node.js", "Vue.js"],
@@ -61,11 +61,66 @@ function MainPage() {
   const {
     user: { userId, role },
   } = useAuthStore();
+
   const [recentCards, setRecentCards] = useState([]); // 최근 등록된 카드 목록
   const [rankingData, setRankingData] = useState([]);
 
-  // 최근 등록된 카드 목록 로딩
+  // 소켓 + 구독 관련
+  const stompClient = useWebSocketStore((state) => state.stompClient);
+  const connected = useWebSocketStore((state) => state.connected);
+  const addSubscription = useWebSocketStore((state) => state.addSubscription);
+  const checkSubscriptions = useWebSocketStore(
+    (state) => state.checkSubscriptions,
+  );
+
+  // 이미 구독을 했는지 여부
+  const [hasSubscribed, setHasSubscribed] = useState(false);
+
+  // 1) 메인페이지 마운트 시점: 채팅방 구독 (중복 방지)
   useEffect(() => {
+    // connected && stompClient가 준비된 상태이고, 아직 구독이 안 됐다면
+    if (connected && stompClient && !hasSubscribed) {
+      (async () => {
+        try {
+          const rooms = await chatAPI.getChatRooms();
+          console.log("[MainPage] Fetched rooms:", rooms);
+
+          if (!rooms || rooms.length === 0) {
+            console.log("[MainPage] 채팅방 목록이 없습니다.");
+          } else {
+            rooms.forEach((room) => {
+              console.log(`[MainPage] Subscribing to room ${room.id}`);
+              const subscription = stompClient.subscribe(
+                `/queue/chat/${room.id}`,
+                (frame) => {
+                  console.log(
+                    `[MainPage] 새 메시지 도착 - roomId: ${room.id}, 내용: `,
+                    frame.body,
+                  );
+                },
+              );
+              addSubscription(room.id, subscription);
+            });
+          }
+
+          // 구독 현황 확인
+          checkSubscriptions();
+
+          // 한 번 구독한 후에는 true로 바꿔서 재실행 방지
+          setHasSubscribed(true);
+        } catch (error) {
+          console.error("[MainPage] 채팅방 목록 조회 중 오류:", error);
+        }
+      })();
+    }
+  }, [connected, stompClient, hasSubscribed]);
+  // addSubscription, checkSubscriptions는 의존성에서 제외
+
+  // 2) 최근 등록된 카드 목록 로딩
+  useEffect(() => {
+    // (옵션) 현재 구독 상태 확인 로그
+    checkSubscriptions();
+
     const fetchRecentCards = async () => {
       try {
         const response = await memberAPI.searchMembers({
@@ -74,7 +129,6 @@ function MainPage() {
           size: 8,
         });
 
-        // 응답 데이터 가공
         const processedCards = response.members.map((member) => ({
           nickname: member.nickname,
           subjects: member.subjects,
@@ -96,9 +150,9 @@ function MainPage() {
     if (role !== "GUEST") {
       fetchRecentCards();
     }
-  }, [role, userId]);
+  }, [role, userId, checkSubscriptions]);
 
-  // 랭킹 데이터 로딩
+  // 3) 랭킹 데이터 로딩
   useEffect(() => {
     const fetchRankingData = async () => {
       try {
@@ -113,6 +167,7 @@ function MainPage() {
     fetchRankingData();
   }, []);
 
+  // 렌더링
   return (
     <div className="w-full h-[calc(100vh-96px)] overflow-y-auto custom-scrollbar">
       <PromotionLink />

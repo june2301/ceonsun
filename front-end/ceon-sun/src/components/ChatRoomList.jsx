@@ -18,11 +18,10 @@ function ChatRoomList({ onClose }) {
       // API 응답을 ChatRoomCard 컴포넌트에 맞는 형식으로 변환
       const formattedRooms = rooms.map((room) => ({
         id: room.id,
-        name: room.nickname,
-        subjects: ["과목"], // 추후 과목 정보가 추가되면 수정
-        lastMessage: "메시지 없음", // 추후 구현 예정
-        lastMessageTime: "없음", // 추후 구현 예정
+        name: room.partnerName,
         profileImage: room.profileImage,
+        // subjects, lastMessage, lastMessageTime은 제외
+        // 추후 API에서 제공되면 추가
       }));
       setChatRooms(formattedRooms);
     } catch (error) {
