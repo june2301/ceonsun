@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import PromotionLink from "../components/PromotionLink";
 import CardListMain from "../components/CardListMain";
 import RecentCardList from "../components/RecentCardList";
 import RankingList from "../components/RankingList";
+import { memberAPI } from "../api/services/member";
+import useAuthStore from "../stores/authStore";
 
 // 예시 데이터 (임시)
 const myTeacherCards = [
@@ -55,88 +57,83 @@ const myStudentCards = [
   },
 ];
 
-// 최근 등록된 수업(선생 카드) 예시 데이터
-const recentLessonData = [
-  { nickname: "선선선1", subjects: ["Python", "JavaScript"] },
-  { nickname: "선선선2", subjects: ["Python", "JavaScript"] },
-  { nickname: "선선선3", subjects: ["Python", "JavaScript"] },
-  { nickname: "선선선4", subjects: ["Python", "JavaScript"] },
-  { nickname: "선선선5", subjects: ["Python", "JavaScript"] },
-  { nickname: "선선선6", subjects: ["Python", "JavaScript"] },
-  { nickname: "선선선7", subjects: ["Python", "JavaScript"] },
-  { nickname: "선선선8", subjects: ["Python", "JavaScript"] },
-];
-
-// 랭킹 컴포넌트 예시
-const rankingData = [
-  {
-    id: 1,
-    profileImage: "",
-    nickname: "선생님1",
-    rankScore: "랭킹 수치",
-  },
-  {
-    id: 2,
-    profileImage: "",
-    nickname: "선생님2",
-    rankScore: "랭킹 수치",
-  },
-  {
-    id: 3,
-    profileImage: "",
-    nickname: "선생님3",
-    rankScore: "랭킹 수치",
-  },
-  {
-    id: 4,
-    profileImage: "",
-    nickname: "선생님4",
-    rankScore: "랭킹 수치",
-  },
-  {
-    id: 5,
-    profileImage: "",
-    nickname: "선생님5",
-    rankScore: "랭킹 수치",
-  },
-  {
-    id: 6,
-    profileImage: "",
-    nickname: "선생님6",
-    rankScore: "랭킹 수치",
-  },
-];
-
 function MainPage() {
-  // 현재 사용자 역할 (임시로 teacher 로 해둠)
-  // => "student" 일 경우, CardListMain은 teacherCards를 이용해 선생카드 렌더
-  // => "teacher" 일 경우, CardListMain은 studentCards를 이용해 학생카드 렌더
-  const userRole = "student"; // "student" or "teacher"
+  const {
+    user: { userId, role },
+  } = useAuthStore();
+  const [recentCards, setRecentCards] = useState([]); // 최근 등록된 카드 목록
+  const [rankingData, setRankingData] = useState([]);
+
+  // 최근 등록된 카드 목록 로딩
+  useEffect(() => {
+    const fetchRecentCards = async () => {
+      try {
+        const response = await memberAPI.searchMembers({
+          userId,
+          page: 0,
+          size: 8,
+        });
+
+        // 응답 데이터 가공
+        const processedCards = response.members.map((member) => ({
+          nickname: member.nickname,
+          subjects: member.subjects,
+          showDetail: false,
+          showAge: false,
+          showGender: false,
+          age: member.age,
+          gender: member.gender,
+          profileImage: member.profileImage,
+        }));
+
+        setRecentCards(processedCards);
+      } catch (error) {
+        console.error("최근 카드 데이터 로딩 실패:", error);
+        setRecentCards([]);
+      }
+    };
+
+    if (role !== "GUEST") {
+      fetchRecentCards();
+    }
+  }, [role, userId]);
+
+  // 랭킹 데이터 로딩
+  useEffect(() => {
+    const fetchRankingData = async () => {
+      try {
+        const data = await memberAPI.getRankingList();
+        setRankingData(data);
+      } catch (error) {
+        console.error("랭킹 데이터 로딩 실패:", error);
+        setRankingData([]);
+      }
+    };
+
+    fetchRankingData();
+  }, []);
 
   return (
-    <div className="w-full">
+    <div className="w-full h-[calc(100vh-96px)] overflow-y-auto custom-scrollbar">
       <PromotionLink />
 
       {/* 내 수강 목록 or 내 학생 목록 */}
       <CardListMain
-        userRole={userRole}
-        // userRole이 teacher면 "내 학생 목록", student면 "내 수강 목록"
-        title={userRole === "teacher" ? "내 학생 목록" : "내 수강 목록"}
-        // (학생일 경우) 내가 수강 중인 선생카드 목록
-        teacherCards={myTeacherCards}
-        // (선생일 경우) 내가 가르치는 학생카드 목록
-        studentCards={myStudentCards}
+        userRole={role === "TEACHER" ? "teacher" : "student"}
+        title={role === "TEACHER" ? "내 학생 목록" : "내 수강 목록"}
+        teacherCards={role === "STUDENT" ? myTeacherCards : []}
+        studentCards={role === "TEACHER" ? myStudentCards : []}
         onClickMore={() => console.log("목록 전체 이동")}
       />
 
       {/* 구분선 */}
       <hr className="mx-auto w-[900px] my-8 border-2 border-gray-300" />
 
-      {/* 최근 등록된 수업 (TeacherCard) */}
+      {/* 최근 등록된 수업/학생 카드 */}
       <RecentCardList
-        title="최근 등록된 수업"
-        teacherCards={recentLessonData}
-        onClickMore={() => console.log("최근 등록된 수업 전체 이동")}
+        title={role === "TEACHER" ? "최근 등록된 학생카드" : "최근 등록된 수업"}
+        recentCards={recentCards}
+        onClickMore={() => console.log("최근 등록된 수업/학생카드 전체 이동")}
       />
 
       {/* 구분선 */}

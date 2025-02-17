@@ -15,19 +15,19 @@ const useWebSocketStore = create((set, get) => ({
     const socketUrl = `${WEBSOCKET_URL}/ws?token=${encodeURIComponent(token)}`;
     const socket = new SockJS(socketUrl);
 
-    // // onclose 이벤트로 연결 종료 시 자동 재연결 시도
-    // socket.onclose = () => {
-    //   console.log("WebSocket 연결이 끊어졌습니다.");
-    //   set({ connected: false });
-    //   // 일정 시간 후 재연결 시도 (예: 5초 후)
-    //   setTimeout(() => {
-    //     const currentToken = get().token;
-    //     if (currentToken) {
-    //       console.log("WebSocket 재연결 시도 중...");
-    //       get().connect(currentToken);
-    //     }
-    //   }, 5000);
-    // };
+    // onclose 이벤트로 연결 종료 시 자동 재연결 시도
+    socket.onclose = () => {
+      console.log("WebSocket 연결이 끊어졌습니다.");
+      set({ connected: false });
+      // 일정 시간 후 재연결 시도 (예: 5초 후)
+      setTimeout(() => {
+        const currentToken = get().token;
+        if (currentToken) {
+          console.log("WebSocket 재연결 시도 중...");
+          get().connect(currentToken);
+        }
+      }, 5000);
+    };
 
     const client = Stomp.over(socket);
     // 디버그 메시지 출력 제거 (선택사항)
@@ -43,13 +43,13 @@ const useWebSocketStore = create((set, get) => ({
         console.error("WebSocket connection error:", error);
         set({ connected: false });
         // 에러 발생 시 일정 시간 후 재연결 시도
-        // setTimeout(() => {
-        //   const currentToken = get().token;
-        //   if (currentToken) {
-        //     console.log("에러 후 WebSocket 재연결 시도 중...");
-        //     get().connect(currentToken);
-        //   }
-        // }, 5000);
+        setTimeout(() => {
+          const currentToken = get().token;
+          if (currentToken) {
+            console.log("에러 후 WebSocket 재연결 시도 중...");
+            get().connect(currentToken);
+          }
+        }, 5000);
       },
     );
   },
