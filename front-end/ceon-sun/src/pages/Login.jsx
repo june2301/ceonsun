@@ -13,18 +13,22 @@ import * as jwt_decode from "jwt-decode";
 const Login = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { kakaoLogin, user } = useAuthStore();
+  const { kakaoLogin } = useAuthStore();
+
+  // WebSocket 연결만 담당 (메인 페이지에서 구독)
   const connectWebSocket = useWebSocketStore((state) => state.connect);
 
   const KAKAO_AUTH_URL = "https://kauth.kakao.com/oauth/authorize";
   const CLIENT_ID = import.meta.env.VITE_KAKAO_CLIENT_ID;
   const REDIRECT_URI = import.meta.env.VITE_KAKAO_REDIRECT_URI;
 
+  // 카카오 로그인 버튼 클릭
   const handleKakaoLoginClick = () => {
     const kakaoURL = `${KAKAO_AUTH_URL}?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code`;
     window.location.href = kakaoURL;
   };
 
+  // 로그인 후 콜백 처리
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const code = params.get("code");
@@ -33,19 +37,26 @@ const Login = () => {
     if (code) {
       kakaoLogin(code)
         .then(async (result) => {
+          // 1) 회원가입이 필요한 경우 → /signup
           if (result.needsSignup) {
             navigate("/signup", {
               state: { userInfo: result.userInfo, authCode: code },
               replace: true,
             });
           } else {
-            connectWebSocket(result.token);
+            // 2) 이미 회원가입 완료된 사용자
+            //    소켓 연결 + 알림 설정 + mainpage로 이동
+            useWebSocketStore.getState().connect();
+
+            // 알림 로직
             const token = result.token.startsWith("Bearer ")
               ? result.token.slice(7)
               : result.token;
             const decoded = jwt_decode.jwtDecode(token);
+
             connectNotification(decoded.sub);
             await checkUnreadNotifications(decoded.sub);
+
             navigate(returnUrl || "/mainpage", { replace: true });
           }
         })

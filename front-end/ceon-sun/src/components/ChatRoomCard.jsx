@@ -20,13 +20,19 @@ function ChatRoomCard({ room, onSelect }) {
         <div className="flex justify-between items-center">
           <div className="flex items-center">
             <span className="font-medium text-sm">{name}</span>
-            <span className="ml-2 text-xs text-gray-500">
-              {subjects.join(", ")}
-            </span>
+            {subjects && subjects.length > 0 && (
+              <span className="ml-2 text-xs text-gray-500">
+                {subjects.join(", ")}
+              </span>
+            )}
           </div>
-          <span className="text-xs text-gray-400">{lastMessageTime}</span>
+          {lastMessageTime && (
+            <span className="text-xs text-gray-400">{lastMessageTime}</span>
+          )}
         </div>
-        <p className="text-xs text-gray-500 mt-1 truncate">{lastMessage}</p>
+        {lastMessage && (
+          <p className="text-xs text-gray-500 mt-1 truncate">{lastMessage}</p>
+        )}
       </div>
     </div>
   );

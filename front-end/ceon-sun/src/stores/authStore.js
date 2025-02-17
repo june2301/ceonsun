@@ -3,6 +3,9 @@ import { persist, createJSONStorage } from "zustand/middleware";
 import { authAPI } from "../api/services/auth";
 import * as jwt_decode from "jwt-decode";
 
+// (중요) websocketStore 불러오기
+import useWebSocketStore from "./websocketStore";
+
 const useAuthStore = create(
   persist(
     (set, get) => ({
@@ -60,7 +63,14 @@ const useAuthStore = create(
       },
 
       logout: () => {
+        // 1) 세션 스토리지에서 토큰 제거
         sessionStorage.removeItem("token");
+
+        // 2) WebSocket 구독/연결 해제
+        //    (websocketStore의 disconnect() 호출)
+        useWebSocketStore.getState().disconnect();
+
+        // 3) 상태 리셋
         set({
           isAuthenticated: false,
           token: null,
