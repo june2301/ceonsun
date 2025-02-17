@@ -18,6 +18,7 @@ function CardList({
   onClassEnter,
   onInquiry,
   onEndClass,
+  isRanking = false,
 }) {
   return (
     <div className="flex flex-col gap-4">
@@ -40,6 +41,8 @@ function CardList({
               showClassroomButton={card.showClassroomButton}
               classroomButtonOnTop={card.classroomButtonOnTop}
               showPaymentButton={card.showPaymentButton}
+              isRanking={isRanking}
+              rankingNumber={isRanking ? idx + 1 : null}
             />
           );
         } else {

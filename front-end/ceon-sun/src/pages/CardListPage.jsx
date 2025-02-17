@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import useAuthStore from "../stores/authStore";
 import Filter from "../components/Filter";
 import TopBar from "../components/TopBar";
@@ -8,12 +8,15 @@ import { memberAPI } from "../api/services/member";
 
 function CardListPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuthStore();
   const role = user.role;
 
   // TopBar 메뉴 항목 (학생이 "선생님 리스트" 볼 때만 사용)
   const topBarItems = ["선생님 목록", "찜한 선생님", "선생님 랭킹"];
-  const [selectedMenu, setSelectedMenu] = useState(0);
+  const [selectedMenu, setSelectedMenu] = useState(
+    location.state?.selectedMenu || 0,
+  );
 
   // 카드 리스트 상태 관리
   const [cardList, setCardList] = useState([]);
@@ -38,28 +41,25 @@ function CardListPage() {
   const fetchCardList = async () => {
     setLoading(true);
     try {
-      console.log("API 호출 파라미터:", {
-        userId: user.userId,
-        categories: filterState.categories,
-        gender: filterState.gender,
-        ageRange: filterState.ageRange,
-        page,
-      });
+      // 학생이고 "선생님 랭킹" 메뉴 선택 시
+      if (role === "STUDENT" && selectedMenu === 2) {
+        const response = await memberAPI.getRankingList();
+        setCardList(response);
+        setTotalPages(1); // 랭킹은 페이지네이션 없음
+      } else {
+        // 기존 searchMembers API 호출
+        const response = await memberAPI.searchMembers({
+          userId: user.userId,
+          categories: filterState.categories,
+          gender: filterState.gender,
+          ageRange: filterState.ageRange,
+          page,
+          size: 10,
+        });
 
-      const response = await memberAPI.searchMembers({
-        userId: user.userId,
-        categories: filterState.categories,
-        gender: filterState.gender,
-        ageRange: filterState.ageRange,
-        page,
-        size: 10,
-      });
-
-      console.log("API 응답:", response);
-
-      // 응답 데이터 설정
-      setCardList(response.members);
-      setTotalPages(response.pagination.totalPages);
+        setCardList(response.members);
+        setTotalPages(response.pagination.totalPages);
+      }
     } catch (err) {
       setError(err.message);
       console.error("카드 목록을 불러오는데 실패했습니다:", err);
@@ -70,9 +70,17 @@ function CardListPage() {
 
   // 필터 변경시 API 재호출
   useEffect(() => {
-    console.log("필터 상태 변경:", filterState);
-    fetchCardList();
+    // 랭킹 목록 조회 시에는 필터 변경 무시
+    if (!(role === "STUDENT" && selectedMenu === 2)) {
+      fetchCardList();
+    }
   }, [filterState, page]);
+
+  // 메뉴 선택 시 API 호출
+  useEffect(() => {
+    setPage(0); // 메뉴 변경 시 페이지 초기화
+    fetchCardList();
+  }, [selectedMenu]);
 
   // 필터 적용 핸들러
   const handleFilterChange = (newFilter) => {
@@ -159,7 +167,12 @@ function CardListPage() {
 
   // 선생 카드에서 "자세히 보기" 클릭 시 TeacherDetail 페이지로 이동하는 함수
   const handleTeacherDetail = (cardData) => {
-    navigate("/teacherdetailpage", { state: { teacher: cardData } });
+    navigate("/teacherdetailpage", {
+      state: {
+        teacher: cardData,
+        previousTab: selectedMenu,
+      },
+    });
   };
 
   // 학생 카드에서 "자세히 보기" 클릭 시 해당 카드가 확장되도록 처리하는 함수
@@ -226,6 +239,7 @@ function CardListPage() {
                 expandedStudentData={expandedStudentData}
                 isBackArrow={false}
                 isInquiryMode={cardType === "student"}
+                isRanking={role === "STUDENT" && selectedMenu === 2}
               />
             )}
           </div>

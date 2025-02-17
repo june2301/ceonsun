@@ -4,10 +4,19 @@ import DefaultProfile from "@/assets/img/default-profile.png";
 import Modal from "./Modal";
 import { chatAPI } from "../api/services/chat";
 import useAuthStore from "../stores/authStore";
+import { useNavigate, useLocation } from "react-router-dom";
 
-function TeacherAction({ teacher, onBack }) {
+function TeacherAction({ teacher, previousTab }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { user } = useAuthStore(); // 로그인한 사용자 정보 가져오기
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleBack = () => {
+    navigate("/cardlistpage", {
+      state: { selectedMenu: previousTab ?? 0 },
+    });
+  };
 
   const handleInquiryClick = () => {
     setIsModalOpen(true);
@@ -37,7 +46,7 @@ function TeacherAction({ teacher, onBack }) {
     <div className="w-[240px] min-w-[240px] flex flex-col px-4 py-3 border-r-2 border-gray-300">
       {/* 뒤로가기 버튼 (오른쪽 정렬) */}
       <div className="flex justify-end mb-3">
-        <button onClick={onBack} className="hover:opacity-80">
+        <button onClick={handleBack} className="hover:opacity-80">
           <ArrowLongLeftIcon className="w-8 h-8 text-gray-600" />
         </button>
       </div>

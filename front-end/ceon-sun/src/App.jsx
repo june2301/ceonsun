@@ -24,7 +24,7 @@ function AppContent() {
   const isAuthPage = ["/", "/signup"].includes(location.pathname);
 
   return (
-    <div className="min-h-screen">
+    <div className="h-screen overflow-hidden">
       {!isAuthPage && <Header />}
       <Routes>
         <Route path="/" element={<Login />} />
@@ -53,11 +53,11 @@ function App() {
   const token = useAuthStore((state) => state.token);
   const { connect } = useWebSocketStore();
 
-  // useEffect(() => {
-  //   if (token) {
-  //     connect(token);
-  //   }
-  // }, [token]);
+  useEffect(() => {
+    if (token) {
+      connect(token);
+    }
+  }, [token]);
 
   return (
     <QueryClientProvider client={queryClient}>

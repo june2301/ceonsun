@@ -1,18 +1,23 @@
 import React, { useState } from "react";
 import TeacherCard from "../components/TeacherCard";
+import StudentCard from "../components/StudentCard";
 import { PlayIcon } from "@heroicons/react/24/solid";
+import useAuthStore from "../stores/authStore";
 
 function RecentCardList({
   title = "최근 등록된 수업",
-  teacherCards = [],
+  recentCards = [],
   onClickMore,
 }) {
-  const PAGE_SIZE = 4; // 2줄 x 2칸
+  const {
+    user: { role },
+  } = useAuthStore();
+  const PAGE_SIZE = 4;
   const [currentPage, setCurrentPage] = useState(0);
 
-  const totalPages = Math.ceil(teacherCards.length / PAGE_SIZE);
+  const totalPages = Math.ceil(recentCards.length / PAGE_SIZE);
   const startIndex = currentPage * PAGE_SIZE;
-  const pageData = teacherCards.slice(startIndex, startIndex + PAGE_SIZE);
+  const pageData = recentCards.slice(startIndex, startIndex + PAGE_SIZE);
 
   const handlePageClick = (pageIndex) => {
     setCurrentPage(pageIndex);
@@ -49,7 +54,11 @@ function RecentCardList({
       >
         {pageData.map((card, idx) => (
           <div key={idx} className="w-[420px]">
-            <TeacherCard {...card} />
+            {role === "TEACHER" ? (
+              <StudentCard {...card} />
+            ) : (
+              <TeacherCard {...card} />
+            )}
           </div>
         ))}
 

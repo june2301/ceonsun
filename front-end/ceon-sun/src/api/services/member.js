@@ -46,11 +46,16 @@ export const memberAPI = {
   },
 
   // 프로필 수정
-  updateProfile: async (userId, profileData) => {
+  updateProfile: async (userId, formData) => {
     try {
       const response = await api.put(
         `/member-service/members/${userId}`,
-        profileData,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        },
       );
       return response.data;
     } catch (error) {
@@ -332,6 +337,30 @@ export const memberAPI = {
       return response.data;
     } catch (error) {
       console.error("선생님 카드 수정 실패:", error);
+      throw error;
+    }
+  },
+
+  // 랭킹 목록 조회
+  getRankingList: async () => {
+    try {
+      const response = await api.get("/member-service/members/ranking");
+      console.log("랭킹 데이터 응답:", response.data);
+
+      return response.data.map((member) => ({
+        id: member.id,
+        profileImage: member.profileImage,
+        nickname: member.nickname,
+        age: member.age,
+        gender: member.gender === "MALE" ? "남자" : "여자",
+        subjects: member.categories.map((cat) => cat.name),
+        score: member.score.toFixed(0), // 소수점 제거
+        showDetail: true,
+        showAge: true,
+        showGender: true,
+      }));
+    } catch (error) {
+      console.error("랭킹 목록 조회 실패:", error);
       throw error;
     }
   },

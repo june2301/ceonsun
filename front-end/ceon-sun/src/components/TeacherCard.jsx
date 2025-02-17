@@ -1,5 +1,9 @@
 import React from "react";
-import { ArrowRightIcon } from "@heroicons/react/24/solid";
+import {
+  ArrowRightIcon,
+  TrophyIcon,
+  StarIcon,
+} from "@heroicons/react/24/solid";
 import DefaultProfile from "@/assets/img/default-profile.png";
 
 function TeacherCard({
@@ -20,6 +24,9 @@ function TeacherCard({
   classroomButtonOnTop = false, // true면 상단, false면 하단
   showPaymentButton = false,
   onDetailClick, // "자세히 보기" 버튼 클릭 시 호출할 함수
+  // 랭킹 관련 props 추가
+  isRanking = false,
+  rankingNumber = null,
 }) {
   // 하단 영역(구분선 아래)을 표시해야 하는지 여부
   const bottomVisible =
@@ -27,20 +34,40 @@ function TeacherCard({
     (showClassroomButton && !classroomButtonOnTop) ||
     showPaymentButton;
 
-  // 나이+성별이 둘 다 공개된 경우 => w-20 h-20, 그렇지 않으면 기본 w-16 h-16
-  const profileSizeClass =
-    showAge && age !== null && showGender && gender !== ""
-      ? "w-20 h-20"
-      : "w-16 h-16";
+  // 프로필 이미지 크기 클래스 설정
+  const profileSizeClass = isRanking
+    ? "w-16 h-16"
+    : showAge && age !== null && showGender && gender !== ""
+    ? "w-20 h-20"
+    : "w-16 h-16";
 
   // "2번째 줄(나이/성별) 표시 여부" => 사실상 3줄이 되는 조건
-  // (showAge || showGender)가 true면 3줄, 둘 다 false면 2줄
-  const isThreeLines = showAge || showGender;
+  const isThreeLines = !isRanking && (showAge || showGender);
+
+  // 랭킹 아이콘/숫자 표시 함수
+  const getRankingDisplay = (rank) => {
+    switch (rank) {
+      case 1:
+        return <TrophyIcon className="w-8 h-8 text-yellow-400" />;
+      case 2:
+        return <StarIcon className="w-7 h-7 text-gray-400" />;
+      case 3:
+        return <StarIcon className="w-6 h-6 text-amber-600" />;
+      default:
+        return <span className="text-xl font-bold text-gray-500">{rank}</span>;
+    }
+  };
 
   return (
     <div className="bg-white rounded-md p-4 shadow-[0_2px_8px_rgba(0,0,0,0.1)]">
-      {/* 상단 영역 */}
       <div className="pl-1 relative flex items-start">
+        {/* 랭킹 표시 영역 - 수직 중앙 정렬을 위해 top 값 수정 */}
+        {isRanking && rankingNumber && (
+          <div className="absolute -left-2 top-[45%] -translate-y-1/2 w-8 flex justify-center">
+            {getRankingDisplay(rankingNumber)}
+          </div>
+        )}
+
         {/* 프로필 이미지 */}
         <div
           className={`
@@ -52,6 +79,7 @@ function TeacherCard({
             overflow-hidden
             border
             border-gray-300
+            ${isRanking ? "ml-6" : ""}
           `}
         >
           <img
@@ -61,15 +89,14 @@ function TeacherCard({
           />
         </div>
 
-        {/* 상단 텍스트 영역: 1,2,3번째 라인을 flex-col + gap-2 */}
-        <div className="flex flex-col w-full gap-2">
+        {/* 텍스트 영역: flex-col + gap-2로 간격 일정하게 유지 */}
+        <div
+          className={`flex flex-col w-full ${
+            isThreeLines ? "gap-2" : "justify-center gap-2 h-16"
+          }`}
+        >
           {/* 1번째 줄: 닉네임 & 자세히 보기 */}
-          {/* 2줄일 때(나이/성별이 없음)만 닉네임 영역에 mt-1 추가 */}
-          <div
-            className={`flex items-center justify-between ${
-              !isThreeLines ? "mt-1" : ""
-            }`}
-          >
+          <div className="flex items-center justify-between">
             <div>
               <span className="text-gray-600">닉네임 : </span>
               <span className="font-bold text-gray-600">{nickname}</span>
@@ -85,8 +112,8 @@ function TeacherCard({
             )}
           </div>
 
-          {/* 2번째 줄: 나이 / 성별 (옵션) - 있으면 3줄, 없으면 2줄 */}
-          {(showAge || showGender) && (
+          {/* 2번째 줄: 나이 / 성별 (랭킹이 아닐 때만) */}
+          {isThreeLines && (
             <div className="text-sm text-gray-500 flex items-center gap-4">
               {showAge && age !== null && (
                 <span>
@@ -106,17 +133,7 @@ function TeacherCard({
           {/* 3번째 줄: 수업 과목 */}
           <div className="text-sm text-gray-500 flex items-center">
             <span className="text-gray-600 mr-1">수업 과목 : </span>
-            <span
-              className="
-                inline-block
-                max-w-[180px]
-                overflow-hidden
-                whitespace-nowrap
-                text-ellipsis
-                font-bold
-                text-gray-600
-              "
-            >
+            <span className="inline-block max-w-[180px] overflow-hidden whitespace-nowrap text-ellipsis font-bold text-gray-600">
               {subjects.join(", ")}
             </span>
           </div>

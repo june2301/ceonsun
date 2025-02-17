@@ -5,17 +5,17 @@ import { PlayIcon } from "@heroicons/react/24/solid";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
 
 function CardListMain({
-  userRole = "student", // "teacher" or "student"
   title = "내 목록",
-  teacherCards = [], // 학생 역할일 때 표시할 선생님 카드 데이터
-  studentCards = [], // 선생 역할일 때 표시할 학생 카드 데이터
+  teacherCards = [], // 학생이 보는 선생님 카드 데이터
+  studentCards = [], // 선생님이 보는 학생 카드 데이터
   onClickMore,
 }) {
   const PAGE_SIZE = 2;
   const [currentPage, setCurrentPage] = useState(0);
 
-  // 사용자 역할에 맞게 "현재 보여줄 카드 배열" 결정
-  const dataToShow = userRole === "teacher" ? studentCards : teacherCards;
+  // MainPage에서 이미 role에 맞는 데이터를 전달받았으므로
+  // 둘 중 비어있지 않은 배열을 사용
+  const dataToShow = teacherCards.length > 0 ? teacherCards : studentCards;
 
   const totalPages = Math.ceil(dataToShow.length / PAGE_SIZE);
   const startIndex = currentPage * PAGE_SIZE;
@@ -81,11 +81,9 @@ function CardListMain({
           <div className="flex flex-nowrap items-center justify-center gap-4 mt-2 mb-2">
             {pageData.map((item, idx) => (
               <div key={idx} className="flex-shrink-0 w-[410px]">
-                {userRole === "teacher" ? (
-                  // 선생이라면 StudentCard
+                {studentCards.length > 0 ? (
                   <StudentCard {...item} />
                 ) : (
-                  // 학생이라면 TeacherCard
                   <TeacherCard {...item} />
                 )}
               </div>

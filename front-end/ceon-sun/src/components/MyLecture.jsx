@@ -111,7 +111,7 @@ function MyLecture({ role }) {
       gender: userInfo.gender,
       profileImage: userInfo.profileImage,
       subjects: studentCard.categories.map((cat) => cat.name),
-      introduction: studentCard.description,
+      description: studentCard.description,
       cardPublic: studentCard.isExposed,
       categoryIds: studentCard.categories.map((cat) => cat.id),
     };
@@ -244,7 +244,7 @@ function MyLecture({ role }) {
                     gender={myStudentCard.gender}
                     profileImage={myStudentCard.profileImage}
                     subjects={myStudentCard.subjects}
-                    introduction={myStudentCard.introduction}
+                    description={myStudentCard.description}
                     isMyDetail={true}
                     onClose={handleMyDetailClose}
                     onUpdate={handleStudentUpdate}
