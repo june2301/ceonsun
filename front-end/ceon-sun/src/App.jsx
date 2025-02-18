@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -15,6 +15,8 @@ import MyPage from "./pages/MyPage";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Payment from "./pages/Payment";
 import Promotion from "./pages/Promotion";
+import useAuthStore from "./stores/authStore";
+import useWebSocketStore from "./stores/websocketStore";
 
 // Header를 조건부로 표시하기 위한 래퍼 컴포넌트
 function AppContent() {
@@ -22,7 +24,7 @@ function AppContent() {
   const isAuthPage = ["/", "/signup"].includes(location.pathname);
 
   return (
-    <div className="min-h-screen">
+    <div className="h-screen overflow-hidden">
       {!isAuthPage && <Header />}
       <Routes>
         <Route path="/" element={<Login />} />
@@ -48,6 +50,15 @@ const queryClient = new QueryClient({
 });
 
 function App() {
+  const token = useAuthStore((state) => state.token);
+  const { connect } = useWebSocketStore();
+
+  useEffect(() => {
+    if (token) {
+      connect(token);
+    }
+  }, [token]);
+
   return (
     <QueryClientProvider client={queryClient}>
       <Router>

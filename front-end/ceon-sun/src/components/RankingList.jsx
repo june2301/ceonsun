@@ -1,17 +1,46 @@
 import React, { useState } from "react";
 import DefaultProfile from "@/assets/img/default-profile.png";
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
+import { TrophyIcon, StarIcon } from "@heroicons/react/24/solid";
 
 function RankingList({ rankingData = [] }) {
   // 랭킹 설명 팝업 표시 여부
   const [showTooltip, setShowTooltip] = useState(false);
 
-  // 6개 초과로 보여줄 경우 수정
-  const leftList = rankingData.slice(0, 3);
-  const rightList = rankingData.slice(3, 6);
+  // 상위 3개만 사용
+  const top3List = rankingData.slice(0, 3);
+
+  // 순위별 아이콘 및 스타일
+  const getRankingStyle = (rank) => {
+    switch (rank) {
+      case 0: // 1등
+        return {
+          icon: <TrophyIcon className="w-8 h-8 text-yellow-400" />,
+          containerClass: "w-[200px]",
+          imageClass: "w-36 h-36",
+          textClass: "text-xl",
+        };
+      case 1: // 2등
+        return {
+          icon: <StarIcon className="w-7 h-7 text-gray-400" />,
+          containerClass: "w-[160px]",
+          imageClass: "w-28 h-28",
+          textClass: "text-lg",
+        };
+      case 2: // 3등
+        return {
+          icon: <StarIcon className="w-6 h-6 text-amber-600" />,
+          containerClass: "w-[160px]",
+          imageClass: "w-28 h-28",
+          textClass: "text-lg",
+        };
+      default:
+        return {};
+    }
+  };
 
   return (
-    <section className="mb-8 max-w-[920px] mx-auto px-2 pb-12">
+    <section className="mb-12 max-w-[920px] mx-auto px-2">
       {/* 제목 + 랭킹 설명 */}
       <div className="flex items-center mb-3">
         <h2 className="text-lg font-semibold mr-2">선생님 랭킹</h2>
@@ -27,7 +56,7 @@ function RankingList({ rankingData = [] }) {
           {showTooltip && (
             <div
               className="
-                absolute top-6 left-0
+                absolute bottom-6 left-0
                 w-[250px] p-3
                 bg-white border border-gray-300
                 rounded shadow-lg
@@ -43,100 +72,51 @@ function RankingList({ rankingData = [] }) {
         </div>
       </div>
 
-      {/* 큰 박스 (6개 리스트가 들어갈 박스) */}
-      <div
-        className="
-          shadow-[0_2px_8px_rgba(0,0,0,0.1)]
-          rounded-md
-          p-2
-          relative
-          bg-white
-          w-[860px] mx-auto
-        "
-      >
-        {/* 가운데 세로 구분선 */}
-        <div
-          className="
-            absolute
-            top-4 bottom-4
-            left-1/2
-            w-[1px]
-            bg-gray-300
-            -translate-x-1/2
-            z-10
-          "
-        />
+      {/* 랭킹 컨테이너 - 컨테이너만 너비 줄이고 가운데 정렬 */}
+      <div className="flex justify-center">
+        <div className="w-[860px] shadow-[0_2px_8px_rgba(0,0,0,0.1)] rounded-md p-6 relative bg-white">
+          <div className="flex justify-center items-end gap-24">
+            {top3List.map((item, index) => {
+              const style = getRankingStyle(index);
+              return (
+                <div
+                  key={index}
+                  className={`flex flex-col items-center ${style.containerClass}`}
+                >
+                  {/* 순위 아이콘 */}
+                  <div className="mb-2">{style.icon}</div>
 
-        {/* 좌우 3개씩 (그리드: 3행 × 2열) */}
-        <div
-          className="
-            grid
-            grid-cols-2
-            grid-rows-3
-            gap-y-2
-            items-center
-          "
-        >
-          {Array.from({ length: 3 }).map((_, row) => {
-            const leftItem = leftList[row]; // row=0,1,2
-            const rightItem = rightList[row]; // row=0,1,2
-
-            return (
-              <React.Fragment key={row}>
-                {/* 왼쪽 랭킹 */}
-                <div className="flex justify-center">
-                  {leftItem && (
-                    <RankingItem
-                      rankNumber={row + 1}
-                      profileImage={leftItem.profileImage}
-                      nickname={leftItem.nickname}
-                      rankScore={leftItem.rankScore}
+                  {/* 프로필 이미지 */}
+                  <div
+                    className={`${style.imageClass} bg-white border-2 border-gray-300 rounded overflow-hidden mb-2`}
+                  >
+                    <img
+                      src={item.profileImage || DefaultProfile}
+                      alt={`${index + 1}등`}
+                      className="w-full h-full object-cover"
                     />
-                  )}
-                </div>
+                  </div>
 
-                {/* 오른쪽 랭킹 */}
-                <div className="flex justify-center">
-                  {rightItem && (
-                    <RankingItem
-                      rankNumber={row + 4} // 4,5,6
-                      profileImage={rightItem.profileImage}
-                      nickname={rightItem.nickname}
-                      rankScore={rightItem.rankScore}
-                    />
-                  )}
+                  {/* 닉네임 */}
+                  <div
+                    className={`${style.textClass} font-bold text-gray-800 flex gap-2`}
+                  >
+                    <span className="text-gray-500 font-normal">닉네임 :</span>
+                    <span>{item.nickname}</span>
+                  </div>
+
+                  {/* 랭킹 점수 */}
+                  <div className="text-gray-600 mt-1 flex gap-2">
+                    <span className="text-gray-500 font-normal">점수 :</span>
+                    <span>{item.score}</span>
+                  </div>
                 </div>
-              </React.Fragment>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
       </div>
     </section>
-  );
-}
-
-// 각 항목(프로필 + 닉네임 + 랭킹 수치)
-function RankingItem({ rankNumber, profileImage, nickname, rankScore }) {
-  return (
-    <div className="w-[420px] flex items-center p-2 bg-white">
-      {/* 랭킹 번호 */}
-      <span className="text-sm text-gray-600 ml-4 mr-2">{rankNumber}.</span>
-
-      {/* 프로필 */}
-      <div className="w-10 h-10 bg-white border border-gray-300 rounded-md overflow-hidden mr-2 flex-shrink-0">
-        <img
-          src={profileImage || DefaultProfile}
-          alt="profile"
-          className="object-cover w-full h-full"
-        />
-      </div>
-
-      {/* 닉네임 (가운데 정렬) */}
-      <span className="font-semibold text-gray-800 mr-auto">{nickname}</span>
-
-      {/* 랭킹 수치 */}
-      <span className="text-gray-600 text-sm mr-4">{rankScore}</span>
-    </div>
   );
 }
 

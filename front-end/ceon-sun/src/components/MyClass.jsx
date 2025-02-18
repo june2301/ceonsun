@@ -84,27 +84,17 @@ function MyClass({ role }) {
         return;
       }
 
-      console.log("카테고리 등록 요청:", {
-        userId: user.userId,
-        categoryIds: teacherCardData.subjects.map((category) => category.id),
-      });
+      // 카테고리 등록
       await memberAPI.createMemberCategories(
-        user.userId,
         teacherCardData.subjects.map((category) => category.id),
       );
-      console.log("유저id:", user.userId);
-      const { subjects, ...cardData } = teacherCardData;
-      const submitData = {
-        ...cardData,
-        id: user.userId,
-      };
 
-      console.log("선생 카드 생성 요청:", submitData);
-      const response = await memberAPI.createTeacherCard(submitData);
-      console.log("선생 카드 생성 응답:", response);
+      // 선생 카드 생성 요청 - id 제거
+      const { subjects, ...cardData } = teacherCardData;
+      const response = await memberAPI.createTeacherCard(cardData);
 
       if (response.message === "선생 카드 생성 완료") {
-        const { token } = await authAPI.refreshToken();
+        const { token } = await authAPI.changeRole();
         if (token) {
           setAuth(token);
           alert("선생 수업 등록에 성공하였습니다.");

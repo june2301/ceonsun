@@ -68,13 +68,13 @@ function StudentCardCreate({
     e.preventDefault();
     try {
       // 1. 회원 카테고리 입력 (최초 등록)
-      await memberAPI.createMemberCategories(user.userId, selectedCategoryIds);
+      await memberAPI.createMemberCategories(selectedCategoryIds);
 
       // 2. 학생 카드 생성
-      await memberAPI.createStudentCard(user.userId, cardPublic, introduction);
+      await memberAPI.createStudentCard(cardPublic, introduction);
 
       // 3. 토큰 재발급 요청 및 role 업데이트
-      const { token } = await authAPI.refreshToken();
+      const { token } = await authAPI.changeRole();
       if (token) {
         setAuth(token); // store 업데이트
 

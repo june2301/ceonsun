@@ -45,7 +45,10 @@ function TeacherDetailPage() {
     <div className="h-[calc(100vh-96px)] w-full flex flex-col overflow-hidden">
       <div className="flex-1 flex justify-center overflow-hidden">
         <div className="flex w-[860px]">
-          <TeacherAction teacher={teacher} onBack={handleBack} />
+          <TeacherAction
+            teacher={teacher}
+            previousTab={location.state?.previousTab}
+          />
           <div className="flex flex-col pt-2 pl-2 w-full">
             <TeacherDetail teacher={teacher} topBarItems={topBarItems} />
           </div>

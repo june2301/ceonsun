@@ -13,8 +13,14 @@ function UpdateProfile({ userInfo, onSave }) {
   const [nicknameChecked, setNicknameChecked] = useState(false);
 
   const handleNicknameChange = (e) => {
-    setFormData({ ...formData, nickname: e.target.value });
-    setNicknameChecked(false);
+    const newNickname = e.target.value;
+    setFormData({ ...formData, nickname: newNickname });
+    // 현재 사용자의 닉네임과 동일하면 중복체크 통과
+    if (newNickname === user.nickname) {
+      setNicknameChecked(true);
+    } else {
+      setNicknameChecked(false);
+    }
   };
 
   const handleProfileImageChange = (e) => {
@@ -22,9 +28,27 @@ function UpdateProfile({ userInfo, onSave }) {
     setFormData({ ...formData, profileImage: file });
   };
 
+  const handleResetProfileImage = () => {
+    // profileImage를 null로 설정하여 기본 이미지가 표시되도록 함
+    setFormData({ ...formData, profileImage: null });
+
+    // 파일 input 초기화
+    const fileInput = document.querySelector('input[type="file"]');
+    if (fileInput) {
+      fileInput.value = "";
+    }
+  };
+
   const handleDuplicateCheck = async () => {
     if (!formData.nickname.trim()) {
       alert("닉네임을 입력해주세요.");
+      return;
+    }
+
+    // 현재 사용자의 닉네임과 동일한 경우
+    if (formData.nickname === user.nickname) {
+      setNicknameChecked(true);
+      alert("사용 가능한 닉네임입니다.");
       return;
     }
 
@@ -52,13 +76,23 @@ function UpdateProfile({ userInfo, onSave }) {
     }
 
     try {
-      await memberAPI.updateProfile(user.userId, {
-        nickname: formData.nickname,
-        profileImage: formData.profileImage,
-      });
+      // FormData 객체 생성
+      const formDataToSend = new FormData();
+      formDataToSend.append("nickname", formData.nickname);
+
+      // 프로필 이미지가 File 객체인 경우에만 추가
+      if (formData.profileImage instanceof File) {
+        formDataToSend.append(
+          "profileImage",
+          formData.profileImage,
+          formData.profileImage.name,
+        );
+      }
+
+      await memberAPI.updateProfile(user.userId, formDataToSend);
 
       // 2. 토큰 재발급 요청 및 store 업데이트
-      const { token } = await authAPI.refreshToken();
+      const { token } = await authAPI.changeRole();
       if (token) {
         setAuth(token);
       }
@@ -97,12 +131,30 @@ function UpdateProfile({ userInfo, onSave }) {
             alt="Profile Preview"
             className="w-24 h-24 border border-gray-300 rounded-md mr-4 object-cover"
           />
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleProfileImageChange}
-            className="text-gray-700"
-          />
+          <div className="flex flex-col gap-2">
+            <div className="relative">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleProfileImageChange}
+                className="hidden"
+                id="profileImageInput"
+              />
+              <label
+                htmlFor="profileImageInput"
+                className="w-24 h-[28px] flex items-center justify-center bg-blue-500 text-white rounded shadow hover:bg-blue-600 transition text-sm cursor-pointer px-1"
+              >
+                이미지 선택
+              </label>
+            </div>
+            <button
+              type="button"
+              onClick={handleResetProfileImage}
+              className="w-24 h-[28px] flex items-center justify-center bg-gray-500 text-white rounded shadow hover:bg-gray-600 transition text-sm"
+            >
+              초기화
+            </button>
+          </div>
         </div>
       </div>
       <div className="mb-4 ml-2">

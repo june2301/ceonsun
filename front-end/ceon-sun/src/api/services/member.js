@@ -46,11 +46,16 @@ export const memberAPI = {
   },
 
   // 프로필 수정
-  updateProfile: async (userId, profileData) => {
+  updateProfile: async (userId, formData) => {
     try {
       const response = await api.put(
         `/member-service/members/${userId}`,
-        profileData,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        },
       );
       return response.data;
     } catch (error) {
@@ -212,10 +217,9 @@ export const memberAPI = {
   },
 
   // 회원 카테고리 입력 (최초 등록)
-  createMemberCategories: async (userId, categoryIds) => {
+  createMemberCategories: async (categoryIds) => {
     try {
       const response = await api.post("/member-service/category", {
-        id: userId,
         categoryIds: categoryIds,
       });
       return response.data;
@@ -228,8 +232,7 @@ export const memberAPI = {
   // 회원 카테고리 수정
   updateMemberCategories: async (userId, categoryIds) => {
     try {
-      const response = await api.put("/member-service/category", {
-        id: userId,
+      const response = await api.put(`/member-service/category/${userId}`, {
         categoryIds: categoryIds,
       });
       return response.data;
@@ -240,10 +243,9 @@ export const memberAPI = {
   },
 
   // 학생 카드 생성
-  createStudentCard: async (userId, isExposed, description) => {
+  createStudentCard: async (isExposed, description) => {
     try {
       const response = await api.post("/member-service/students", {
-        id: userId,
         isExposed: isExposed,
         description: description,
       });
@@ -283,7 +285,6 @@ export const memberAPI = {
   createTeacherCard: async (teacherCardData) => {
     try {
       const response = await api.post("/member-service/teachers", {
-        id: Number(teacherCardData.id), // 사용자 ID
         description: teacherCardData.description,
         careerProgress: teacherCardData.careerProgress,
         careerDescription: teacherCardData.careerDescription,
@@ -291,7 +292,7 @@ export const memberAPI = {
         isWanted: teacherCardData.isWanted,
         bank: teacherCardData.bank,
         account: teacherCardData.account,
-        price: Number(teacherCardData.price), // 숫자로 변환
+        price: Number(teacherCardData.price),
       });
 
       return response.data;
@@ -332,6 +333,30 @@ export const memberAPI = {
       return response.data;
     } catch (error) {
       console.error("선생님 카드 수정 실패:", error);
+      throw error;
+    }
+  },
+
+  // 랭킹 목록 조회
+  getRankingList: async () => {
+    try {
+      const response = await api.get("/member-service/members/ranking");
+      console.log("랭킹 데이터 응답:", response.data);
+
+      return response.data.map((member) => ({
+        id: member.id,
+        profileImage: member.profileImage,
+        nickname: member.nickname,
+        age: member.age,
+        gender: member.gender === "MALE" ? "남자" : "여자",
+        subjects: member.categories.map((cat) => cat.name),
+        score: member.score.toFixed(0), // 소수점 제거
+        showDetail: true,
+        showAge: true,
+        showGender: true,
+      }));
+    } catch (error) {
+      console.error("랭킹 목록 조회 실패:", error);
       throw error;
     }
   },
