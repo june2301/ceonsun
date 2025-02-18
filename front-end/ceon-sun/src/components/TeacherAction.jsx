@@ -5,9 +5,11 @@ import Modal from "./Modal";
 import { chatAPI } from "../api/services/chat";
 import useAuthStore from "../stores/authStore";
 import { useNavigate, useLocation } from "react-router-dom";
+import { classAPI } from "../api/services/class";
 
 function TeacherAction({ teacher, previousTab }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isLessonModalOpen, setIsLessonModalOpen] = useState(false);
   const { user } = useAuthStore(); // 로그인한 사용자 정보 가져오기
   const navigate = useNavigate();
   const location = useLocation();
@@ -20,6 +22,10 @@ function TeacherAction({ teacher, previousTab }) {
 
   const handleInquiryClick = () => {
     setIsModalOpen(true);
+  };
+
+  const handleLessonClick = () => {
+    setIsLessonModalOpen(true);
   };
 
   const handleModalConfirm = async () => {
@@ -40,6 +46,24 @@ function TeacherAction({ teacher, previousTab }) {
 
   const handleModalClose = () => {
     setIsModalOpen(false);
+  };
+
+  const handleLessonModalConfirm = async () => {
+    try {
+      const response = await classAPI.createClassRequest(teacher.id);
+      if (response.status === 201) {
+        alert("과외 신청이 완료되었습니다.");
+      }
+    } catch (error) {
+      console.error("과외 신청 실패:", error);
+      alert("과외 신청에 실패했습니다. 다시 시도해주세요.");
+    } finally {
+      setIsLessonModalOpen(false);
+    }
+  };
+
+  const handleLessonModalClose = () => {
+    setIsLessonModalOpen(false);
   };
 
   return (
@@ -103,7 +127,10 @@ function TeacherAction({ teacher, previousTab }) {
             찜하기
           </button>
         </div>
-        <button className="bg-amber-200 hover:bg-amber-300 text-black rounded py-2 font-bold">
+        <button
+          onClick={handleLessonClick}
+          className="bg-amber-200 hover:bg-amber-300 text-black rounded py-2 font-bold"
+        >
           과외 신청하기
         </button>
       </div>
@@ -117,6 +144,17 @@ function TeacherAction({ teacher, previousTab }) {
         who="선생님과"
         what="문의 채팅방을 생성하시겠습니까?"
         notice="*문의 채팅방을 생성하면 생성 메시지가 전송됩니다."
+      />
+
+      {/* 과외 신청 모달 추가 */}
+      <Modal
+        isOpen={isLessonModalOpen}
+        onClose={handleLessonModalClose}
+        onConfirm={handleLessonModalConfirm}
+        nickname={teacher.nickname}
+        who="선생님에게"
+        what="과외 신청을 하시겠습니까?"
+        notice=""
       />
     </div>
   );
