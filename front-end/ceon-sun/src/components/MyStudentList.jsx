@@ -1,94 +1,110 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import TopBar from "./TopBar";
 import CardList from "./CardList";
+import { classAPI } from "../api/services/class";
 
 function MyStudentList() {
   const [selectedTab, setSelectedTab] = useState(0);
   const [expandedStudentIndex, setExpandedStudentIndex] = useState(null);
   const menuItems = ["신청 학생", "과외 학생", "종료 학생"];
+  const [studentLists, setStudentLists] = useState({
+    pending: [],
+    progress: [],
+    end: [],
+  });
 
-  // 예시 데이터
-  const studentLists = {
-    pending: [
-      {
-        nickname: "학생1",
-        name: "학생1",
-        age: "20",
-        gender: "남",
-        subjects: ["Python", "Java"],
-        profileImage: "",
-        introduction: "안녕하세요\n열심히 하겠습니다.",
+  // 신청 학생 리스트 조회
+  const fetchPendingStudents = async () => {
+    try {
+      const response = await classAPI.getPendingStudents();
+      const formattedStudents = response.content.map((student) => ({
+        id: student.id,
+        memberId: student.memberId,
+        nickname: student.nickname,
+        age: student.age,
+        gender: student.gender === "MALE" ? "남" : "여",
+        subjects: student.categories,
+        profileImage: student.profileImageUrl,
+        introduction: "", // API에서 제공하지 않는 정보
         studentStatus: "신청중",
         showDetail: true,
         showAcceptButton: true,
         showRejectButton: true,
-      },
-      {
-        nickname: "학생1",
-        name: "학생1",
-        age: "20",
-        gender: "남",
-        subjects: ["Python", "Java"],
-        profileImage: "",
-        introduction: "안녕하세요\n열심히 하겠습니다.",
-        studentStatus: "신청중",
-        showDetail: true,
-        showAcceptButton: true,
-        showRejectButton: true,
-      },
-      {
-        nickname: "학생1",
-        name: "학생1",
-        age: "20",
-        gender: "남",
-        subjects: ["Python", "Java"],
-        profileImage: "",
-        introduction: "안녕하세요\n열심히 하겠습니다.",
-        studentStatus: "신청중",
-        showDetail: true,
-        showAcceptButton: true,
-        showRejectButton: true,
-      },
-    ],
-    active: [
-      {
-        nickname: "학생3",
-        name: "학생3",
-        age: "22",
-        gender: "여",
-        subjects: ["Python", "JavaScript"],
-        profileImage: "",
-        introduction: "열심히 공부중입니다.",
-        studentStatus: "과외중",
-        showDetail: true,
-        showRemainLessons: true,
-        remainLessonsCnt: 5,
-        showClassroomButton: true,
-      },
-    ],
-    completed: [
-      {
-        nickname: "학생5",
-        name: "학생5",
-        age: "25",
-        gender: "남",
-        subjects: ["C++"],
-        profileImage: "",
-        introduction: "감사했습니다.",
-        studentStatus: "과외 종료",
-        showDetail: true,
-      },
-    ],
+      }));
+
+      setStudentLists((prev) => ({
+        ...prev,
+        pending: formattedStudents,
+      }));
+    } catch (error) {
+      console.error("신청 학생 목록 조회 실패:", error);
+    }
   };
+
+  // 과외/종료 학생 리스트 조회
+  const fetchContractedStudents = async () => {
+    try {
+      const response = await classAPI.getContractedStudents();
+
+      // PROGRESS와 END 상태에 따라 학생 데이터 분리
+      const progressStudents = [];
+      const endStudents = [];
+
+      response.content.forEach((student) => {
+        const baseStudent = {
+          id: student.id,
+          memberId: student.memberId,
+          nickname: student.nickname,
+          age: student.age,
+          gender: student.gender === "MALE" ? "남" : "여",
+          subjects: student.categories,
+          profileImage: student.profileImageUrl,
+          introduction: "",
+          showDetail: true,
+        };
+
+        if (student.status === "PROGRESS") {
+          progressStudents.push({
+            ...baseStudent,
+            studentStatus: "과외중",
+            showRemainLessons: true,
+            remainLessonsCnt: student.count,
+            showClassroomButton: true,
+          });
+        } else if (student.status === "END") {
+          endStudents.push({
+            ...baseStudent,
+            studentStatus: "과외 종료",
+          });
+        }
+      });
+
+      setStudentLists((prev) => ({
+        ...prev,
+        progress: progressStudents,
+        end: endStudents,
+      }));
+    } catch (error) {
+      console.error("과외/종료 학생 목록 조회 실패:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (selectedTab === 0) {
+      fetchPendingStudents();
+    } else if (selectedTab === 1 || selectedTab === 2) {
+      fetchContractedStudents();
+    }
+  }, [selectedTab]);
 
   const getStudentList = () => {
     switch (selectedTab) {
       case 0:
         return studentLists.pending;
       case 1:
-        return studentLists.active;
+        return studentLists.progress;
       case 2:
-        return studentLists.completed;
+        return studentLists.end;
       default:
         return [];
     }
