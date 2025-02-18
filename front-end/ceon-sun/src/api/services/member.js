@@ -160,6 +160,7 @@ export const memberAPI = {
       const teacherData = {
         id: teacherId,
         name: response.data.name,
+        profileImage: response.data.MultipartFile || "", // MultipartFile을 profileImage로 매핑
         nickname: response.data.nickname,
         gender: response.data.gender === "MALE" ? "남자" : "여자",
         age: response.data.age,
@@ -190,6 +191,7 @@ export const memberAPI = {
       const studentData = {
         id: studentId,
         name: response.data.name,
+        profileImage: response.data.MultipartFile || "", // MultipartFile을 profileImage로 매핑
         nickname: response.data.nickname,
         gender: response.data.gender === "MALE" ? "남자" : "여자",
         age: response.data.age,
