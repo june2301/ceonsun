@@ -47,7 +47,7 @@ public class MemberController {
 	public ResponseEntity<MemberDto.UpdateInfoResponse> updateMemberProfile(
 		@RequestHeader("X-User-ID") Long memberId,
 		@PathVariable Long id,
-		@RequestPart("nickname") String nickname,
+		@RequestPart(value = "nickname", required = false) String nickname,
 		@RequestPart(value = "profileImage", required = false) MultipartFile image) {
 		HeaderUtil.validateUserId(id, memberId);
 

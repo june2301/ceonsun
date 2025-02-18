@@ -125,6 +125,7 @@ public class MemberServiceImpl implements MemberService {
 				throw new RuntimeException(e);
 			}
 		} else {
+			s3Service.deleteImage(profile);
 			profile = "";
 		}
 

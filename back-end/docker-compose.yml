@@ -55,7 +55,7 @@ services:
       - chunsun-network
     healthcheck:
       test: [ "CMD", "redis-cli", "ping" ]
-      
+
   rabbitmq:
     image: rabbitmq:3-management
     container_name: rabbitmq
