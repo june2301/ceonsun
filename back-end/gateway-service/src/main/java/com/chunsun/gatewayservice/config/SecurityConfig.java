@@ -33,8 +33,7 @@ public class SecurityConfig {
 	private final JwtProvider jwtProvider;
 
 	private static final String[] PUBLIC_PATHS = {
-		"/", "favicon.ico", "/actuator/**", "/auth-service/**",
-		"/config-service/**", "/discovery-service/**"
+		"/", "favicon.ico", "/auth-service/**", "/discovery-service/**"
 	};
 
 	/*
@@ -72,6 +71,9 @@ public class SecurityConfig {
 					"/member-service/teachers/details/*")
 				.hasAnyRole(Role.STUDENT, Role.ADMIN)
 
+				.pathMatchers("/coupon-service/coupons/admin")
+				.hasAnyRole(Role.ADMIN)
+
 				.pathMatchers(HttpMethod.GET, "/member-service/students/details/*")
 				.hasAnyRole(Role.TEACHER, Role.ADMIN)
 
@@ -102,7 +104,7 @@ public class SecurityConfig {
 				.pathMatchers(HttpMethod.POST, "/class-service/class-requests")
 				.hasAnyRole(Role.STUDENT, Role.ADMIN)
 
-				.pathMatchers(HttpMethod.POST, "/class-service/class-requests/response")
+				.pathMatchers(HttpMethod.POST, "/class-service/class-requests/response", "/class-service/class/status/*")
 				.hasAnyRole(Role.TEACHER, Role.ADMIN)
 
 				.pathMatchers("/notification-service/coupons/send/all")
@@ -116,12 +118,6 @@ public class SecurityConfig {
 
 				.pathMatchers("/class-service/**")
 				.hasAnyRole(Role.USER)
-
-				.pathMatchers("/chat-service/**")
-				.hasAnyRole(Role.USER)
-
-				.pathMatchers("/notification-service/**")
-				.hasAnyRole(Role.ALL)
 
 				.pathMatchers("/coupon-service/**")
 				.hasAnyRole(Role.USER)
@@ -149,7 +145,7 @@ public class SecurityConfig {
 		config.setAllowedOriginPatterns(List.of("*"));
 		config.setAllowedHeaders(List.of("*"));
 		config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-		config.setExposedHeaders(List.of("Authorization", "X-User-ID"));
+		config.setExposedHeaders(List.of("Authorization", "X-Chunsun-Authorization", "X-User-ID"));
 
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 		source.registerCorsConfiguration("/**", config);
