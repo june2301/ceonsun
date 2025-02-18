@@ -37,7 +37,7 @@ const useWebSocketStore = create(
         }
 
         const pureToken = token.startsWith("Bearer ") ? token.slice(7) : token;
-        const socketUrl = `${WEBSOCKET_URL}/ws?token=${encodeURIComponent(
+        const socketUrl = `${WEBSOCKET_URL}/chat-service/ws?token=${encodeURIComponent(
           pureToken,
         )}`;
         const socket = new SockJS(socketUrl);
