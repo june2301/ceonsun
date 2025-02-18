@@ -4,7 +4,7 @@ import SockJS from "sockjs-client";
 import Stomp from "stompjs";
 import useAuthStore from "./authStore"; // authStore에서 토큰을 가져온다
 
-const WEBSOCKET_URL = import.meta.env.VITE_WEBSOCKET_URL;
+const WEBSOCKET_URL = import.meta.env.VITE_API_BASE_URL;
 
 const useWebSocketStore = create(
   persist(
