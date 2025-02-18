@@ -121,7 +121,7 @@ public class SecurityConfig {
 				.hasAnyRole(Role.USER)
 
 				.pathMatchers("/chat-service/**")
-				.hasAnyRole(Role.USER)
+				.hasAnyRole(Role.ALL)
 
 				.pathMatchers("/notification-service/**")
 				.hasAnyRole(Role.ALL)
