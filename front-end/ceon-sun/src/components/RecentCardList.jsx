@@ -3,6 +3,7 @@ import TeacherCard from "../components/TeacherCard";
 import StudentCard from "../components/StudentCard";
 import { PlayIcon } from "@heroicons/react/24/solid";
 import useAuthStore from "../stores/authStore";
+import { useNavigate } from "react-router-dom";
 
 function RecentCardList({
   title = "최근 등록된 수업",
@@ -12,6 +13,7 @@ function RecentCardList({
   const {
     user: { role },
   } = useAuthStore();
+  const navigate = useNavigate();
   const PAGE_SIZE = 4;
   const [currentPage, setCurrentPage] = useState(0);
 
@@ -19,8 +21,8 @@ function RecentCardList({
   const startIndex = currentPage * PAGE_SIZE;
   const pageData = recentCards.slice(startIndex, startIndex + PAGE_SIZE);
 
-  const handlePageClick = (pageIndex) => {
-    setCurrentPage(pageIndex);
+  const handleMoreClick = () => {
+    navigate("/cardlistpage");
   };
 
   return (
@@ -31,7 +33,7 @@ function RecentCardList({
         {onClickMore && (
           <button
             className="text-sm text-gray-500 hover:text-gray-700 flex items-center"
-            onClick={onClickMore}
+            onClick={handleMoreClick}
           >
             이동하기
             <PlayIcon className="w-3.5 h-3.5 ml-0.5" />

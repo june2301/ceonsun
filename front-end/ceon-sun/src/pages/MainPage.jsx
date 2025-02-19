@@ -5,64 +5,17 @@ import RecentCardList from "../components/RecentCardList";
 import RankingList from "../components/RankingList";
 import { memberAPI } from "../api/services/member";
 import { chatAPI } from "@/api/services/chat"; // 채팅방 목록 조회
+import { classAPI } from "../api/services/class"; // class API 추가
 import useAuthStore from "../stores/authStore";
 import useWebSocketStore from "../stores/websocketStore";
-
-// 예시 데이터 (임시)
-const myTeacherCards = [
-  {
-    nickname: "선선선",
-    subjects: ["Java", "Spring"],
-    remainLessonsCnt: 6,
-    showRemainLessons: true,
-    showClassroomButton: true,
-  },
-  {
-    nickname: "선선선",
-    subjects: ["Java", "Spring", "Python", "Node.js", "Vue.js"],
-    remainLessonsCnt: 2,
-    showRemainLessons: true,
-    showClassroomButton: true,
-  },
-  {
-    nickname: "선선선",
-    subjects: ["Java", "Spring"],
-    remainLessonsCnt: 3,
-    showRemainLessons: true,
-    showClassroomButton: true,
-  },
-];
-
-const myStudentCards = [
-  {
-    nickname: "홍길동",
-    subjects: ["Java", "Spring", "Python", "Node.js", "Vue.js"],
-    showRemainLessons: true,
-    remainLessonsCnt: 5,
-    showClassroomButton: true,
-  },
-  {
-    nickname: "김싸피",
-    subjects: ["Java", "Spring"],
-    showRemainLessons: true,
-    remainLessonsCnt: 1,
-    showClassroomButton: true,
-  },
-  {
-    nickname: "이이이",
-    subjects: ["Java", "Spring"],
-    showRemainLessons: true,
-    remainLessonsCnt: 2,
-    showClassroomButton: true,
-  },
-];
 
 function MainPage() {
   const {
     user: { userId, role },
   } = useAuthStore();
 
-  const [recentCards, setRecentCards] = useState([]); // 최근 등록된 카드 목록
+  const [contractedMembers, setContractedMembers] = useState([]); // 과외 연결된 멤버 리스트
+  const [recentCards, setRecentCards] = useState([]);
   const [rankingData, setRankingData] = useState([]);
 
   // 소켓 + 구독 관련
@@ -75,6 +28,35 @@ function MainPage() {
 
   // 이미 구독을 했는지 여부
   const [hasSubscribed, setHasSubscribed] = useState(false);
+
+  // 과외 연결된 멤버 리스트 조회
+  useEffect(() => {
+    const fetchContractedMembers = async () => {
+      try {
+        const response = await classAPI.getContractedMembers();
+        const formattedMembers = response.content.map((member) => ({
+          id: member.id, // 과외 PK
+          memberId: member.memberId, // 멤버 ID
+          nickname: member.nickname,
+          profileImage: member.profileImageUrl,
+          subjects: member.categories,
+          age: member.age,
+          gender: member.gender === "MALE" ? "남" : "여",
+          remainLessonsCnt: member.count,
+          showRemainLessons: true,
+          showClassroomButton: true,
+        }));
+        setContractedMembers(formattedMembers);
+      } catch (error) {
+        console.error("과외 연결된 멤버 목록 조회 실패:", error);
+        setContractedMembers([]);
+      }
+    };
+
+    if (role !== "GUEST") {
+      fetchContractedMembers();
+    }
+  }, [role]);
 
   // 1) 메인페이지 마운트 시점: 채팅방 구독 (중복 방지)
   useEffect(() => {
@@ -176,8 +158,8 @@ function MainPage() {
       <CardListMain
         userRole={role === "TEACHER" ? "teacher" : "student"}
         title={role === "TEACHER" ? "내 학생 목록" : "내 수강 목록"}
-        teacherCards={role === "STUDENT" ? myTeacherCards : []}
-        studentCards={role === "TEACHER" ? myStudentCards : []}
+        teacherCards={role === "STUDENT" ? contractedMembers : []}
+        studentCards={role === "TEACHER" ? contractedMembers : []}
         onClickMore={() => console.log("목록 전체 이동")}
       />
 

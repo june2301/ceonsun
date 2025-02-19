@@ -63,7 +63,7 @@ export const classAPI = {
   // 과외 상태 변경 (종료)
   endClass: async (contractedClassId) => {
     try {
-      const response = await api.patch(
+      const response = await api.put(
         `/class-service/class/status/${contractedClassId}`,
       );
       return response;
