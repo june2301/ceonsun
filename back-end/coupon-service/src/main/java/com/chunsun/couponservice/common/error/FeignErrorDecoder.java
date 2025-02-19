@@ -3,7 +3,6 @@ package com.chunsun.couponservice.common.error;
 import java.io.IOException;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Component;
 
 import com.chunsun.couponservice.common.exception.BusinessException;
 import com.fasterxml.jackson.databind.ObjectMapper;

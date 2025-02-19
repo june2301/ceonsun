@@ -6,7 +6,12 @@ import static com.chunsun.couponservice.presentation.dto.ControllerDto.*;
 
 import java.time.LocalDateTime;
 
+import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.constraints.Range;
+
 import com.chunsun.couponservice.application.dto.IssueCouponRecord;
+
+import jakarta.validation.constraints.NotNull;
 
 public class DtoConverter {
 

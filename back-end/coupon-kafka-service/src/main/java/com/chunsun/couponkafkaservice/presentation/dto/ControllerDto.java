@@ -23,7 +23,7 @@ public record ControllerDto() {
 		@NotNull(message = "쿠폰 유효기간(일)을 입력해주세요.")
 		Integer validDays,
 
-		@Range(min = 1, max = 10000)
+		@Range(min = 1, max = 50000)
 		@NotNull(message = "쿠폰 수량을 입력해주세요.")
 		Integer totalQuantity
 	) {
