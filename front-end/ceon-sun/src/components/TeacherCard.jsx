@@ -23,6 +23,7 @@ function TeacherCard({
   showClassroomButton = false,
   classroomButtonOnTop = false, // true면 상단, false면 하단
   showPaymentButton = false,
+  onPaymentClick, // 결제 버튼 클릭 핸들러 추가
   onDetailClick, // "자세히 보기" 버튼 클릭 시 호출할 함수
   // 랭킹 관련 props 추가
   isRanking = false,
@@ -198,6 +199,7 @@ function TeacherCard({
               {/* 수강료 결제하기 버튼 */}
               {showPaymentButton && (
                 <button
+                  onClick={() => onPaymentClick?.()}
                   className="
                     whitespace-nowrap
                     px-3 py-1.5

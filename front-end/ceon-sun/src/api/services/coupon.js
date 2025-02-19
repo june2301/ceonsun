@@ -28,4 +28,15 @@ export const couponAPI = {
       throw error;
     }
   },
+
+  // 보유 쿠폰 목록 조회
+  getMyCoupons: async () => {
+    try {
+      const response = await api.get("/coupon-kafka-service/coupons/members");
+      return response.data.coupons;
+    } catch (error) {
+      console.error("보유 쿠폰 목록 조회 실패:", error);
+      throw error;
+    }
+  },
 };

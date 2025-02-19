@@ -52,7 +52,7 @@ function TeacherAction({ teacher, previousTab }) {
     try {
       const response = await classAPI.createClassRequest(teacher.id);
       if (response.status === 201) {
-        alert("과외 신청이 완료되었습니다.");
+        alert("과외 신청이 접수되었습니다.");
       }
     } catch (error) {
       console.error("과외 신청 실패:", error);
