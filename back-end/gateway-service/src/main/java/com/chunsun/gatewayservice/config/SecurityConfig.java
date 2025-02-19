@@ -33,7 +33,7 @@ public class SecurityConfig {
 	private final JwtProvider jwtProvider;
 
 	private static final String[] PUBLIC_PATHS = {
-		"/", "favicon.ico", "/auth-service/**", "/discovery-service/**"
+		"/", "favicon.ico", "/auth-service/**", "/discovery-service/**", "/coupon-service/**",
 	};
 
 	/*
@@ -71,8 +71,8 @@ public class SecurityConfig {
 					"/member-service/teachers/details/*")
 				.hasAnyRole(Role.STUDENT, Role.ADMIN)
 
-				.pathMatchers("/coupon-service/coupons/admin")
-				.hasAnyRole(Role.ADMIN)
+				// .pathMatchers("/coupon-service/coupons/admin")
+				// .hasAnyRole(Role.ADMIN)
 
 				.pathMatchers(HttpMethod.GET, "/member-service/students/details/*")
 				.hasAnyRole(Role.TEACHER, Role.ADMIN)
@@ -110,8 +110,8 @@ public class SecurityConfig {
 				.pathMatchers("/notification-service/coupons/send/all")
 				.hasAnyRole(Role.ADMIN)
 
-				.pathMatchers(HttpMethod.POST, "/coupon-service/coupons")
-				.hasAnyRole(Role.STUDENT, Role.ADMIN)
+				// .pathMatchers(HttpMethod.POST, "/coupon-service/coupons")
+				// .hasAnyRole(Role.STUDENT, Role.ADMIN)
 
 				.pathMatchers("/rank-service/**")
 				.hasRole(Role.ADMIN)
@@ -119,8 +119,8 @@ public class SecurityConfig {
 				.pathMatchers("/class-service/**")
 				.hasAnyRole(Role.USER)
 
-				.pathMatchers("/coupon-service/**")
-				.hasAnyRole(Role.USER)
+				// .pathMatchers("/coupon-service/**")
+				// .hasAnyRole(Role.USER)
 
 				.pathMatchers("/payment-service/**")
 				.hasAnyRole(Role.STUDENT, Role.ADMIN)
