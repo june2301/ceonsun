@@ -8,6 +8,7 @@ import { ArrowLongLeftIcon } from "@heroicons/react/24/solid";
 import useAuthStore from "../stores/authStore";
 import { memberAPI } from "../api/services/member";
 import { classAPI } from "../api/services/class";
+import { useNavigate } from "react-router-dom";
 
 function MyLecture({ role }) {
   const [isMyDetailMode, setIsMyDetailMode] = useState(false);
@@ -18,6 +19,7 @@ function MyLecture({ role }) {
   const [studentCard, setStudentCard] = useState(null);
   const { user } = useAuthStore();
   const [teacherList, setTeacherList] = useState([]);
+  const navigate = useNavigate();
 
   // userInfo와 studentCard 데이터 조회
   useEffect(() => {
@@ -48,16 +50,15 @@ function MyLecture({ role }) {
       try {
         if (role === "STUDENT") {
           const response = await classAPI.getContractedMembers();
-          // API 응답 데이터를 CardList 컴포넌트에 맞는 형식으로 변환
           const formattedTeachers = response.content.map((teacher) => ({
-            id: teacher.id,
-            memberId: teacher.memberId, // TeacherDetail 조회 시 필요
+            id: teacher.id, // 체결된 수업 ID
+            memberId: teacher.memberId, // 선생님 ID
             nickname: teacher.nickname,
             profileImage: teacher.profileImageUrl,
             age: teacher.age,
             gender: teacher.gender === "MALE" ? "남" : "여",
             subjects: teacher.categories,
-            remainLessonsCnt: teacher.count, // 남은 수업 횟수
+            remainLessonsCnt: teacher.count,
             showDetail: true,
             showAge: true,
             showGender: true,
@@ -147,6 +148,23 @@ function MyLecture({ role }) {
   const handleUpdateComplete = async () => {
     await refreshStudentCard();
     setIsUpdateMode(false); // 수정 모드 종료
+  };
+
+  // 결제 페이지 이동 핸들러 수정
+  const handlePaymentClick = async (card) => {
+    try {
+      // 선생님 상세 정보 조회하여 가격 정보 가져오기
+      const teacherDetail = await memberAPI.getTeacherDetail(card.memberId);
+
+      navigate("/payment", {
+        state: {
+          contractedClassId: card.id, // 수업 ID를 contractedClassId로 변경
+          price: teacherDetail.price,
+        },
+      });
+    } catch (error) {
+      console.error("선생님 상세 정보 조회 실패:", error);
+    }
   };
 
   // 렌더링 분기
@@ -263,6 +281,7 @@ function MyLecture({ role }) {
                     type="teacher"
                     showDetail={true}
                     onDetailClick={handleTeacherDetail}
+                    onPaymentClick={handlePaymentClick}
                   />
                 </div>
               </div>

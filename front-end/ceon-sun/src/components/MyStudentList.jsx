@@ -20,6 +20,16 @@ function MyStudentList() {
     student: null,
     action: null, // 'accept' 또는 'reject'
   });
+  const [endClassModalConfig, setEndClassModalConfig] = useState({
+    isOpen: false,
+    student: null,
+  });
+
+  // 알림용 Modal state 추가
+  const [notificationModal, setNotificationModal] = useState({
+    isOpen: false,
+    message: "",
+  });
 
   // TopBar의 탭 선택 핸들러 추가
   const handleTabSelect = (index) => {
@@ -207,9 +217,54 @@ function MyStudentList() {
     // TODO: 수업방 입장 처리 로직
   };
 
+  // 과외 종료 버튼 클릭 핸들러
   const handleEndClass = (student) => {
-    console.log("과외 종료:", student);
-    // TODO: 과외 종료 처리 로직
+    setEndClassModalConfig({
+      isOpen: true,
+      student: student,
+    });
+  };
+
+  // 과외 종료 Modal 닫기
+  const handleEndClassModalClose = () => {
+    setEndClassModalConfig({
+      isOpen: false,
+      student: null,
+    });
+  };
+
+  // 과외 종료 확인
+  const handleEndClassConfirm = async () => {
+    try {
+      console.log("과외 종료 요청:", {
+        studentNickname: endClassModalConfig.student?.nickname,
+        contractedClassId: endClassModalConfig.student?.id,
+      });
+
+      const response = await classAPI.endClass(endClassModalConfig.student.id);
+
+      if (response.status === 204) {
+        handleEndClassModalClose();
+        // 알림 Modal 열기
+        setNotificationModal({
+          isOpen: true,
+          message: "과외가 종료되었습니다.",
+        });
+        // 목록 새로고침
+        fetchContractedStudents();
+      }
+    } catch (error) {
+      console.error("과외 종료 실패:", error);
+      alert("과외 종료 처리 중 오류가 발생했습니다.");
+    }
+  };
+
+  // 알림 Modal 닫기
+  const handleNotificationClose = () => {
+    setNotificationModal({
+      isOpen: false,
+      message: "",
+    });
   };
 
   return (
@@ -250,6 +305,27 @@ function MyStudentList() {
           modalConfig.action === "accept" ? "수락" : "거절"
         }하시겠습니까?`}
         notice=""
+      />
+
+      <Modal
+        isOpen={endClassModalConfig.isOpen}
+        onClose={handleEndClassModalClose}
+        onConfirm={handleEndClassConfirm}
+        nickname={endClassModalConfig.student?.nickname || ""}
+        who="학생과의"
+        what="과외를 종료하시겠습니까?"
+        notice={
+          "*과외 종료 후 다시 과외를 시작하려면\n과외 신청 과정이 필요합니다."
+        }
+      />
+
+      {/* 알림용 Modal 추가 */}
+      <Modal
+        isOpen={notificationModal.isOpen}
+        onClose={handleNotificationClose}
+        onConfirm={handleNotificationClose}
+        what={notificationModal.message}
+        showCancelButton={false} // 확인 버튼만 표시
       />
     </div>
   );
