@@ -7,6 +7,8 @@ import TeacherDetail from "./TeacherDetail";
 import { ArrowLongLeftIcon } from "@heroicons/react/24/solid";
 import useAuthStore from "../stores/authStore";
 import { memberAPI } from "../api/services/member";
+import { classAPI } from "../api/services/class";
+import { useNavigate } from "react-router-dom";
 
 function MyLecture({ role }) {
   const [isMyDetailMode, setIsMyDetailMode] = useState(false);
@@ -16,66 +18,8 @@ function MyLecture({ role }) {
   const [userInfo, setUserInfo] = useState(null);
   const [studentCard, setStudentCard] = useState(null);
   const { user } = useAuthStore();
-
-  // DB에서 가져온 선생님 카드 리스트 데이터 (예시 데이터)
-  const teacherList = [
-    {
-      id: 1,
-      nickname: "Teacher1",
-      name: "Teacher One",
-      subjects: ["Java", "C++"],
-      profileImage: "",
-      showDetail: true,
-      showAge: true,
-      age: 35,
-      showGender: true,
-      gender: "여성",
-      showRemainLessons: true,
-      remainLessonsCnt: 5,
-      showClassroomButton: true,
-      classroomButtonOnTop: true,
-      showPaymentButton: true,
-      introduction:
-        "안녕하세요, 저는 Teacher1입니다. 열정적으로 학생들을 지도하고 있습니다.",
-      experience:
-        "2010 ~ 2015: Company A\n2010 ~ 2015: Company A\n2010 ~ 2015: Company A\n2010 ~ 2015: Company A\n2010 ~ 2015: Company A\n2015 ~ 2020: Company B\n2015 ~ 2020: Company B\n2015 ~ 2020: Company B\n2015 ~ 2020: Company B\n2015 ~ 2020: Company B",
-      lessonFee: 50000,
-      lessonInfo: "주 3회, 1시간 수업 진행, 온라인/오프라인 가능",
-      materials: [
-        { date: "2023.04.01(토)", fileUrl: "/files/teacher1_lesson1.pdf" },
-        { date: "2023.04.08(토)", fileUrl: "/files/teacher1_lesson2.pdf" },
-      ],
-      onDetailClick: () => console.log("Teacher1 자세히 보기 클릭"),
-    },
-    {
-      id: 2,
-      nickname: "Teacher2",
-      name: "Teacher Two",
-      subjects: ["Python", "JavaScript"],
-      profileImage: "",
-      showDetail: true,
-      showAge: true,
-      age: 40,
-      showGender: true,
-      gender: "남성",
-      showRemainLessons: true,
-      remainLessonsCnt: 3,
-      showClassroomButton: true,
-      classroomButtonOnTop: true,
-      showPaymentButton: true,
-      introduction:
-        "안녕하세요, 저는 Teacher2입니다. 다양한 프로젝트 경험을 바탕으로 수업을 진행합니다.",
-      experience: "2005 ~ 2010: Company C\n2010 ~ 2018: Company D",
-      lessonFee: 60000,
-      lessonInfo: "주 2회, 90분 수업 진행, 커리큘럼 맞춤형 수업",
-      materials: [
-        { date: "2023.04.02(일)", fileUrl: "/files/teacher2_lessonA.pdf" },
-        { date: "2023.04.09(일)", fileUrl: "/files/teacher2_lessonB.pdf" },
-      ],
-      onDetailClick: () => console.log("Teacher2 자세히 보기 클릭"),
-    },
-    // 추가 데이터가 있을 경우 목록이 길어집니다.
-  ];
+  const [teacherList, setTeacherList] = useState([]);
+  const navigate = useNavigate();
 
   // userInfo와 studentCard 데이터 조회
   useEffect(() => {
@@ -99,6 +43,39 @@ function MyLecture({ role }) {
 
     fetchData();
   }, [user.userId, role]);
+
+  // 과외 연결된 선생님 리스트 조회
+  useEffect(() => {
+    const fetchTeacherList = async () => {
+      try {
+        if (role === "STUDENT") {
+          const response = await classAPI.getContractedMembers();
+          const formattedTeachers = response.content.map((teacher) => ({
+            id: teacher.id, // 체결된 수업 ID
+            memberId: teacher.memberId, // 선생님 ID
+            nickname: teacher.nickname,
+            profileImage: teacher.profileImageUrl,
+            age: teacher.age,
+            gender: teacher.gender === "MALE" ? "남" : "여",
+            subjects: teacher.categories,
+            remainLessonsCnt: teacher.count,
+            showDetail: true,
+            showAge: true,
+            showGender: true,
+            showRemainLessons: true,
+            showClassroomButton: true,
+            classroomButtonOnTop: true,
+            showPaymentButton: true,
+          }));
+          setTeacherList(formattedTeachers);
+        }
+      } catch (error) {
+        console.error("선생님 목록 조회 실패:", error);
+      }
+    };
+
+    fetchTeacherList();
+  }, [role]);
 
   // 학생 카드 데이터 조합
   const myStudentCard = useMemo(() => {
@@ -133,10 +110,22 @@ function MyLecture({ role }) {
     setIsUpdateMode(true);
   };
 
-  // 선생님 상세 보기 모드 전환 (시나리오 2: MyLecture 내에서 선생님 "자세히 보기" 버튼 클릭 시)
-  const handleTeacherDetail = (card) => {
-    setSelectedTeacher(card);
-    setTeacherDetailMode(true);
+  // 선생님 상세 보기 모드 전환
+  const handleTeacherDetail = async (card) => {
+    try {
+      // memberAPI를 통해 선생님 상세 정보 조회
+      const teacherDetail = await memberAPI.getTeacherDetail(card.memberId);
+
+      // 상세 정보에 remainLessonsCnt 추가 (getContractedMembers에서 가져온 count 값 사용)
+      setSelectedTeacher({
+        ...teacherDetail,
+        remainLessonsCnt: card.remainLessonsCnt, // card에서 가져온 count 값
+        showClassButton: true,
+      });
+      setTeacherDetailMode(true);
+    } catch (error) {
+      console.error("선생님 상세 정보 조회 실패:", error);
+    }
   };
 
   // 선생님 상세 보기 모드 종료
@@ -159,6 +148,23 @@ function MyLecture({ role }) {
   const handleUpdateComplete = async () => {
     await refreshStudentCard();
     setIsUpdateMode(false); // 수정 모드 종료
+  };
+
+  // 결제 페이지 이동 핸들러 수정
+  const handlePaymentClick = async (card) => {
+    try {
+      // 선생님 상세 정보 조회하여 가격 정보 가져오기
+      const teacherDetail = await memberAPI.getTeacherDetail(card.memberId);
+
+      navigate("/payment", {
+        state: {
+          contractedClassId: card.id, // 수업 ID를 contractedClassId로 변경
+          price: teacherDetail.price,
+        },
+      });
+    } catch (error) {
+      console.error("선생님 상세 정보 조회 실패:", error);
+    }
   };
 
   // 렌더링 분기
@@ -230,7 +236,7 @@ function MyLecture({ role }) {
                     gender={myStudentCard.gender}
                     profileImage={myStudentCard.profileImage}
                     categoryIds={myStudentCard.categoryIds}
-                    introduction={myStudentCard.introduction}
+                    introduction={myStudentCard.description}
                     cardPublic={myStudentCard.cardPublic}
                     updateMode={true}
                     onClose={() => setIsUpdateMode(false)}
@@ -275,6 +281,7 @@ function MyLecture({ role }) {
                     type="teacher"
                     showDetail={true}
                     onDetailClick={handleTeacherDetail}
+                    onPaymentClick={handlePaymentClick}
                   />
                 </div>
               </div>

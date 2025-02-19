@@ -19,6 +19,7 @@ function CardList({
   onInquiry,
   onEndClass,
   isRanking = false,
+  onPaymentClick,
 }) {
   return (
     <div className="flex flex-col gap-4">
@@ -32,8 +33,9 @@ function CardList({
               age={card.age}
               gender={card.gender}
               subjects={card.subjects}
+              onDetailClick={() => onDetailClick?.(card)}
+              onPaymentClick={() => onPaymentClick?.(card)}
               showDetail={showDetail}
-              onDetailClick={() => onDetailClick && onDetailClick(card)}
               showAge={card.showAge}
               showGender={card.showGender}
               showRemainLessons={card.showRemainLessons}

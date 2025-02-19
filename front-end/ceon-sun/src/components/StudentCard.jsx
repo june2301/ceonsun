@@ -20,6 +20,9 @@ function StudentCard({
   showAcceptButton = false, // "수락하기"
   showRejectButton = false, // "거절하기"
   onDetailClick, // "자세히 보기" 버튼 클릭 시 호출할 함수
+  onClassEnter, // "수업방 접속" 버튼 클릭 시 호출할 함수
+  onAccept, // "수락하기" 버튼 클릭 시 호출할 함수
+  onReject, // "거절하기" 버튼 클릭 시 호출할 함수
 
   // 새롭게 추가한 prop (본인 카드인 경우)
   isOwner = false,
@@ -156,21 +159,30 @@ function StudentCard({
             <div className="flex justify-end space-x-2 ml-auto">
               {/* 수업방 접속 */}
               {showClassroomButton && (
-                <button className="whitespace-nowrap text-sm text-gray-700 font-semibold rounded px-3 py-2 border-2 border-gray-300 bg-white hover:bg-gray-300 mr-1">
+                <button
+                  onClick={onClassEnter}
+                  className="whitespace-nowrap text-sm text-gray-700 font-semibold rounded px-3 py-2 border-2 border-gray-300 bg-white hover:bg-gray-300 mr-1"
+                >
                   수업방 접속
                 </button>
               )}
 
               {/* 수락하기 */}
               {showAcceptButton && (
-                <button className="whitespace-nowrap text-sm font-semibold rounded px-3 py-2 bg-blue-400 hover:bg-blue-500 text-white">
+                <button
+                  onClick={onAccept}
+                  className="whitespace-nowrap text-sm font-semibold rounded px-3 py-2 bg-blue-400 hover:bg-blue-500 text-white"
+                >
                   수락하기
                 </button>
               )}
 
               {/* 거절하기 */}
               {showRejectButton && (
-                <button className="whitespace-nowrap text-sm font-semibold rounded px-3 py-2 bg-gray-400 hover:bg-gray-600 text-white">
+                <button
+                  onClick={onReject}
+                  className="whitespace-nowrap text-sm font-semibold rounded px-3 py-2 bg-gray-400 hover:bg-gray-600 text-white"
+                >
                   거절하기
                 </button>
               )}
