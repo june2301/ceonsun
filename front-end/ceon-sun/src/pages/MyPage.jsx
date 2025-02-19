@@ -7,11 +7,15 @@ import MyInfo from "../components/MyInfo";
 import MyLecture from "../components/MyLecture";
 import MyClass from "../components/MyClass";
 import MyStudentList from "../components/MyStudentList";
+import { useLocation } from "react-router-dom";
 
 function MyPage() {
   const { user } = useAuthStore();
   const role = user.role; // store에서 role 가져오기
-  const [selectedMenu, setSelectedMenu] = useState("내 정보");
+  const location = useLocation();
+  const [selectedMenu, setSelectedMenu] = useState(
+    location.state?.selectedMenu || "내 정보",
+  );
   const [userInfo, setUserInfo] = useState(null);
 
   useEffect(() => {

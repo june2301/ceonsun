@@ -59,4 +59,17 @@ export const classAPI = {
       throw error;
     }
   },
+
+  // 과외 상태 변경 (종료)
+  endClass: async (contractedClassId) => {
+    try {
+      const response = await api.patch(
+        `/class-service/class/status/${contractedClassId}`,
+      );
+      return response;
+    } catch (error) {
+      console.error("과외 종료 요청 실패:", error);
+      throw error;
+    }
+  },
 };
