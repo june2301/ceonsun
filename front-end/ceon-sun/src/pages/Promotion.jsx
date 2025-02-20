@@ -49,7 +49,7 @@ function Promotion() {
   }
 
   return (
-    <div className="min-h-screen h-full overflow-y-auto">
+    <div className="h-[calc(100vh-96px)] overflow-y-auto custom-scrollbar">
       <div className="max-w-screen-xl mx-auto px-4">
         <div className="max-w-[70%] mx-auto text-center relative">
           <img
@@ -59,7 +59,7 @@ function Promotion() {
           />
         </div>
       </div>
-      <div className="flex flex-col items-center gap-10 mt-6 pb-20">
+      <div className="flex flex-col items-center gap-10 mt-6">
         {coupons.map((coupon) => (
           <div key={coupon.couponId} className="relative w-1/3">
             <p

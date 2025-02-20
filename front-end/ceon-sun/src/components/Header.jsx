@@ -150,7 +150,7 @@ const Header = () => {
   };
 
   return (
-    <div className="w-full bg-gray-100">
+    <div className="w-full bg-white border-b-2 border-gray-300">
       <div className="max-w-[940px] mx-auto flex items-center justify-between h-24 px-4">
         {/* 로고 */}
         <div className="flex items-center">
@@ -160,7 +160,7 @@ const Header = () => {
         </div>
 
         {/* 메뉴 */}
-        <div className="flex gap-12">{renderMenus()}</div>
+        <div className="flex gap-20 ml-8">{renderMenus()}</div>
 
         {/* 사용자 정보 */}
         <div className="flex items-center gap-6">

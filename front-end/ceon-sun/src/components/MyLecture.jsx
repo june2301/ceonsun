@@ -192,7 +192,7 @@ function MyLecture({ role }) {
 
   // 렌더링 분기
   if (teacherDetailMode) {
-    const topBarItems = ["선생님 소개", "수업 설명", "수업 자료"];
+    const topBarItems = ["선생님 소개", "수업 설명"];
     return (
       <div className="h-full flex flex-col">
         <div className="flex-none ml-4 my-3 flex items-center justify-between">
@@ -225,6 +225,7 @@ function MyLecture({ role }) {
             showClassButton={true}
             onClassEnter={handleClassEnter}
             onBack={handleTeacherDetailClose}
+            isMyLecture={true}
           />
         </div>
       </div>

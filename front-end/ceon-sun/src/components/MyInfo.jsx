@@ -38,11 +38,11 @@ function MyInfo({
             )}
           </div>
           <hr className="mt-4 border-t-2 border-gray-300" />
-          {role === "TEACHER" && (
+          {/* {role === "TEACHER" && (
             <div className="mt-4 font-semibold text-gray-700 text-center">
               수업 이력 : 과외 체결 횟수 {teacherLessonCount}회
             </div>
-          )}
+          )} */}
         </>
       )}
     </div>

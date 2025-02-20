@@ -9,6 +9,7 @@ function TeacherDetail({
   topBarItems,
   showClassButton = false,
   onClassEnter,
+  isMyLecture = false,
 }) {
   // 기본 탭 배열 (3개 탭)
   const defaultTabs = ["선생님 소개", "수업 설명", "수업 자료"];
@@ -17,8 +18,25 @@ function TeacherDetail({
   const [selectedTab, setSelectedTab] = useState(0);
 
   let mainContent;
-  if (items.length === 2) {
-    // 탭이 2개인 경우: TeacherInfoA와 TeacherInfoB만 렌더링
+  if (isMyLecture) {
+    // MyLecture에서 접근할 때: 2개 탭이지만 3개 탭 모드의 props 전달
+    mainContent =
+      selectedTab === 0 ? (
+        <TeacherInfoA
+          description={teacher.description}
+          careerDescription={teacher.careerDescription}
+          teacher={teacher}
+          showProfile={true}
+        />
+      ) : (
+        <TeacherInfoB
+          subjects={teacher.subjects}
+          price={teacher.price}
+          careerProgress={teacher.careerProgress}
+        />
+      );
+  } else if (items.length === 2) {
+    // 일반적인 2개 탭 모드
     mainContent =
       selectedTab === 0 ? (
         <TeacherInfoA
@@ -33,7 +51,7 @@ function TeacherDetail({
         />
       );
   } else {
-    // 기본: 3개의 탭 사용
+    // 기본: 3개 탭 모드
     mainContent =
       selectedTab === 0 ? (
         <TeacherInfoA

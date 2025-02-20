@@ -32,7 +32,7 @@ const PromotionLink = () => {
 
   return (
     <div
-      className="bg-blue-100 w-full py-4 mb-6 cursor-pointer overflow-hidden"
+      className="bg-gray-100 w-full py-4 mb-6 cursor-pointer overflow-hidden"
       onClick={handleClick}
     >
       <div className="max-w-screen-xl mx-auto px-4">
