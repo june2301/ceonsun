@@ -19,7 +19,7 @@ spring:
 
   cloud:
     config:
-      uri: http://config-service:8888
+      uri: http://config-service:8889
       server:
         git:
           uri: https://lab.ssafy.com/s12-webmobile1-sub1/S12P11A505.git
