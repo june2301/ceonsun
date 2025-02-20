@@ -5,6 +5,8 @@ import Filter from "../components/Filter";
 import TopBar from "../components/TopBar";
 import CardList from "../components/CardList";
 import { memberAPI } from "../api/services/member";
+import { chatAPI } from "../api/services/chat";
+import Modal from "../components/Modal";
 
 function CardListPage() {
   const navigate = useNavigate();
@@ -36,6 +38,10 @@ function CardListPage() {
 
   // 학생 카드 상세 정보를 저장할 상태
   const [expandedStudentData, setExpandedStudentData] = useState(null);
+
+  // 모달 상태 관리 추가
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedStudent, setSelectedStudent] = useState(null);
 
   // API 호출 함수
   const fetchCardList = async () => {
@@ -124,6 +130,25 @@ function CardListPage() {
     }
   };
 
+  // 문의하기 버튼 클릭 시 모달 표시
+  const handleInquiryClick = (studentData) => {
+    setSelectedStudent(studentData);
+    setIsModalOpen(true);
+  };
+
+  // 모달 확인 버튼 클릭 시 채팅방 생성
+  const handleInquiryConfirm = async () => {
+    try {
+      const response = await chatAPI.createChatRoom(selectedStudent.id);
+      console.log("채팅방 생성 성공:", response);
+      setIsModalOpen(false);
+      // 추가 처리 (예: 채팅방으로 이동)
+    } catch (error) {
+      console.error("채팅방 생성 실패:", error);
+      alert("문의하기 기능 실행 중 오류가 발생했습니다.");
+    }
+  };
+
   return (
     <div className="h-[calc(100vh-96px)] w-full flex flex-col overflow-hidden">
       <div className="flex-1 flex justify-center overflow-hidden pt-5">
@@ -169,11 +194,23 @@ function CardListPage() {
                 isBackArrow={false}
                 isInquiryMode={cardType === "student"}
                 isRanking={role === "STUDENT" && selectedMenu === 2}
+                onInquiry={handleInquiryClick} // 모달 표시 함수로 변경
               />
             )}
           </div>
         </div>
       </div>
+
+      {/* 모달 추가 */}
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onConfirm={handleInquiryConfirm}
+        nickname={selectedStudent?.nickname}
+        who="학생과"
+        what="문의 채팅방을 생성하겠습니까?"
+        notice="*문의 채팅방을 생성하면 생성 메시지가 전송됩니다."
+      />
     </div>
   );
 }

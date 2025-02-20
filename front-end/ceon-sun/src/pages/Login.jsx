@@ -4,6 +4,7 @@ import useAuthStore from "../stores/authStore";
 import useWebSocketStore from "../stores/websocketStore";
 import logo from "../assets/img/logo.png";
 import kakao_login from "../assets/img/kakao_login.png";
+import loginBg from "../assets/img/login.png"; // 배경 이미지 import
 import {
   connectNotification,
   checkUnreadNotifications,
@@ -68,8 +69,20 @@ const Login = () => {
   }, [location, navigate, kakaoLogin, connectWebSocket]);
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-gray-100">
-      <div className="w-[480px] h-[360px] bg-white rounded-lg shadow-md p-8 flex flex-col justify-around">
+    <div
+      className="min-h-screen w-full flex items-center justify-center bg-gray-100 relative"
+      style={{
+        backgroundImage: `url(${loginBg})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+      }}
+    >
+      {/* 배경 오버레이 (선택사항: 배경을 어둡게 하여 로그인 창을 더 잘 보이게 함) */}
+      <div className="absolute inset-0 bg-black bg-opacity-5"></div>
+
+      {/* 로그인 창 */}
+      <div className="w-[480px] h-[360px] bg-white rounded-lg shadow-md p-8 flex flex-col justify-around relative z-10">
         <div className="flex flex-col items-center">
           <img src={logo} alt="ChunSun Logo" className="w-[150px] mb-6" />
           <p className="text-lg text-gray-700 font-bold">

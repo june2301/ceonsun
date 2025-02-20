@@ -129,7 +129,7 @@ function StudentCardDetail({
             </span>
           )}
           {/* 닫기 버튼 */}
-          <button onClick={onClose} title="닫기">
+          <button onClick={onClose}>
             <ArrowUpIcon className="w-5 h-5 text-gray-600 hover:text-gray-800" />
           </button>
         </div>
