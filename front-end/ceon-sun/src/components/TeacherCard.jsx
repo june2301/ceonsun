@@ -28,6 +28,7 @@ function TeacherCard({
   // 랭킹 관련 props 추가
   isRanking = false,
   rankingNumber = null,
+  onClassEnter, // 수업방 입장 핸들러 prop 추가
 }) {
   // 하단 영역(구분선 아래)을 표시해야 하는지 여부
   const bottomVisible =
@@ -140,10 +141,11 @@ function TeacherCard({
           </div>
         </div>
 
-        {/* 상단 "수업방 접속" 버튼 (옵션, 절대 배치) */}
+        {/* 상단 "수업방 접속" 버튼 수정 */}
         {classroomButtonOnTop && showClassroomButton && (
           <div className="absolute bottom-0 right-0">
             <button
+              onClick={() => onClassEnter?.()}
               className="
                 whitespace-nowrap
                 text-sm 
@@ -177,9 +179,10 @@ function TeacherCard({
               </span>
             )}
             <div className="flex space-x-2">
-              {/* 하단 수업방 접속 버튼 */}
+              {/* 하단 수업방 접속 버튼 수정 */}
               {!classroomButtonOnTop && showClassroomButton && (
                 <button
+                  onClick={() => onClassEnter?.()}
                   className="
                     whitespace-nowrap
                     text-sm 

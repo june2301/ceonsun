@@ -35,6 +35,7 @@ function CardList({
               subjects={card.subjects}
               onDetailClick={() => onDetailClick?.(card)}
               onPaymentClick={() => onPaymentClick?.(card)}
+              onClassEnter={() => onClassEnter?.(card)}
               showDetail={showDetail}
               showAge={card.showAge}
               showGender={card.showGender}

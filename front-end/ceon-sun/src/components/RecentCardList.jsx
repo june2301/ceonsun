@@ -25,6 +25,10 @@ function RecentCardList({
     navigate("/cardlistpage");
   };
 
+  const handlePageClick = (pageIndex) => {
+    setCurrentPage(pageIndex);
+  };
+
   return (
     <section className="mb-8 max-w-[920px] mx-auto px-2">
       {/* 타이틀 + 이동하기 버튼 */}
