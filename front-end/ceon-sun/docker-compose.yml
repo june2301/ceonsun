@@ -16,7 +16,6 @@ services:
   certbot:
     image: certbot/certbot
     container_name: certbot
-    restart: always
     entrypoint: >
       sh -c "if [ ! -f /etc/letsencrypt/live/i12a505.p.ssafy.io/fullchain.pem ]; then
       openssl req -x509 -nodes -newkey rsa:2048 -days 1 \
