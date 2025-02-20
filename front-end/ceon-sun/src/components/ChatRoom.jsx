@@ -105,7 +105,7 @@ function ChatRoom({ room, onBack }) {
       {!isMine && (
         <div className="flex-shrink-0 mr-2">
           <img
-            src={message.profileImage || DefaultProfile}
+            src={room.partner.profileImage || DefaultProfile}
             alt="프로필"
             className="w-9 h-9 rounded-md border border-gray-200"
           />
@@ -114,7 +114,7 @@ function ChatRoom({ room, onBack }) {
       <div className={`flex flex-col ${isMine ? "items-end" : "items-start"}`}>
         {!isMine && (
           <span className="text-sm text-gray-700 mb-1">
-            {message.sender || message.senderId}
+            {room.partner.name}
           </span>
         )}
         <div
@@ -137,7 +137,7 @@ function ChatRoom({ room, onBack }) {
         <button onClick={onBack}>
           <ArrowLeftIcon className="w-6 h-6 text-gray-600" />
         </button>
-        <span className="font-semibold text-md">{room.name}</span>
+        <span className="font-semibold text-md">{room.partner.name}</span>
         <button>
           <Cog6ToothIcon className="w-6 h-6 text-gray-600" />
         </button>

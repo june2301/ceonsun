@@ -160,7 +160,7 @@ export const memberAPI = {
       const teacherData = {
         id: teacherId,
         name: response.data.name,
-        profileImage: response.data.MultipartFile || "", // MultipartFile을 profileImage로 매핑
+        profileImage: response.data.profileImage || "", // MultipartFile을 profileImage로 매핑
         nickname: response.data.nickname,
         gender: response.data.gender === "MALE" ? "남자" : "여자",
         age: response.data.age,
@@ -172,6 +172,7 @@ export const memberAPI = {
         totalClassCount: response.data.totalClassCount,
         totalClassHours: response.data.totalClassHours,
       };
+      console.log("선생님 상세 정보:", teacherData);
 
       return teacherData;
     } catch (error) {
@@ -191,13 +192,14 @@ export const memberAPI = {
       const studentData = {
         id: studentId,
         name: response.data.name,
-        profileImage: response.data.MultipartFile || "", // MultipartFile을 profileImage로 매핑
+        profileImage: response.data.profileImage || "", // MultipartFile을 profileImage로 매핑
         nickname: response.data.nickname,
         gender: response.data.gender === "MALE" ? "남자" : "여자",
         age: response.data.age,
         subjects: response.data.categories.map((cat) => cat.name),
         description: response.data.description,
       };
+      console.log("학생 상세 정보:", studentData);
 
       return studentData;
     } catch (error) {

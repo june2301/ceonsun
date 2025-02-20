@@ -201,6 +201,7 @@ const OpenViduSession = () => {
     session.current
       .connect(token, { clientData: nickname })
       .then(() => {
+        console.log("세션 연결 성공");
         // 카메라/오디오 퍼블리셔
         const localPublisher = OV.current.initPublisher(undefined, {
           publishVideo: true,

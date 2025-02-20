@@ -33,7 +33,13 @@ function ChatRoomList({ onClose }) {
   };
 
   const handleRoomSelect = (room) => {
-    setSelectedRoom(room);
+    setSelectedRoom({
+      ...room,
+      partner: {
+        name: room.name,
+        profileImage: room.profileImage,
+      },
+    });
   };
 
   const handleBack = () => {
