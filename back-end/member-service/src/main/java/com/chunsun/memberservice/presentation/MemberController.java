@@ -62,8 +62,6 @@ public class MemberController {
 	public ResponseEntity<MemberDto.GetInfoResponse> getMemberProfile(
 		@RequestHeader("X-User-ID") Long memberId,
 		@PathVariable Long id) {
-		HeaderUtil.validateUserId(id, memberId);
-
 		MemberDto.GetInfoResponse getInfo = memberService.getMemberInfo(id);
 
 		return ResponseEntity.ok(getInfo);
