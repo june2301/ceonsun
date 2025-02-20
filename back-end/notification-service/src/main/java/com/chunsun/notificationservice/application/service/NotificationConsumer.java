@@ -27,8 +27,7 @@ public class NotificationConsumer {
 	@Transactional
 	@KafkaListener(
 		topics = "alarm",
-		groupId = "notification-group",
-		containerFactory = "kafkaListenerContainerFactory"
+		groupId = "notification-group"
 	)
 	public void consumeAlarm(ConsumerRecord<String, NotificationDto.RequestDto> record, Acknowledgment ack) {
 		NotificationDto.RequestDto event = record.value();
