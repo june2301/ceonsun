@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import TopBar from "./TopBar";
 import CardList from "./CardList";
 import { classAPI } from "../api/services/class";
 import { memberAPI } from "../api/services/member";
+import { openviduAPI } from "../api/services/openvidu";
+import useAuthStore from "../stores/authStore";
 import Modal from "./Modal";
 
 function MyStudentList() {
+  const navigate = useNavigate();
+  const { user } = useAuthStore();
   const [selectedTab, setSelectedTab] = useState(0);
   const [expandedStudentIndex, setExpandedStudentIndex] = useState(null);
   const [expandedStudentData, setExpandedStudentData] = useState(null);
@@ -212,9 +217,27 @@ function MyStudentList() {
     });
   };
 
-  const handleClassEnter = (student) => {
-    console.log("수업방 입장:", student);
-    // TODO: 수업방 입장 처리 로직
+  // 수업방 입장 핸들러
+  const handleClassEnter = async (student) => {
+    try {
+      console.log("수업방 입장 요청된 학생 정보:", student);
+      const response = await openviduAPI.createToken(student.id);
+      console.log("수업방 세션 생성 응답:", response.data.token);
+      // const token = new URL(response.data.token).searchParams.get("token");
+      // console.log("토큰 :", token);
+      if (response.status === 201) {
+        navigate("/openvidu", {
+          state: {
+            token: response.data.token,
+            contractedClassId: student.id,
+            nickname: user.nickname,
+          },
+        });
+      }
+    } catch (error) {
+      console.error("수업방 입장 실패:", error);
+      alert("수업방 입장에 실패했습니다. 다시 시도해주세요.");
+    }
   };
 
   // 과외 종료 버튼 클릭 핸들러
