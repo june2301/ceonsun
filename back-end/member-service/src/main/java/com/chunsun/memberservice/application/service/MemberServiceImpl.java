@@ -243,7 +243,6 @@ public class MemberServiceImpl implements MemberService {
 
 	@Override
 	public List<MemberDto.TeacherListItem> getTeachersRank(List<MemberDto.TeacherTupleDto> teachersRank) {
-
 		List<Long> memberIds = teachersRank.stream()
 			.map(dto -> Long.parseLong(dto.value()))
 			.toList();
@@ -256,8 +255,18 @@ public class MemberServiceImpl implements MemberService {
 		return IntStream.range(0, memberIds.size())
 			.mapToObj(i -> {
 				Long id = memberIds.get(i);
+
+				if (!teacherRepository.existsById(id)) {
+					return null;
+				}
+
 				Member member = teacherMap.get(id);
-				Integer age = Period.between(member.getBirthdate(), LocalDate.now()).getYears();
+				if (member == null) {
+					return null;
+				}
+
+				LocalDate birthdate = member.getBirthdate();
+				Integer age = (birthdate != null) ? Period.between(birthdate, LocalDate.now()).getYears() : null;
 
 				List<Category> categories = member.getMemberCategories().stream()
 					.map(MemberCategory::getCategory)
@@ -273,8 +282,10 @@ public class MemberServiceImpl implements MemberService {
 					teachersRank.get(i).score()
 				);
 			})
+			.filter(Objects::nonNull)
 			.collect(Collectors.toList());
 	}
+
 
 	@Override
 	public List<MemberDto.MemberNickNameDto> getUserNicknames(List<Long> memberIds) {
