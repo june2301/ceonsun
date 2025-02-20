@@ -49,14 +49,14 @@ const useWebSocketStore = create(
             stompClient: null,
             ephemeralSubscriptions: [],
           });
-          // 자동 재연결
-          setTimeout(() => {
-            const curToken = useAuthStore.getState().token;
-            if (curToken) {
-              console.log("[webSocketStore] 재연결 시도");
-              get().connect();
-            }
-          }, 5000);
+          // // 자동 재연결
+          // setTimeout(() => {
+          //   const curToken = useAuthStore.getState().token;
+          //   if (curToken) {
+          //     console.log("[webSocketStore] 재연결 시도");
+          //     get().connect();
+          //   }
+          // }, 5000);
         };
 
         const client = Stomp.over(socket);
@@ -101,14 +101,14 @@ const useWebSocketStore = create(
               stompClient: null,
               ephemeralSubscriptions: [],
             });
-            // 재연결
-            setTimeout(() => {
-              const curToken = useAuthStore.getState().token;
-              if (curToken) {
-                console.log("[webSocketStore] 에러 후 재연결 시도");
-                get().connect();
-              }
-            }, 5000);
+            // // 재연결
+            // setTimeout(() => {
+            //   const curToken = useAuthStore.getState().token;
+            //   if (curToken) {
+            //     console.log("[webSocketStore] 에러 후 재연결 시도");
+            //     get().connect();
+            //   }
+            // }, 5000);
           },
         );
       },
