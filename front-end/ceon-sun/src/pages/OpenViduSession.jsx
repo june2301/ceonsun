@@ -143,13 +143,18 @@ const OpenViduSession = () => {
   // 초기화
   // -------------------------
   useEffect(() => {
+    console.log("token 123 123 : ", token);
+    console.log("nickname 123 123 : ", nickname);
     if (!token || !nickname) {
       console.error("필수 정보(token, nickname)가 누락되었습니다.");
       return;
     }
+
     // OpenVidu 초기화
     OV.current = new OpenVidu();
     session.current = OV.current.initSession();
+    console.log("OV.current 123 123 : ", OV.current);
+    console.log("session.current 123 123 : ", session.current);
 
     session.current.on("connectionCreated", (event) => {
       console.log("새로운 연결이 생성되었습니다:", event.connection);
@@ -205,7 +210,7 @@ const OpenViduSession = () => {
     session.current
       .connect(token, { clientData: nickname })
       .then(() => {
-        console.log("오픈비두 접속 후 세션 연결 성공");
+        console.log("4 오픈비두 접속 후 세션 연결 성공");
         // 카메라/오디오 퍼블리셔
         const localPublisher = OV.current.initPublisher(undefined, {
           publishVideo: true,
