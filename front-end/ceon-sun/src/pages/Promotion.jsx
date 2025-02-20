@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { couponAPI } from "../api/services/coupon";
+import promotion from "@/assets/img/promotion.png";
 
 function Promotion() {
   const [coupons, setCoupons] = useState([]);
@@ -47,48 +47,42 @@ function Promotion() {
   }
 
   return (
-    <div className="flex justify-center px-4 py-8">
-      <div className="w-[800px] max-w-full">
-        <h1 className="text-3xl font-bold text-center mb-8">
-          대충 프로모션 페이지
-        </h1>
-
-        {/* 쿠폰 목록 */}
-        <div className="space-y-6">
-          {coupons.map((coupon) => (
-            <div
-              key={coupon.couponId}
-              className="bg-white rounded-lg shadow-md p-6 relative"
+    <div className="min-h-screen h-full overflow-y-auto">
+      <div className="max-w-screen-xl mx-auto px-4">
+        <div className="max-w-[70%] mx-auto text-center relative">
+          <img
+            src={promotion}
+            alt="프로모션 이미지"
+            className="w-full h-auto object-cover rounded-xl border border-gray-300 border-[1px] mt-4"
+          />
+        </div>
+      </div>
+      <div className="flex flex-col items-center gap-10 mt-6 pb-20">
+        {coupons.map((coupon) => (
+          <div key={coupon.couponId} className="relative w-1/3">
+            <p
+              className="text-2xl font-bold text-sky-600 mb-2"
+              style={{ marginLeft: "1.5rem" }}
             >
-              {/* 쿠폰 정보 */}
-              <div className="flex justify-between items-start mb-4">
-                <div>
-                  <h2 className="text-xl font-bold mb-2">{coupon.name}</h2>
-                  <div className="space-y-1 text-gray-600">
-                    <p>
-                      할인율:{" "}
-                      <span className="font-semibold text-blue-600">
-                        {coupon.discountRate}%
-                      </span>
-                    </p>
-                    <p>
-                      남은 수량:{" "}
-                      <span className="font-semibold text-blue-600">
-                        {coupon.remainingQuantity}개
-                      </span>
-                    </p>
-                    <p>
-                      사용 가능 기간:{" "}
-                      <span className="font-semibold text-blue-600">
-                        발급일로부터 {coupon.validDays}일
-                      </span>
-                    </p>
-                  </div>
-                </div>
+              {coupon.name}
+            </p>
 
-                {/* 발급하기 버튼 */}
+            <div className="bg-white rounded-lg shadow-md flex items-center justify-between p-6 border border-sky-300 w-full">
+              <div>
+                <p className="text-2xl font-bold text-sky-500">
+                  {coupon.discountRate}% 할인
+                </p>
+                <p className="text-gray-700 mt-2">
+                  남은 수량:{" "}
+                  <span className="text-sky-600 font-semibold">
+                    {coupon.remainingQuantity}개
+                  </span>
+                </p>
+              </div>
+
+              <div className="flex items-center justify-center">
                 <button
-                  className="px-6 py-2 bg-blue-500 text-white rounded-lg font-bold hover:bg-blue-600 transition-colors"
+                  className="px-4 py-2 bg-gradient-to-r from-sky-500 to-sky-400 text-white text-lg font-bold rounded-lg hover:opacity-90 transition"
                   onClick={() =>
                     handleIssueCoupon(coupon.couponId, coupon.validDays)
                   }
@@ -97,9 +91,10 @@ function Promotion() {
                 </button>
               </div>
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
       </div>
+      <div className="h-20"></div>
     </div>
   );
 }
