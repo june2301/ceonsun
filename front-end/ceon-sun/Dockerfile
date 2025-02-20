@@ -17,12 +17,11 @@ RUN npm run build
 FROM nginx:latest
 
 # 7. Nginx 설정 파일을 복사 (필요시 수정)
-# COPY nginx.conf /etc/nginx/nginx.conf
+COPY nginx.conf /etc/nginx/nginx.conf
 
 # 8. 빌드된 정적 파일을 Nginx의 기본 정적 파일 디렉토리로 복사
-# COPY --from=build /app/dist /usr/share/nginx/html
+COPY --from=build /app/dist /usr/share/nginx/html
 
 # 9. 컨테이너 실행 (기본적으로 Nginx 실행)
-# EXPOSE 80
-EXPOSE 3000
+EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
