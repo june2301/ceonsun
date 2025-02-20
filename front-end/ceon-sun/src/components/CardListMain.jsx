@@ -40,7 +40,7 @@ function CardListMain({
     // teacherCards가 있으면 수강 정보로, studentCards가 있으면 수업 정보로 이동
     navigate("/mypage", {
       state: {
-        selectedMenu: teacherCards.length > 0 ? "수강 정보" : "수업 정보",
+        selectedMenu: teacherCards.length > 0 ? "수강 정보" : "내 학생 목록",
       },
     });
   };

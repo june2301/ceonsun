@@ -1,3 +1,4 @@
+// App.jsx
 import React, { useEffect } from "react";
 import {
   BrowserRouter as Router,
@@ -12,16 +13,17 @@ import Login from "./pages/Login";
 import TeacherDetailPage from "./pages/TeacherDetailPage";
 import CardListPage from "./pages/CardListPage";
 import MyPage from "./pages/MyPage";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Payment from "./pages/Payment";
 import Promotion from "./pages/Promotion";
+import OpenViduSession from "./pages/OpenViduSession";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import useAuthStore from "./stores/authStore";
 import useWebSocketStore from "./stores/websocketStore";
 
 // Header를 조건부로 표시하기 위한 래퍼 컴포넌트
 function AppContent() {
   const location = useLocation();
-  const isAuthPage = ["/", "/signup"].includes(location.pathname);
+  const isAuthPage = ["/", "/signup", "/openvidu"].includes(location.pathname);
 
   return (
     <div className="h-screen overflow-hidden">
@@ -35,6 +37,7 @@ function AppContent() {
         <Route path="/mypage" element={<MyPage />} />
         <Route path="/payment" element={<Payment />} />
         <Route path="/promotion" element={<Promotion />} />
+        <Route path="/openvidu" element={<OpenViduSession />} />
       </Routes>
     </div>
   );
