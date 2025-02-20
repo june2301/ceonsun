@@ -8,10 +8,12 @@ import { chatAPI } from "@/api/services/chat"; // 채팅방 목록 조회
 import { classAPI } from "../api/services/class"; // class API 추가
 import useAuthStore from "../stores/authStore";
 import useWebSocketStore from "../stores/websocketStore";
+import { useNavigate } from "react-router-dom";
+import { openviduAPI } from "../api/services/openvidu";
 
 function MainPage() {
   const {
-    user: { userId, role },
+    user: { userId, role, nickname },
   } = useAuthStore();
 
   const [contractedMembers, setContractedMembers] = useState([]); // 과외 연결된 멤버 리스트
@@ -28,6 +30,8 @@ function MainPage() {
 
   // 이미 구독을 했는지 여부
   const [hasSubscribed, setHasSubscribed] = useState(false);
+
+  const navigate = useNavigate();
 
   // 과외 연결된 멤버 리스트 조회
   useEffect(() => {
@@ -149,6 +153,28 @@ function MainPage() {
     fetchRankingData();
   }, []);
 
+  // 수업방 입장 핸들러 추가
+  const handleClassEnter = async (member) => {
+    try {
+      console.log("수업방 입장 요청:", member);
+      const response = await openviduAPI.createToken(member.id);
+      console.log("수업방 세션 생성 응답:", response.data.token);
+
+      if (response.status === 201) {
+        navigate("/openvidu", {
+          state: {
+            token: response.data.token,
+            contractedClassId: member.id,
+            nickname: nickname,
+          },
+        });
+      }
+    } catch (error) {
+      console.error("수업방 입장 실패:", error);
+      alert("수업방 입장에 실패했습니다. 다시 시도해주세요.");
+    }
+  };
+
   // 렌더링
   return (
     <div className="w-full h-[calc(100vh-96px)] overflow-y-auto custom-scrollbar">
@@ -161,6 +187,7 @@ function MainPage() {
         teacherCards={role === "STUDENT" ? contractedMembers : []}
         studentCards={role === "TEACHER" ? contractedMembers : []}
         onClickMore={() => console.log("목록 전체 이동")}
+        onClassEnter={handleClassEnter}
       />
 
       {/* 구분선 */}

@@ -9,6 +9,7 @@ import useAuthStore from "../stores/authStore";
 import { memberAPI } from "../api/services/member";
 import { classAPI } from "../api/services/class";
 import { useNavigate } from "react-router-dom";
+import { openviduAPI } from "../api/services/openvidu";
 
 function MyLecture({ role }) {
   const [isMyDetailMode, setIsMyDetailMode] = useState(false);
@@ -119,7 +120,8 @@ function MyLecture({ role }) {
       // 상세 정보에 remainLessonsCnt 추가 (getContractedMembers에서 가져온 count 값 사용)
       setSelectedTeacher({
         ...teacherDetail,
-        remainLessonsCnt: card.remainLessonsCnt, // card에서 가져온 count 값
+        id: card.id, // 체결된 수업 ID가 여기서도 보존됨
+        remainLessonsCnt: card.remainLessonsCnt,
         showClassButton: true,
       });
       setTeacherDetailMode(true);
@@ -167,6 +169,27 @@ function MyLecture({ role }) {
     }
   };
 
+  // 수업방 입장 핸들러 추가
+  const handleClassEnter = async (teacher) => {
+    try {
+      const response = await openviduAPI.createToken(teacher.id);
+      console.log("수업방 세션 생성 응답:", response.data.token);
+
+      if (response.status === 201) {
+        navigate("/openvidu", {
+          state: {
+            token: response.data.token,
+            contractedClassId: teacher.id,
+            nickname: user.nickname,
+          },
+        });
+      }
+    } catch (error) {
+      console.error("수업방 입장 실패:", error);
+      alert("수업방 입장에 실패했습니다. 다시 시도해주세요.");
+    }
+  };
+
   // 렌더링 분기
   if (teacherDetailMode) {
     const topBarItems = ["선생님 소개", "수업 설명", "수업 자료"];
@@ -200,6 +223,7 @@ function MyLecture({ role }) {
             teacher={selectedTeacher}
             topBarItems={topBarItems}
             showClassButton={true}
+            onClassEnter={handleClassEnter}
             onBack={handleTeacherDetailClose}
           />
         </div>
@@ -282,6 +306,7 @@ function MyLecture({ role }) {
                     showDetail={true}
                     onDetailClick={handleTeacherDetail}
                     onPaymentClick={handlePaymentClick}
+                    onClassEnter={handleClassEnter}
                   />
                 </div>
               </div>

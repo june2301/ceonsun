@@ -4,7 +4,12 @@ import TeacherInfoA from "./TeacherInfoA";
 import TeacherInfoB from "./TeacherInfoB";
 import TeacherInfoC from "./TeacherInfoC";
 
-function TeacherDetail({ teacher, topBarItems, showClassButton = false }) {
+function TeacherDetail({
+  teacher,
+  topBarItems,
+  showClassButton = false,
+  onClassEnter,
+}) {
   // 기본 탭 배열 (3개 탭)
   const defaultTabs = ["선생님 소개", "수업 설명", "수업 자료"];
   // topBarItems가 전달되면 해당 배열을 사용, 없으면 기본 배열 사용
@@ -61,7 +66,10 @@ function TeacherDetail({ teacher, topBarItems, showClassButton = false }) {
         {mainContent}
         {showClassButton && (
           <div className="flex justify-end p-4">
-            <button className="px-4 py-2 border-2 border-gray-300 bg-white hover:bg-gray-300 font-bold text-gray-700 rounded">
+            <button
+              onClick={() => onClassEnter?.(teacher)}
+              className="px-4 py-2 border-2 border-gray-300 bg-white hover:bg-gray-300 font-bold text-gray-700 rounded"
+            >
               수업방 접속
             </button>
           </div>
