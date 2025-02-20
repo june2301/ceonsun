@@ -1,0 +1,33 @@
+version: "3.8"
+
+services:
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/certbot/conf:/etc/letsencrypt
+      - ./nginx/certbot/www:/var/www/certbot
+
+  certbot:
+    image: certbot/certbot
+    container_name: certbot
+    restart: always
+    entrypoint: >
+      sh -c "if [ ! -f /etc/letsencrypt/live/i12a505.p.ssafy.io/fullchain.pem ]; then
+      openssl req -x509 -nodes -newkey rsa:2048 -days 1 \
+      -keyout /etc/letsencrypt/live/i12a505.p.ssafy.io/privkey.pem \
+      -out /etc/letsencrypt/live/i12a505.p.ssafy.io/fullchain.pem \
+      -subj '/CN=localhost'; fi && tail -f /dev/null"
+    volumes:
+      - ./nginx/certbot/conf:/etc/letsencrypt
+      - ./nginx/certbot/www:/var/www/certbot
+
+networks:
+  default:
+    external:
+      name: back-end_chunsun-network
