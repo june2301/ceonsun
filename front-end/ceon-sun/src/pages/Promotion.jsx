@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import promotion from "@/assets/img/promotion.png";
 
+import { couponAPI } from "../api/services/coupon";
+
 function Promotion() {
   const [coupons, setCoupons] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
