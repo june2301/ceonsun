@@ -10,6 +10,7 @@ function CardListMain({
   teacherCards = [], // 학생이 보는 선생님 카드 데이터
   studentCards = [], // 선생님이 보는 학생 카드 데이터
   onClickMore,
+  onClassEnter,
 }) {
   const navigate = useNavigate();
   const PAGE_SIZE = 2;
@@ -92,9 +93,15 @@ function CardListMain({
             {pageData.map((item, idx) => (
               <div key={idx} className="flex-shrink-0 w-[410px]">
                 {studentCards.length > 0 ? (
-                  <StudentCard {...item} />
+                  <StudentCard
+                    {...item}
+                    onClassEnter={() => onClassEnter?.(item)}
+                  />
                 ) : (
-                  <TeacherCard {...item} />
+                  <TeacherCard
+                    {...item}
+                    onClassEnter={() => onClassEnter?.(item)}
+                  />
                 )}
               </div>
             ))}
