@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { memberAPI } from "../api/services/member";
 import logo from "../assets/img/logo.png"; // 로고 이미지 import
+import loginBg from "../assets/img/login.png"; // 배경 이미지 import
 import useAuthStore from "../stores/authStore";
 
 const KAKAO_AUTH_URL = "https://kauth.kakao.com/oauth/authorize";
@@ -131,8 +132,20 @@ const SignUp = () => {
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-gray-100">
-      <div className="w-[400px] bg-white rounded-lg shadow-md p-8">
+    <div
+      className="min-h-screen w-full flex items-center justify-center bg-gray-100 relative"
+      style={{
+        backgroundImage: `url(${loginBg})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+      }}
+    >
+      {/* 배경 오버레이 */}
+      <div className="absolute inset-0 bg-black bg-opacity-5"></div>
+
+      {/* 회원가입 폼 */}
+      <div className="w-[400px] bg-white rounded-lg shadow-md p-8 relative z-10">
         <div className="flex flex-col items-center mb-6">
           <img src={logo} alt="ChunSun Logo" className="w-[150px]" />
           <p className="text-lg text-gray-700 mt-4 font-bold">추가 정보 입력</p>
