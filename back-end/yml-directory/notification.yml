@@ -9,22 +9,13 @@ spring:
     consumer:
       group-id: notification-group
       auto-offset-reset: earliest
-      properties:
-        spring.json.trusted.packages: "*"
-        max.poll.records: 30
-        retry.backoff.ms: 1000
-        fetch.max.wait.ms: 5000
       enable-auto-commit: false
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
-    producer:
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-      retries: 3
-      delivery.timeout.ms: 3000
-      acks: all
+      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
       properties:
-        spring.json.add.type.headers: false
+        spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JsonDeserializer
+        spring.json.trusted.packages: "*"
+        spring.json.value.default.type: "com.chunsun.notificationservice.application.dto.NotificationDto$RequestDto"
     listener:
       ack-mode: manual_immediate
 

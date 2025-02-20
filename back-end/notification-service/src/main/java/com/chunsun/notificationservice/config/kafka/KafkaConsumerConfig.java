@@ -11,33 +11,30 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
+import org.springframework.kafka.listener.DefaultErrorHandler;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
+import org.springframework.util.backoff.FixedBackOff;
 
 import com.chunsun.notificationservice.application.dto.NotificationDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Configuration
 @EnableKafka
 public class KafkaConsumerConfig {
 
-	@Value("${spring.kafka.bootstrap-servers}")
-	private String bootstrapServers;
-
 	@Bean
-	public ConsumerFactory<String, NotificationDto.RequestDto> consumerFactory() {
-		Map<String, Object> props = new HashMap<>();
-		props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
-		props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-		props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
-
-		JsonDeserializer<NotificationDto.RequestDto> jsonDeserializer =
-			new JsonDeserializer<>(NotificationDto.RequestDto.class, new ObjectMapper());
-
-		return new DefaultKafkaConsumerFactory<>(
-			props,
-			new StringDeserializer(),
-			jsonDeserializer
+	public DefaultErrorHandler kafkaErrorHandler() {
+		DefaultErrorHandler errorHandler = new DefaultErrorHandler(
+			(record, exception) -> {
+				log.error("Kafka 역직렬화 오류 발생! 건너뜀 - 메시지: {}", record, exception);
+			},
+			new FixedBackOff(1000L, 2)
 		);
+
+		return errorHandler;
 	}
 }
 
