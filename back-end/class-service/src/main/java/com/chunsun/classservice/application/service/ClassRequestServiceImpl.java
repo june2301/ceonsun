@@ -83,7 +83,7 @@ public class ClassRequestServiceImpl implements ClassRequestService {
 				.targetUserId(classRequest.getTeacherId().toString())
 				.type("CLASS")
 				.message(String.format("%s 회원님이 %s 회원님에게 과외를 신청하셨습니다.",
-					teacherInfo.nickname(), studentInfo.nickname()))
+					studentInfo.nickname(), teacherInfo.nickname()))
 				.build());
 	}
 
