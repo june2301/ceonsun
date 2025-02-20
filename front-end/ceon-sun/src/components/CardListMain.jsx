@@ -3,6 +3,7 @@ import TeacherCard from "../components/TeacherCard";
 import StudentCard from "../components/StudentCard";
 import { PlayIcon } from "@heroicons/react/24/solid";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
+import { useNavigate } from "react-router-dom";
 
 function CardListMain({
   title = "내 목록",
@@ -10,6 +11,7 @@ function CardListMain({
   studentCards = [], // 선생님이 보는 학생 카드 데이터
   onClickMore,
 }) {
+  const navigate = useNavigate();
   const PAGE_SIZE = 2;
   const [currentPage, setCurrentPage] = useState(0);
 
@@ -33,20 +35,28 @@ function CardListMain({
     }
   };
 
+  // 이동하기 버튼 클릭 핸들러
+  const handleMoreClick = () => {
+    // teacherCards가 있으면 수강 정보로, studentCards가 있으면 수업 정보로 이동
+    navigate("/mypage", {
+      state: {
+        selectedMenu: teacherCards.length > 0 ? "수강 정보" : "내 학생 목록",
+      },
+    });
+  };
+
   return (
     <section className="mb-8 max-w-[920px] mx-auto px-2">
       {/* 제목 + 이동하기 버튼 */}
       <div className="flex items-center mb-3">
         <h2 className="text-lg font-semibold mr-2">{title}</h2>
-        {onClickMore && (
-          <button
-            className="text-sm text-gray-500 hover:text-gray-700 flex items-center"
-            onClick={onClickMore}
-          >
-            이동하기
-            <PlayIcon className="w-3.5 h-3.5 ml-0.5" />
-          </button>
-        )}
+        <button
+          className="text-sm text-gray-500 hover:text-gray-700 flex items-center"
+          onClick={handleMoreClick}
+        >
+          이동하기
+          <PlayIcon className="w-3.5 h-3.5 ml-0.5" />
+        </button>
       </div>
 
       {/* 카드 리스트 + 좌우 버튼 + 하단 인디케이터 */}
