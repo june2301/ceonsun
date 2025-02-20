@@ -173,14 +173,14 @@ function MyLecture({ role }) {
   const handleClassEnter = async (teacher) => {
     try {
       const response = await openviduAPI.createToken(teacher.id);
-      // console.log("수업방 세션 생성 응답:", response.data.token);
-      const token = new URL(response.data.token).searchParams.get("token");
-      console.log("토큰 :", token);
+      console.log("수업방 세션 생성 응답:", response.data.token);
+      // const token = new URL(response.data.token).searchParams.get("token");
+      // console.log("토큰 :", token);
 
       if (response.status === 201) {
         navigate("/openvidu", {
           state: {
-            token: token,
+            token: response.data.token,
             contractedClassId: teacher.id,
             nickname: user.nickname,
           },

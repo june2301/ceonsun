@@ -151,6 +151,10 @@ const OpenViduSession = () => {
     OV.current = new OpenVidu();
     session.current = OV.current.initSession();
 
+    session.current.on("connectionCreated", (event) => {
+      console.log("새로운 연결이 생성되었습니다:", event.connection);
+    });
+
     // --- 1) 원격 스트림 구독 ---
     session.current.on("streamCreated", (event) => {
       const subscriber = session.current.subscribe(
