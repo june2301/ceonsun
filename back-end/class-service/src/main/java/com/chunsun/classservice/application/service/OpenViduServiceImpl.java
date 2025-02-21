@@ -25,10 +25,13 @@ import io.openvidu.java.client.MediaMode;
 import io.openvidu.java.client.OpenVidu;
 import io.openvidu.java.client.OpenViduHttpException;
 import io.openvidu.java.client.OpenViduJavaClientException;
+import io.openvidu.java.client.OpenViduRole;
 import io.openvidu.java.client.Session;
 import io.openvidu.java.client.SessionProperties;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RequiredArgsConstructor
 @Transactional
 @Service
@@ -56,7 +59,12 @@ public class OpenViduServiceImpl implements OpenViduService {
 		updateJoinTime(contractedClass, role);
 
 		final Session session = getOrCreateSession(contractedClassId);
-		return session.createConnection(getConnectionProperties());
+		log.info("Session created: {}", session);
+
+		Connection connection = session.createConnection(getConnectionProperties());
+		log.info("Token issued: {}", connection.getToken());
+
+		return connection;
 	}
 
 	@Override
@@ -124,7 +132,7 @@ public class OpenViduServiceImpl implements OpenViduService {
 
 		Session session = openVidu.getActiveSession(contractedClassId.toString());
 		if (session == null) {
-			SessionProperties properties = SessionProperties.fromJson(null)
+			SessionProperties properties = new SessionProperties.Builder()
 				.customSessionId(contractedClassId.toString())
 				.mediaMode(MediaMode.ROUTED)
 				.build();
@@ -133,7 +141,9 @@ public class OpenViduServiceImpl implements OpenViduService {
 		return session;
 	}
 
-	private static ConnectionProperties getConnectionProperties() {
-		return ConnectionProperties.fromJson(null).build();
+	private ConnectionProperties getConnectionProperties() {
+		return new ConnectionProperties.Builder()
+			.role(OpenViduRole.PUBLISHER)
+			.build();
 	}
 }

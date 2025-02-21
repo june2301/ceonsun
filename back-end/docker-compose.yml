@@ -45,24 +45,6 @@ services:
       timeout: 5s
       retries: 5
 
-  openvidu:
-    image: openvidu/openvidu-dev:2.31.0
-    container_name: openvidu
-    restart: always
-    env_file:
-      - .env
-    environment:
-      OPENVIDU_SECRET: "${OPENVIDU_SECRET}"
-    ports:
-      - "4443:4443"
-    networks:
-      - chunsun-network
-    healthcheck:
-      test: [ "CMD-SHELL", "curl -f http://localhost:4443 || exit 1" ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-
   auth-redis:
     image: redis:7.0
     container_name: auth-redis-db
@@ -100,7 +82,7 @@ services:
       context: ./config-service
       dockerfile: Dockerfile
     ports:
-      - "8888:8888"
+      - "8889:8889"
     env_file:
       - .env
     environment:
@@ -114,7 +96,7 @@ services:
       rabbitmq:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "curl -f -u ${CONFIG_USER}:${CONFIG_PASSWORD} http://localhost:8888/actuator/health || exit 1"]
+      test: ["CMD-SHELL", "curl -f -u ${CONFIG_USER}:${CONFIG_PASSWORD} http://localhost:8889/actuator/health || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -338,6 +320,8 @@ services:
     environment:
       spring.cloud.config.username: "${CONFIG_USER}"
       spring.cloud.config.password: "${CONFIG_PASSWORD}"
+      OPENVIDU_SECRET: "${OPENVIDU_SECRET}"
+      OPENVIDU_URL: "${OPENVIDU_URL}"
     networks:
       - chunsun-network
     depends_on:

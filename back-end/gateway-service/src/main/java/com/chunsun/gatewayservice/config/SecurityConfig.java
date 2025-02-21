@@ -102,7 +102,7 @@ public class SecurityConfig {
 				.hasAnyRole(Role.TEACHER, Role.ADMIN)
 
 				.pathMatchers(HttpMethod.POST, "/class-service/class-requests")
-				.hasAnyRole(Role.STUDENT, Role.ADMIN)
+				.hasAnyRole(Role.USER)
 
 				.pathMatchers(HttpMethod.POST, "/class-service/class-requests/response", "/class-service/class/status/*")
 				.hasAnyRole(Role.TEACHER, Role.ADMIN)

@@ -194,6 +194,7 @@ public class RankingServiceImpl implements RankingService {
 
 				long previousScore = (teacherScore.getTotalScore() != null) ? teacherScore.getTotalScore() : 0L;
 				long newTotalScore = Math.round(totalPoints - (previousScore * 0.5));
+				if(newTotalScore < 0) newTotalScore = 0;
 
 				teacherScore.setTotalScore(newTotalScore);
 				rankingDataList.add(teacherScore);
