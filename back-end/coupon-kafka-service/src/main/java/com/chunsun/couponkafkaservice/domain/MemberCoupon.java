@@ -53,4 +53,11 @@ public class MemberCoupon extends BaseEntity {
 	public void changeStatus(CouponStatus status) {
 		this.status = status;
 	}
+
+	public MemberCoupon(Coupon coupon, Long memberId, LocalDateTime expiryDate){
+		this.coupon = coupon;
+		this.memberId = memberId;
+		this.status = CouponStatus.UNUSED;
+		this.expiryDate = expiryDate;
+	}
 }

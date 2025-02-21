@@ -11,4 +11,6 @@ public interface CouponService {
 	SearchCouponsServiceResponse searchCoupons(final Long memberId);
 
 	void updateCouponStatus(final UpdateCouponStatusServiceRequest request);
+
+	void test(Long memberId);
 }

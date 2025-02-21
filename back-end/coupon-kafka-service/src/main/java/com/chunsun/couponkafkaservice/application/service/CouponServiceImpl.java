@@ -5,6 +5,7 @@ import static com.chunsun.couponkafkaservice.application.convert.CouponConverter
 import static com.chunsun.couponkafkaservice.application.dto.ServiceDto.*;
 import static com.chunsun.couponkafkaservice.common.error.CouponKafkaErrorCodes.INVALID_COUPON_DELETE_REQUEST;
 import static com.chunsun.couponkafkaservice.common.error.CouponKafkaErrorCodes.INVALID_COUPON_STATUS_UPDATE_REQUEST;
+import static com.chunsun.couponkafkaservice.common.error.CouponKafkaErrorCodes.INVALID_REQUEST;
 import static com.chunsun.couponkafkaservice.domain.CouponStatus.*;
 
 import java.time.LocalDateTime;
@@ -77,5 +78,23 @@ public class CouponServiceImpl implements CouponService {
 		final MemberCoupon memberCoupon = memberCouponRepository.findByMemberIdAndCoupon_Id(request.memberId(),
 			request.couponId()).orElseThrow(() -> new BusinessException(INVALID_COUPON_STATUS_UPDATE_REQUEST));
 		memberCoupon.changeStatus(USED);
+	}
+
+	@Transactional
+	@Override
+	public void test(Long memberId) {
+		Coupon coupon = couponRepository.findByIdWithLock(1L).orElseThrow(() -> new BusinessException(INVALID_REQUEST));
+		if (coupon.getRemainingQuantity() < 1L) {
+			throw new BusinessException(INVALID_REQUEST);
+		}
+
+		memberCouponRepository.findByMemberIdAndCoupon_Id(memberId, coupon.getId())
+			.ifPresent(mc -> {
+				throw new BusinessException(INVALID_REQUEST); // 중복 저장 방지
+			});
+
+		MemberCoupon memberCoupon = new MemberCoupon(coupon, memberId, coupon.getExpiryDate());
+		memberCouponRepository.save(memberCoupon);
+		coupon.decreaseRemainingQuantity();
 	}
 }

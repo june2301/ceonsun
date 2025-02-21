@@ -50,4 +50,8 @@ public class Coupon extends BaseEntity {
 		this.remainingQuantity = totalQuantity;
 		this.expiryDate = LocalDateTime.now().plusDays(validDays);
 	}
+
+	public void decreaseRemainingQuantity() {
+		this.remainingQuantity--;
+	}
 }
